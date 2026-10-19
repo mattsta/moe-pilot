@@ -171,6 +171,10 @@ def collect(
     targets = {target.name: target for target in load_catalog(catalog)}
     if not names or set(names) - set(targets):
         raise ValueError("Unknown model targets")
+    if tuple(config.analysis.layers or ()) != (PLAN["layer"],) or any(
+        targets[name].layers != (PLAN["layer"],) for name in names
+    ):
+        raise ValueError("This frozen study requires exactly its declared layer-7 observation")
     if config.execution.device == "cpu":
         raise ValueError(
             "Research collection requires an accelerator; CPU model comparison is disabled"
