@@ -57,9 +57,18 @@ class Paths:
 @dataclass(frozen=True)
 class Execution:
     device: str = "auto"
-    threads: int = 8
+    weight_cache: str = "stream"
+    threads: int = 2
     max_tokens: int = 64
-    condition_group: int = 10
+    condition_group: int = 1
+    microbatch_documents: int = 4
+    max_memory_gib: int = 8
+    reserve_memory_gib: int = 16
+
+    def resource_policy(self):
+        from moe_pilot.resources import ResourcePolicy
+
+        return ResourcePolicy(self.max_memory_gib, self.reserve_memory_gib)
 
 
 @dataclass(frozen=True)
@@ -205,12 +214,14 @@ class Experiment:
         from moe_pilot.devices import validate_device_name
 
         validate_device_name(self.execution.device)
+        if self.execution.weight_cache not in ("stream", "resident"):
+            raise ValueError("execution.weight_cache must be stream or resident")
         for source in self.study.sources:
             if source.path == self.paths.output or source.path.is_relative_to(self.paths.output):
                 raise ValueError("Study source data must be outside the experiment output")
         for section in ("execution", "analysis", "ablations", "corpora"):
             for name, value in asdict(getattr(self, section)).items():
-                if name == "device":
+                if name in ("device", "weight_cache"):
                     continue
                 if name in ("layers", "expert_counts"):
                     if not isinstance(value, tuple):
@@ -222,7 +233,11 @@ class Experiment:
                     if name == "expert_counts" and not value:
                         raise ValueError("ablations.expert_counts cannot be empty")
                 else:
-                    _integer(value, f"{section}.{name}", 0 if name == "seed" else 1)
+                    _integer(
+                        value,
+                        f"{section}.{name}",
+                        0 if name in ("seed", "microbatch_documents") else 1,
+                    )
         _integer(self.execution.max_tokens, "execution.max_tokens", 2)
         if not isinstance(self.model.repository, str) or not self.model.repository:
             raise ValueError("model.repository must be a nonempty string")

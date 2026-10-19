@@ -212,3 +212,63 @@ def test_checkpoint_without_provenance_is_rejected(local_model, tmp_path):
     np.save(directory / "losses/base.npy", [0.0])
     with pytest.raises(ValueError, match="provenance"):
         engine.run_ckpt(engine.batch([[2, 3]], 4), {}, directory)
+
+
+def test_resident_weights_preserve_outputs_and_avoid_repeated_weight_reads(
+    local_model, monkeypatch
+):
+    _, streaming = local_model
+    resident = Engine(streaming.store.directory, device="cpu", weight_cache="resident")
+    batch = resident.batch([[2, 3, 4, 5], [6, 7, 8]], 32)
+    conditions = {"remove": Intervention({0: [0]}, "remove")}
+    expected = streaming.run(batch, conditions, verbose=False)[0]
+    first = resident.run(batch, conditions, verbose=False)[0]
+    assert resident.resident_weight_bytes > 0
+    original = resident.store.get
+
+    def repeated(name):
+        if name != "model.embed_tokens.weight":
+            pytest.fail(f"Resident execution read an already cached weight: {name}")
+        return original(name)
+
+    monkeypatch.setattr(resident.store, "get", repeated)
+    second = resident.run(batch, conditions, verbose=False)[0]
+    for name in expected:
+        np.testing.assert_array_equal(first[name], expected[name])
+        np.testing.assert_array_equal(second[name], expected[name])
+
+
+def test_padding_uses_actual_length_without_changing_token_limit_semantics(local_model):
+    _, engine = local_model
+    ids = [[2, 3, 4], [5, 6]]
+    short, long = engine.batch(ids, 3), engine.batch(ids, 128)
+    assert long.T == short.T == 3
+    assert long.limit == 128
+    first = engine.run(short, {}, verbose=False)[0]
+    second = engine.run(long, {}, verbose=False)[0]
+    np.testing.assert_array_equal(first["base"], second["base"])
+    with pytest.raises(ValueError, match="context window"):
+        engine.run(engine.batch(ids, 129), {}, verbose=False)
+
+
+def test_cached_engine_rejects_model_config_mutation(local_model):
+    _, engine = local_model
+    resident = Engine(engine.store.directory, device="cpu", weight_cache="resident")
+    batch = engine.batch([[2, 3, 4]], 4)
+    resident.run(batch, {}, verbose=False)
+    path = engine.store.directory / "config.json"
+    config = json.loads(path.read_text())
+    config["rms_norm_eps"] *= 2
+    path.write_text(json.dumps(config))
+    with pytest.raises(ValueError, match="inputs changed"):
+        resident.run(batch, {}, verbose=False)
+
+
+def test_checkpoint_identity_includes_weight_cache_policy(local_model, tmp_path):
+    _, engine = local_model
+    batch = engine.batch([[2, 3, 4]], 4)
+    directory = tmp_path / "checkpoint"
+    engine.run_ckpt(batch, {}, directory, verbose=False)
+    resident = Engine(engine.store.directory, device="cpu", weight_cache="resident")
+    with pytest.raises(ValueError, match="inputs changed"):
+        resident.run_ckpt(batch, {}, directory, verbose=False)

@@ -14,7 +14,12 @@ def run(config: Experiment, *, device=None):
     paths = config.paths
     paths.prepare_outputs()
     corpus = load_corpus(paths.data / "corpus.json")
-    engine = Engine(paths.model, device=device or config.execution.device)
+    engine = Engine(
+        paths.model,
+        device=device or config.execution.device,
+        weight_cache=config.execution.weight_cache,
+        resources=config.execution.resource_policy(),
+    )
     batch = engine.batch(
         [engine.tok(c["text"]).input_ids for c in corpus], config.execution.max_tokens
     )

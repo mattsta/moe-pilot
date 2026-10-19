@@ -12,9 +12,12 @@ revision = ""
 
 [execution]
 device = "auto"
-threads = 8
+threads = 2
 max_tokens = 64
-condition_group = 10
+condition_group = 1
+weight_cache = "stream"
+max_memory_gib = 8
+reserve_memory_gib = 16
 
 [analysis]
 seed = 0

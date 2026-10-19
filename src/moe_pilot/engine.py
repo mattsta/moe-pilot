@@ -6,7 +6,7 @@ not tokenize or download data. All inference runs without autograd.
 
 import hashlib
 import json
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from importlib.metadata import version
 from numbers import Integral
 from pathlib import Path
@@ -21,6 +21,7 @@ from moe_pilot.checkpoints import Checkpoints
 from moe_pilot.devices import DeviceSelection, resolve_device, to_numpy
 from moe_pilot.model import ModelStore, rope_theta
 from moe_pilot.perturbations import Intervention
+from moe_pilot.resources import ResourcePolicy, bounded_inference
 
 
 @dataclass
@@ -29,10 +30,12 @@ class Batch:
 
     ids: list[list[int]]
     T: int
+    limit: int = field(init=False)
 
     def __post_init__(self):
         if type(self.T) is not int or self.T < 2:
             raise ValueError("max_tokens must be at least 2 for next-token evaluation")
+        self.limit = self.T
         self.ids = [list(document[: self.T]) for document in self.ids]
         if not self.ids or any(len(document) < 2 for document in self.ids):
             raise ValueError("Each batch must contain documents with at least two tokens")
@@ -43,6 +46,7 @@ class Batch:
         ):
             raise ValueError("Token IDs must be integers")
         self.lens = np.array([len(document) for document in self.ids])
+        self.T = int(self.lens.max())
         self.N = int(self.lens.sum())
         self.tok = torch.tensor(np.concatenate(self.ids), dtype=torch.long, device="cpu")
         if (self.tok < 0).any():
@@ -60,10 +64,19 @@ class Engine:
     caller; constructing this library object does not change process settings.
     """
 
-    def __init__(self, model_dir, *, device="auto"):
+    def __init__(self, model_dir, *, device="auto", weight_cache="stream", resources=None):
+        if weight_cache not in ("stream", "resident"):
+            raise ValueError("weight_cache must be stream or resident")
         self.store = ModelStore(model_dir)
+        self._model_identity = self.store.fingerprint()
+        self.weight_cache = weight_cache
+        self._weights = {}
+        self._tensor_sizes = None
+        self.resources = resources or ResourcePolicy()
+        self.resources.check()
         self.selection = device if isinstance(device, DeviceSelection) else resolve_device(device)
         self.device = self.selection.device
+        self.resources.limit_device(self.device)
         self.cfg = self.store.config
         cfg = self.cfg
         if cfg.model_type != "olmoe":
@@ -94,17 +107,26 @@ class Engine:
         return Batch(ids, max_tokens)
 
     def get(self, name):
-        return self.store.get(name).to(self.device)
+        if self.weight_cache == "stream":
+            return self.store.get(name).to(self.device)
+        if name not in self._weights:
+            self._weights[name] = self.store.get(name).to(self.device)
+        return self._weights[name]
+
+    @property
+    def resident_weight_bytes(self):
+        return sum(tensor.numel() * tensor.element_size() for tensor in self._weights.values())
 
     def _embed(self, batch):
         # Select token rows while staging from disk; do not upload an entire
         # embedding table just to retain a small corpus's hidden states.
-        return self.store.get("model.embed_tokens.weight")[batch.tok].to(self.device)
+        return self.store.embedding_rows(batch.tok).to(self.device)
 
     def rms(self, x, weight):
         return x * torch.rsqrt(x.pow(2).mean(-1, keepdim=True) + self.cfg.rms_norm_eps) * weight
 
     def load_layer(self, layer):
+        self.resources.check()
         prefix = f"model.layers.{layer}."
         weights = {
             name: self.get(prefix + name)
@@ -241,8 +263,8 @@ class Engine:
             log.append(
                 (
                     to_numpy(top_indices).astype(np.int32),
-                    to_numpy(top_weights).astype(np.float16),
-                    to_numpy(probabilities).astype(np.float16),
+                    to_numpy(top_weights).astype(np.float32),
+                    to_numpy(probabilities).astype(np.float32),
                 )
             )
         return hidden + output
@@ -255,19 +277,21 @@ class Engine:
             self.device
         )
         losses = torch.zeros(batch.N, device=self.device, dtype=hidden.dtype)
-        for start in range(0, batch.N, 2048):
-            losses[start : start + 2048] = F.cross_entropy(
-                normalized[start : start + 2048] @ head.T,
-                targets[start : start + 2048],
+        for start in range(0, batch.N, 256):
+            losses[start : start + 256] = F.cross_entropy(
+                normalized[start : start + 256] @ head.T,
+                targets[start : start + 256],
                 reduction="none",
                 ignore_index=-100,
             )
         return to_numpy(losses), to_numpy(targets != -100)
 
     def _validate(self, batch, conditions, group):
+        if self.store.fingerprint() != self._model_identity:
+            raise ValueError("Model inputs changed after Engine construction; create a new engine")
         if group < 1:
             raise ValueError("group must be positive")
-        if self.cfg.max_position_embeddings < batch.T:
+        if self.cfg.max_position_embeddings < batch.limit:
             raise ValueError("max_tokens exceeds the model context window")
         if batch.tok.max() >= self.cfg.vocab_size:
             raise ValueError("Token ID exceeds the model vocabulary")
@@ -284,13 +308,46 @@ class Engine:
             if not isinstance(condition, Intervention):
                 raise ValueError("Conditions must contain explicit Intervention objects")
             condition.validate(self.L, self.E, self.K)
+        self.resources.check(self.estimate_memory(batch, conditions, group))
 
+    def estimate_memory(self, batch, conditions, group):
+        """Conservative weights, host staging, live activations, and routing allowance."""
+        if self._tensor_sizes is None:
+            self._tensor_sizes = {
+                name: self.store.tensor_bytes(name) for name in self.store.weight_map
+            }
+        sizes = self._tensor_sizes
+        if self.weight_cache == "resident":
+            weights = sum(
+                size for name, size in sizes.items() if name != "model.embed_tokens.weight"
+            )
+        else:
+            weights = (
+                max(
+                    sum(
+                        size
+                        for name, size in sizes.items()
+                        if name.startswith(f"model.layers.{layer}.")
+                    )
+                    for layer in range(self.L)
+                )
+                + sizes["lm_head.weight"]
+                + sizes["model.norm.weight"]
+            )
+        starts = len({min(c.mask) for c in conditions.values() if c})
+        states = batch.N * self.H * 4 * (16 + starts + min(group, len(conditions)))
+        attention = len(batch.ids) * batch.T * self.H * 4 * 12
+        logits = min(batch.N, 256) * self.cfg.vocab_size * 4 * 3
+        routing = batch.N * self.L * (self.E + 2 * self.K) * 8
+        return weights * 2 + states + attention + logits + routing
+
+    @bounded_inference
     @torch.inference_mode()
     def run(
         self,
         batch,
         conditions,
-        group=12,
+        group=1,
         log_routing=False,
         verbose=True,
         on_layer=None,
@@ -366,13 +423,14 @@ class Engine:
             del weights
         return hidden
 
+    @bounded_inference
     @torch.inference_mode()
     def run_ckpt(
         self,
         batch,
         conditions,
         outdir,
-        group=10,
+        group=1,
         on_done=None,
         verbose=True,
         record_diagnostics=False,
@@ -389,7 +447,8 @@ class Engine:
                 {
                     "model": self.store.fingerprint(),
                     "tokens": batch.ids,
-                    "max_tokens": batch.T,
+                    "max_tokens": batch.limit,
+                    "padding_width": batch.T,
                     "implementation": {
                         name: hashlib.sha256(
                             Path(__file__).with_name(name).read_bytes()
@@ -400,6 +459,7 @@ class Engine:
                             "checkpoints.py",
                             "devices.py",
                             "perturbations.py",
+                            "resources.py",
                         )
                     },
                     "dependencies": {
@@ -410,6 +470,7 @@ class Engine:
                         "device": self.selection.identity(),
                         "threads": torch.get_num_threads(),
                         "matmul_precision": torch.get_float32_matmul_precision(),
+                        "weight_cache": self.weight_cache,
                     },
                 },
                 sort_keys=True,

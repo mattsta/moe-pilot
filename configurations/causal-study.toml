@@ -3,7 +3,7 @@ schema_version = 1
 [paths]
 model = "../models/olmoe-0924"
 data = "../data/causal-study"
-output = "../runs/causal-study-0924"
+output = "../runs/causal-study"
 
 [model]
 repository = "allenai/OLMoE-1B-7B-0924"
@@ -11,9 +11,13 @@ revision = "6d84c48581ece794365f2b8e9cfb043c68ade9c5"
 
 [execution]
 device = "auto"
-threads = 8
+weight_cache = "stream"
+threads = 2
+max_memory_gib = 8
+reserve_memory_gib = 16
 max_tokens = 1024
-condition_group = 4
+condition_group = 1
+microbatch_documents = 4
 
 [analysis]
 seed = 20261019

@@ -17,7 +17,12 @@ def run(config, *, device=None):
         raise ValueError("Held-out texts overlap the analysis corpus")
     if set(definition.domains) != {r["domain"] for r in heldout}:
         raise ValueError("Held-out domains must match the analysis domains")
-    engine = Engine(paths.model, device=device or config.execution.device)
+    engine = Engine(
+        paths.model,
+        device=device or config.execution.device,
+        weight_cache=config.execution.weight_cache,
+        resources=config.execution.resource_policy(),
+    )
     if (definition.layers, definition.experts, definition.top_k) != (engine.L, engine.E, engine.K):
         raise ValueError("Condition dimensions differ from the configured model")
     batch = engine.batch(

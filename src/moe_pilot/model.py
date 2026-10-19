@@ -2,6 +2,7 @@
 
 import hashlib
 import json
+import math
 from pathlib import Path
 
 from safetensors import safe_open
@@ -48,6 +49,18 @@ class ModelStore:
             self._handles[filename] = safe_open(self.directory / filename, framework="pt")
         return self._handles[filename].get_tensor(name).float()
 
+    def tensor_bytes(self, name):
+        """Float32 allocation size from safetensors metadata, without loading values."""
+        filename = self.weight_map[name]
+        with safe_open(self.directory / filename, framework="pt") as handle:
+            return math.prod(handle.get_slice(name).get_shape()) * 4
+
+    def embedding_rows(self, token_ids):
+        """Convert only requested rows, rather than the full embedding table."""
+        filename = self.weight_map["model.embed_tokens.weight"]
+        with safe_open(self.directory / filename, framework="pt") as handle:
+            return handle.get_tensor("model.embed_tokens.weight")[token_ids].float()
+
     def fingerprint(self):
         """Fingerprint config and shard identity without hashing multi-GB weights.
 
@@ -59,5 +72,12 @@ class ModelStore:
             path = self.directory / filename
             stat = path.stat()
             shards.append((str(path), stat.st_size, stat.st_mtime_ns))
-        value = {"config": self.config.to_dict(), "weights": self.weight_map, "shards": shards}
+        value = {
+            "config": self.config.to_dict(),
+            "config_sha256": hashlib.sha256(
+                (self.directory / "config.json").read_bytes()
+            ).hexdigest(),
+            "weights": self.weight_map,
+            "shards": shards,
+        }
         return hashlib.sha256(json.dumps(value, sort_keys=True).encode()).hexdigest()

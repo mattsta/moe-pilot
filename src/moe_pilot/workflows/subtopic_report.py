@@ -23,7 +23,12 @@ def run(config, *, device=None):
     OUT.mkdir(parents=True, exist_ok=True)
     figures.mkdir(parents=True, exist_ok=True)
     C = load_corpus(paths.data / "subtopic_corpus.json", subtopics=True)
-    M = Engine(paths.model, device=device or config.execution.device)
+    M = Engine(
+        paths.model,
+        device=device or config.execution.device,
+        weight_cache=config.execution.weight_cache,
+        resources=config.execution.resource_policy(),
+    )
     ids = [M.tok(x["text"]).input_ids for x in C]
     B = M.batch(ids, config.execution.max_tokens)
     res, valid, rl = M.run(B, {}, log_routing=True)
