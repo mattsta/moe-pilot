@@ -34,9 +34,14 @@ def parser():
     )
     publication.add_argument("--output", type=Path, required=True)
     commands.add_parser("inventory", help="Read configured input and output availability")
-    verification = commands.add_parser("verify-model", help="Full-depth local CPU reference parity")
+    verification = commands.add_parser(
+        "verify-model", help="Explicit, memory-budgeted model parity"
+    )
     verification.add_argument("--documents", type=int, default=5)
     verification.add_argument("--max-tokens", type=int)
+    verification.add_argument(
+        "--partition", choices=("corpus", "discovery", "calibration"), default="corpus"
+    )
     verification.add_argument("--output", type=Path, required=True)
     smoke = commands.add_parser("smoke", help="Offline tiny-model numerical verification")
     smoke.add_argument("--output", type=Path, help="Optional JSON report destination")
@@ -50,12 +55,21 @@ def parser():
     benchmark = commands.add_parser("benchmark", help="Compare synchronized engine performance")
     benchmark.add_argument("--model", type=Path, help="Local model; omit for synthetic weights")
     benchmark.add_argument("--profile", choices=("tiny", "medium"), default="medium")
-    benchmark.add_argument("--devices", nargs="+", default=["cpu", "auto"])
-    benchmark.add_argument("--documents", type=int, nargs="+", default=[1, 16])
+    benchmark.add_argument("--devices", nargs="+", default=["auto"])
+    benchmark.add_argument("--documents", type=int, nargs="+", default=[1])
     benchmark.add_argument("--max-tokens", type=int, default=64)
-    benchmark.add_argument("--warmup", type=int, default=2)
-    benchmark.add_argument("--repeats", type=int, default=5)
-    benchmark.add_argument("--threads", type=int, default=8)
+    benchmark.add_argument("--warmup", type=int, default=1)
+    benchmark.add_argument("--repeats", type=int, default=3)
+    benchmark.add_argument("--threads", type=int, default=2)
+    benchmark.add_argument("--max-memory-gib", type=int, default=8)
+    benchmark.add_argument("--reserve-memory-gib", type=int, default=16)
+    benchmark.add_argument("--weight-cache", choices=("stream", "resident"), default="stream")
+    benchmark.add_argument(
+        "--workloads",
+        nargs="+",
+        choices=("baseline", "routing_geometry", "ablations"),
+        default=["baseline"],
+    )
     benchmark.add_argument("--output", type=Path, required=True, help="JSON measurement record")
     return result
 
@@ -77,6 +91,7 @@ def main(argv=None):
             return 0
         if arguments.command == "benchmark":
             from moe_pilot.benchmark import benchmark_engine
+            from moe_pilot.resources import ResourcePolicy
 
             report = benchmark_engine(
                 arguments.model,
@@ -88,6 +103,9 @@ def main(argv=None):
                 repeats=arguments.repeats,
                 threads=arguments.threads,
                 output=arguments.output,
+                weight_cache=arguments.weight_cache,
+                workloads=arguments.workloads,
+                resources=ResourcePolicy(arguments.max_memory_gib, arguments.reserve_memory_gib),
             )
             print("workload documents backend median_seconds speedup_vs_cpu")
             for row in report["results"]:
@@ -149,7 +167,12 @@ def main(argv=None):
 
             if arguments.documents < 1:
                 raise ValueError("documents must be positive")
-            corpus = load_corpus(config.paths.data / "corpus.json")
+            if arguments.partition == "corpus":
+                corpus = load_corpus(config.paths.data / "corpus.json")
+            else:
+                from moe_pilot.study_data import load_study_split
+
+                corpus = load_study_split(config, arguments.partition)
             # First represent each available domain, then add remaining rows.
             chosen, seen = [], set()
             for index, record in enumerate(corpus):
@@ -157,7 +180,11 @@ def main(argv=None):
                     chosen.append(index)
                     seen.add(record["domain"])
             chosen.extend(index for index in range(len(corpus)) if index not in chosen)
-            engine = Engine(config.paths.model, device=config.execution.device)
+            engine = Engine(
+                config.paths.model,
+                device=config.execution.device,
+                resources=config.execution.resource_policy(),
+            )
             report = verify_local_model(
                 config.paths.model,
                 [
@@ -170,6 +197,8 @@ def main(argv=None):
                     else arguments.max_tokens
                 ),
                 device=engine.selection,
+                weight_cache=config.execution.weight_cache,
+                resources=config.execution.resource_policy(),
                 output=arguments.output,
             )
             print(f"Full-depth parity passed; max loss error {report['max_loss_error']:.3g}")

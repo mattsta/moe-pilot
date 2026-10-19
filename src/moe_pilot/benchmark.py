@@ -1,5 +1,6 @@
 """Repeatable synchronized engine timings, independent of scientific results."""
 
+import gc
 import hashlib
 import os
 import platform
@@ -18,6 +19,7 @@ from moe_pilot.devices import resolve_device, synchronize
 from moe_pilot.engine import Engine
 from moe_pilot.perturbations import Intervention
 from moe_pilot.probes import OrthogonalityProbe
+from moe_pilot.resources import ResourcePolicy, bounded_inference
 from moe_pilot.smoke import synthetic_model, tiny_model
 
 WORKLOADS = ("baseline", "routing_geometry", "ablations")
@@ -50,60 +52,71 @@ def _check(actual, expected):
     return max(errors)
 
 
-def _measure(model_dir, *, devices, document_counts, max_tokens, warmup, repeats, threads, profile):
-    reference_engine = Engine(model_dir, device="cpu")
-    if max_tokens > reference_engine.cfg.max_position_embeddings:
-        raise ValueError("max_tokens exceeds the model context window")
-    if reference_engine.E <= reference_engine.K:
-        raise ValueError("Benchmark ablations require at least one maskable expert")
-    engines = {}
+def _measure(
+    model_dir,
+    *,
+    devices,
+    document_counts,
+    max_tokens,
+    warmup,
+    repeats,
+    threads,
+    profile,
+    weight_cache,
+    workloads,
+    resources,
+):
+    selections = {}
     for requested in devices:
         selection = resolve_device(requested)
         key = f"{selection.backend}:{selection.device}"
-        if key not in engines:
-            engines[key] = Engine(model_dir, device=selection)
-    rows = []
-    for count in document_counts:
-        rng = np.random.default_rng(17)
-        ids = rng.integers(2, reference_engine.cfg.vocab_size, size=(count, max_tokens)).tolist()
-        batch = reference_engine.batch(ids, max_tokens)
-        for workload in WORKLOADS:
-            expected = _run(reference_engine, batch, workload)
-            samples = {key: [] for key in engines}
-            errors = dict.fromkeys(engines, 0.0)
-            for engine in engines.values():
+        selections[key] = selection
+    rows, references = [], {}
+    model = None
+    # Only one model cache exists at a time. CPU runs require an explicit request
+    # (or actual automatic fallback on a machine without a compliant accelerator).
+    for selection in selections.values():
+        engine = Engine(model_dir, device=selection, weight_cache=weight_cache, resources=resources)
+        if max_tokens > engine.cfg.max_position_embeddings:
+            raise ValueError("max_tokens exceeds the model context window")
+        if "ablations" in workloads and engine.E <= engine.K:
+            raise ValueError("Benchmark ablations require at least one maskable expert")
+        if model is None:
+            model = {
+                "synthetic_profile": profile,
+                "config": engine.cfg.to_dict(),
+                "local_fingerprint": engine.store.fingerprint(),
+                "weight_bytes": sum(
+                    (Path(model_dir) / name).stat().st_size
+                    for name in set(engine.store.weight_map.values())
+                ),
+            }
+        for count in document_counts:
+            rng = np.random.default_rng(17)
+            ids = rng.integers(2, engine.cfg.vocab_size, size=(count, max_tokens)).tolist()
+            batch = engine.batch(ids, max_tokens)
+            for workload in workloads:
+                case = (count, workload)
+                elapsed, error = [], 0.0
                 for _ in range(warmup):
-                    _check(_run(engine, batch, workload), expected)
-                synchronize(engine.device)
-            # Alternate backend order to reduce systematic drift during a run.
-            for iteration in range(repeats):
-                order = list(engines.items())
-                if iteration % 2:
-                    order.reverse()
-                for key, engine in order:
+                    actual = _run(engine, batch, workload)
+                    if case not in references:
+                        references[case] = actual
+                    error = max(error, _check(actual, references[case]))
+                for _ in range(repeats):
                     synchronize(engine.device)
                     start = perf_counter()
                     actual = _run(engine, batch, workload)
                     synchronize(engine.device)
-                    samples[key].append(perf_counter() - start)
-                    errors[key] = max(errors[key], _check(actual, expected))
-            cpu_median = next(
-                (
-                    statistics.median(samples[key])
-                    for key, engine in engines.items()
-                    if engine.selection.backend == "cpu"
-                ),
-                None,
-            )
-            for key, engine in engines.items():
-                elapsed = samples[key]
+                    elapsed.append(perf_counter() - start)
+                    error = max(error, _check(actual, references[case]))
                 median = statistics.median(elapsed)
                 rows.append(
                     {
                         "workload": workload,
                         "documents": count,
                         "input_tokens": batch.N,
-                        "valid_targets": int(expected[1].sum()),
+                        "valid_targets": int(references[case][1].sum()),
                         "backend": engine.selection.backend,
                         "device": str(engine.device),
                         "seconds": elapsed,
@@ -111,16 +124,36 @@ def _measure(model_dir, *, devices, document_counts, max_tokens, warmup, repeats
                         "min_seconds": min(elapsed),
                         "max_seconds": max(elapsed),
                         "input_tokens_per_second": batch.N / median,
-                        "speedup_vs_cpu": cpu_median / median if cpu_median else None,
-                        "max_loss_error_vs_cpu": errors[key],
+                        "max_loss_error_vs_reference": error,
+                        "resident_weight_bytes": engine.resident_weight_bytes,
                     }
                 )
+        device = engine.device
+        del engine
+        gc.collect()
+        if device.type == "mps":
+            torch.mps.empty_cache()
+        elif device.type == "cuda":
+            with torch.cuda.device(device):
+                torch.cuda.empty_cache()
+    for row in rows:
+        cpu = next(
+            (
+                candidate
+                for candidate in rows
+                if candidate["backend"] == "cpu"
+                and candidate["workload"] == row["workload"]
+                and candidate["documents"] == row["documents"]
+            ),
+            None,
+        )
+        row["speedup_vs_cpu"] = cpu["median_seconds"] / row["median_seconds"] if cpu else None
     implementation = {
         path.name: hashlib.sha256(path.read_bytes()).hexdigest()
         for path in sorted(Path(__file__).parent.glob("*.py"))
     }
     return {
-        "schema_version": 1,
+        "schema_version": 2,
         "kind": "synthetic-engine-benchmark" if profile else "local-model-engine-benchmark",
         "recorded_at": datetime.now(UTC).isoformat(),
         "environment": {
@@ -135,23 +168,23 @@ def _measure(model_dir, *, devices, document_counts, max_tokens, warmup, repeats
             "matmul_precision": torch.get_float32_matmul_precision(),
             "mps_cpu_fallback": os.environ.get("PYTORCH_ENABLE_MPS_FALLBACK", "unset"),
         },
-        "devices": [engine.selection.record() for engine in engines.values()],
-        "model": {
-            "synthetic_profile": profile,
-            "config": reference_engine.cfg.to_dict(),
-            "local_fingerprint": reference_engine.store.fingerprint(),
-            "weight_bytes": sum(
-                (Path(model_dir) / name).stat().st_size
-                for name in set(reference_engine.store.weight_map.values())
-            ),
-        },
+        "devices": [selection.record() for selection in selections.values()],
+        "model": model,
         "method": {
             "warmup_runs_per_case_and_device": warmup,
             "measured_runs_per_case_and_device": repeats,
             "max_tokens": max_tokens,
+            "weight_cache": weight_cache,
+            "workloads": list(workloads),
             "document_counts": list(document_counts),
             "input_seed": 17,
-            "timing": "synchronized wall time; backend order alternates per repeat",
+            "timing": "synchronized wall time; requested backends run sequentially",
+            "correctness_reference": next(iter(selections.values())).record(),
+            "correctness": "repeat consistency and requested-backend agreement; not independent model parity",
+            "resources": {
+                "max_memory_gib": resources.max_memory_gib,
+                "reserve_memory_gib": resources.reserve_memory_gib,
+            },
             "included": "engine calls, layer reads/transfers, loss and host array transfers",
             "excluded": "imports, model creation, tokenization, device probes, JSON writes",
             "cache": "warm process and filesystem cache; no persisted result/checkpoint reuse",
@@ -165,25 +198,33 @@ def _measure(model_dir, *, devices, document_counts, max_tokens, warmup, repeats
     }
 
 
+@bounded_inference
 def benchmark_engine(
     model_dir=None,
     *,
     profile="medium",
-    devices=("cpu", "auto"),
-    document_counts=(1, 16),
+    devices=("auto",),
+    document_counts=(1,),
     max_tokens=64,
-    warmup=2,
-    repeats=5,
-    threads=8,
+    warmup=1,
+    repeats=3,
+    threads=2,
     output=None,
+    weight_cache="stream",
+    workloads=("baseline",),
+    resources=None,
 ):
-    """Compare the same model/inputs across devices; fail on numerical disagreement.
+    """Measure requested devices only; never create a separate CPU model reference.
 
     With no model directory, construct a deterministic synthetic checkpoint.
     Library callers' process thread count is restored, including on failure.
     """
     if profile not in ("tiny", "medium"):
         raise ValueError("profile must be tiny or medium")
+    if weight_cache not in ("stream", "resident"):
+        raise ValueError("weight_cache must be stream or resident")
+    if not workloads or len(workloads) != len(set(workloads)) or set(workloads) - set(WORKLOADS):
+        raise ValueError("workloads must be unique supported benchmark workloads")
     for name, value, minimum in (
         ("max_tokens", max_tokens, 2),
         ("warmup", warmup, 1),
@@ -197,6 +238,8 @@ def benchmark_engine(
     if not devices:
         raise ValueError("devices must contain at least one backend")
     previous_threads = torch.get_num_threads()
+    resources = resources or ResourcePolicy()
+    resources.check()
     try:
         torch.set_num_threads(threads)
         with tempfile.TemporaryDirectory(prefix="moe-pilot-benchmark-") as temporary:
@@ -231,6 +274,9 @@ def benchmark_engine(
                 repeats=repeats,
                 threads=threads,
                 profile=profile,
+                weight_cache=weight_cache,
+                workloads=workloads,
+                resources=resources,
             )
         if output is not None:
             write_json(output, report)

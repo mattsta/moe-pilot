@@ -9,6 +9,7 @@ from moe_pilot.engine import Engine
 from moe_pilot.perturbations import Intervention
 from moe_pilot.probes import OrthogonalityProbe
 from moe_pilot.smoke import tiny_model, verify_engine
+from moe_pilot.verification import verify_local_model
 
 
 @pytest.mark.parametrize("backend", ["cuda", "rocm", "mps"])
@@ -26,7 +27,10 @@ def test_accelerator_inference_geometry_and_checkpoint_roundtrip(backend, tmp_pa
     assert report["device"]["backend"] == backend
     model_dir = tmp_path / "model"
     tiny_model(model_dir)
-    engine = Engine(model_dir, device=selected)
+    reference_check = verify_local_model(model_dir, [[2, 3, 4]], max_tokens=4, device=selected)
+    assert reference_check["device"]["backend"] == backend
+    assert reference_check["max_loss_error"] < 2e-4
+    engine = Engine(model_dir, device=selected, weight_cache="resident")
     cpu = Engine(model_dir, device="cpu")
     batch = engine.batch([[2, 3, 4, 5], [6, 7, 8]], 6)
     conditions = {
@@ -48,6 +52,9 @@ def test_accelerator_inference_geometry_and_checkpoint_roundtrip(backend, tmp_pa
     assert len(observer.extra) == 2
     assert all(np.isfinite(value).all() for value in observer.matrices.values())
     assert routing[0][0].dtype == np.int32
+    assert routing[0][1].dtype == np.float32
+    assert routing[0][2].dtype == np.float32
+    assert engine.resident_weight_bytes > 0
     weights = engine.load_layer(0)
     assert weights["G"][0].device == selected.device
     checkpoint = tmp_path / "checkpoint"
