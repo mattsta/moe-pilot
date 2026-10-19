@@ -99,14 +99,14 @@ The separate commands are equivalent to the ordered `run`. Global `--config`
 precedes the command. Dataset construction and model downloading are separate
 explicit operations; `run` does not fetch missing inputs.
 
-| Stage | Principal outputs within `paths.output` |
-| --- | --- |
-| `routing` | `artifacts/routing.npz`, `orthogonality.npz`, `probe_inputs.npy`; `tables/activation_orthogonality.csv` |
-| `domain-report` | `tables/*.csv`, `tables/counts/`, `figures/*.png` |
-| `build-conditions` | `ablations/conditions.json` with specialists and both control families |
-| `ablate` | `ablations/checkpoint/`, token/document metadata |
-| `ablation-report` | `tables/ablations/delta_loss.csv`, summary/matrix CSVs, `figures/ablations/delta_loss.png` |
-| `subtopic-report` | `artifacts/subtopics.npz`, `tables/subtopics/`, `figures/subtopics/` |
+| Stage              | Principal outputs within `paths.output`                                                                 |
+| ------------------ | ------------------------------------------------------------------------------------------------------- |
+| `routing`          | `artifacts/routing.npz`, `orthogonality.npz`, `probe_inputs.npy`; `tables/activation_orthogonality.csv` |
+| `domain-report`    | `tables/*.csv`, `tables/counts/`, `figures/*.png`                                                       |
+| `build-conditions` | `ablations/conditions.json` with specialists and both control families                                  |
+| `ablate`           | `ablations/checkpoint/`, token/document metadata                                                        |
+| `ablation-report`  | `tables/ablations/delta_loss.csv`, summary/matrix CSVs, `figures/ablations/delta_loss.png`              |
+| `subtopic-report`  | `artifacts/subtopics.npz`, `tables/subtopics/`, `figures/subtopics/`                                    |
 
 `experiment.json` records stage state, resolved configuration, implementation
 and input identities, dependency versions, and output hashes. Reports require

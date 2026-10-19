@@ -28,15 +28,15 @@ Python 3.12; hosted CI has not been executed locally.
 
 Local checks passed on 2026-10-19:
 
-| Check | Result |
-| --- | --- |
-| Locked uv synchronization | Passed |
-| Ruff lint and formatting | Passed |
-| `pytest -q -W error` | 78 passed; no warnings |
-| Offline CLI smoke | Passed; baseline loss error 0 on this machine |
-| Configured read-only inventory | Passed without creating input/output directories |
-| Wheel and source distribution | Built; new modules and sample configuration verified |
-| Built-wheel installation outside the checkout | Installed separately; offline CLI smoke passed |
+| Check                                         | Result                                               |
+| --------------------------------------------- | ---------------------------------------------------- |
+| Locked uv synchronization                     | Passed                                               |
+| Ruff lint and formatting                      | Passed                                               |
+| `pytest -q -W error`                          | 78 passed; no warnings                               |
+| Offline CLI smoke                             | Passed; baseline loss error 0 on this machine        |
+| Configured read-only inventory                | Passed without creating input/output directories     |
+| Wheel and source distribution                 | Built; new modules and sample configuration verified |
+| Built-wheel installation outside the checkout | Installed separately; offline CLI smoke passed       |
 
 Historical corpora, 37 CSV tables, and plots remain unchanged in `research/pilot`.
 Original model weights, routing/geometry arrays, and per-token ablation losses

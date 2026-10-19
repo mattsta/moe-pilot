@@ -33,7 +33,7 @@ def run(config):
         "abisee/cnn_dailymail 3.0.0 test[:2000] (article, first 1500 chars)",
     )
     d = load_dataset("papluca/language-identification", split="test")
-    rows = [r for r in d if r["labels"] not in ("en",)]
+    rows = [r for r in d if r["labels"] != "en"]
     add(
         "multilingual",
         [r["text"] for r in rows],

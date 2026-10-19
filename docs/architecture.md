@@ -14,15 +14,15 @@ library's `Paths` constructor accepts absolute paths only. Model, data, and
 outputs have distinct responsibilities; output paths cannot contain or be
 contained by model/data paths.
 
-| Location | Responsibility |
-| --- | --- |
-| `paths.model` | Immutable local checkpoint, tokenizer, and model revision record |
-| `paths.data` | Analysis, held-out, and subtopic JSON corpora and source records |
-| `paths.output/artifacts` | Routing, geometry, and probe arrays |
-| `paths.output/tables` | Domain, ablation, and subtopic CSV tables |
-| `paths.output/figures` | Exported research figures |
-| `paths.output/ablations` | Explicit condition definitions and inference checkpoints |
-| `paths.output/experiment.json` | Configuration, stage state, identities, and output hashes |
+| Location                       | Responsibility                                                   |
+| ------------------------------ | ---------------------------------------------------------------- |
+| `paths.model`                  | Immutable local checkpoint, tokenizer, and model revision record |
+| `paths.data`                   | Analysis, held-out, and subtopic JSON corpora and source records |
+| `paths.output/artifacts`       | Routing, geometry, and probe arrays                              |
+| `paths.output/tables`          | Domain, ablation, and subtopic CSV tables                        |
+| `paths.output/figures`         | Exported research figures                                        |
+| `paths.output/ablations`       | Explicit condition definitions and inference checkpoints         |
+| `paths.output/experiment.json` | Configuration, stage state, identities, and output hashes        |
 
 The TOML groups execution parameters, statistical analysis settings, ablation
 counts/control search, corpus sample counts, and pinned download revisions.
@@ -31,22 +31,22 @@ model layers. Explicit layer indices are validated against the actual model.
 
 ## Module boundaries
 
-| Module | Responsibility |
-| --- | --- |
-| `config.py` | Frozen settings, validation, explicit path layout |
-| `experiment.py` | Stage graph, writer lock, manifests, reuse/invalidation |
-| `engine.py` | CPU attention, expert routing, batches, and token losses |
-| `model.py` | Local configuration and safetensors tensor access |
-| `checkpoints.py` | Atomic arrays and inference resume identities |
-| `probes.py` | Read-only geometry observer of the shared engine |
-| `plotting.py` | Headless figures without process-wide plotting state |
-| `interventions.py` | Versioned, validated specialist/control metadata |
-| `controls.py` | Specialist ranking and routing-mass matching |
-| `corpora.py`, `datasets.py` | Seeded sampling and pinned source downloads |
-| `metrics.py`, `statistics.py` | Probability metrics and document-level inference |
-| `artifacts.py` | Corpus validation and atomic JSON writes |
-| `workflows/` | Configured stages returning explicit output paths |
-| `cli.py` | Arguments, CLI CPU-thread policy, and API invocation |
+| Module                        | Responsibility                                           |
+| ----------------------------- | -------------------------------------------------------- |
+| `config.py`                   | Frozen settings, validation, explicit path layout        |
+| `experiment.py`               | Stage graph, writer lock, manifests, reuse/invalidation  |
+| `engine.py`                   | CPU attention, expert routing, batches, and token losses |
+| `model.py`                    | Local configuration and safetensors tensor access        |
+| `checkpoints.py`              | Atomic arrays and inference resume identities            |
+| `probes.py`                   | Read-only geometry observer of the shared engine         |
+| `plotting.py`                 | Headless figures without process-wide plotting state     |
+| `interventions.py`            | Versioned, validated specialist/control metadata         |
+| `controls.py`                 | Specialist ranking and routing-mass matching             |
+| `corpora.py`, `datasets.py`   | Seeded sampling and pinned source downloads              |
+| `metrics.py`, `statistics.py` | Probability metrics and document-level inference         |
+| `artifacts.py`                | Corpus validation and atomic JSON writes                 |
+| `workflows/`                  | Configured stages returning explicit output paths        |
+| `cli.py`                      | Arguments, CLI CPU-thread policy, and API invocation     |
 
 Imports never download data, load model weights, or start experiments. Optional
 dataset dependencies are imported only by source-download workflows. The CLI
