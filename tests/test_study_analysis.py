@@ -1,7 +1,12 @@
 import numpy as np
 import pytest
 
-from moe_pilot.study_analysis import contrast_weights, holm, interaction_inference
+from moe_pilot.study_analysis import (
+    contrast_weights,
+    holm,
+    interaction_inference,
+    stage_internal_comparison,
+)
 
 
 def test_holm_is_monotone_in_sorted_probabilities():
@@ -36,3 +41,11 @@ def test_known_domain_effect_is_preserved_by_stratified_bootstrap():
 def test_confounding_is_rejected_for_source_adjusted_design():
     with pytest.raises(ValueError, match="crossed nonempty"):
         contrast_weights(np.array(["a", "b"]), np.array(["one", "two"]), "a")
+
+
+def test_internal_profiles_remove_global_scale_without_inventing_a_shift():
+    mass = np.array([[0.1, 0.2, 0.3], [0.4, 0.2, 0.1]])
+    norms = np.array([[2.0, 3.0, 4.0], [4.0, 3.0, 2.0]])
+    divergence, change = stage_internal_comparison(mass, mass * 3, norms, norms * 2)
+    np.testing.assert_allclose(divergence, 0, atol=1e-12)
+    np.testing.assert_allclose(change, 0, atol=1e-12)

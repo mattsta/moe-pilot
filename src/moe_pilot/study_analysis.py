@@ -8,6 +8,7 @@ from pathlib import Path
 import numpy as np
 
 from moe_pilot.artifacts import read_json, write_json
+from moe_pilot.metrics import jensen_shannon
 from moe_pilot.statistics import document_means
 
 
@@ -221,12 +222,17 @@ def reconstruction_interactions(reconstruction, output):
 
 
 def analyse_study(config):
-    from moe_pilot.study import PLAN, load_observations
+    from moe_pilot.study import PLAN, digest, load_observations, plan_for
 
     root = config.paths.output
+    active_plan = plan_for(config)
+    if read_json(root / "plan.json") != active_plan:
+        raise ValueError("Configured analysis differs from the frozen research plan")
     tables = root / "tables"
     baselines, observed = [], {}
     for path in sorted(root.glob("*/evaluation*/manifest.json")):
+        if path.parent.name not in ("evaluation", "evaluation-interventions"):
+            continue
         if read_json(path).get("status") != "complete":
             continue
         arrays, record = load_observations(path.parent)
@@ -270,7 +276,11 @@ def analyse_study(config):
             ("choice_nll", -arrays["choice_log_probability"], "nats/question"),
         ):
             estimate, low, high = stratified_mean_interval(
-                values, labels, sources, seed=config.analysis.seed
+                values,
+                labels,
+                sources,
+                seed=config.analysis.seed,
+                samples=config.analysis.bootstrap_samples,
             )
             summaries.append(
                 {
@@ -300,7 +310,7 @@ def analyse_study(config):
     write_table(tables / "baseline_by_model_source_domain.csv", sources_table)
     write_table(tables / "model_summary.csv", summaries)
     write_table(tables / "model_paired_documents.csv", documents)
-    comparisons = []
+    comparisons, routing_rows, norm_rows = [], [], []
     if "olmoe-0125-base" in observed:
         base, bm = observed["olmoe-0125-base"]
         labels = np.array([row["domain"] for row in bm["records"]])
@@ -313,6 +323,42 @@ def analyse_study(config):
             same_tokens = (
                 record["identity"]["token_ids_sha256"] == bm["identity"]["token_ids_sha256"]
             )
+            routing_shift, norm_shift = stage_internal_comparison(
+                base["mass"][0], arrays["mass"][0], base["norm"][0], arrays["norm"][0]
+            )
+            for domain in ("all", *sorted(set(labels))):
+                selected = np.ones(len(labels), dtype=bool) if domain == "all" else labels == domain
+                estimate, low, high = stratified_mean_interval(
+                    routing_shift[selected],
+                    labels[selected],
+                    sources[selected],
+                    seed=config.analysis.seed,
+                    samples=config.analysis.bootstrap_samples,
+                )
+                routing_rows.append(
+                    {
+                        "model": name,
+                        "reference": "olmoe-0125-base",
+                        "domain": domain,
+                        "layer": 7,
+                        "mean_jsd_bits": estimate,
+                        "ci_low": low,
+                        "ci_high": high,
+                        "documents": int(selected.sum()),
+                    }
+                )
+            if same_tokens:
+                for expert, value in enumerate(norm_shift.mean(0)):
+                    norm_rows.append(
+                        {
+                            "model": name,
+                            "reference": "olmoe-0125-base",
+                            "expert": expert,
+                            "mean_log_relative_norm_change": float(value),
+                            "relative_norm_fold_change": float(np.exp(value)),
+                            "interpretation": "matched token positions, model-specific incoming hidden states; relative output magnitude only",
+                        }
+                    )
             for metric, values in (
                 ("accuracy", arrays["choice_accuracy"] - base["choice_accuracy"]),
                 ("choice_nll", base["choice_log_probability"] - arrays["choice_log_probability"]),
@@ -321,7 +367,11 @@ def analyse_study(config):
                 if metric == "loss" and not same_tokens:
                     continue
                 estimate, low, high = stratified_mean_interval(
-                    values, labels, sources, seed=config.analysis.seed
+                    values,
+                    labels,
+                    sources,
+                    seed=config.analysis.seed,
+                    samples=config.analysis.bootstrap_samples,
                 )
                 comparisons.append(
                     {
@@ -336,6 +386,8 @@ def analyse_study(config):
                     }
                 )
     write_table(tables / "posttraining_contrasts.csv", comparisons)
+    write_table(tables / "routing_shift.csv", routing_rows)
+    write_table(tables / "expert_norm_changes.csv", norm_rows)
     effect_rows = []
     selection_file = root / "selection.json"
     if selection_file.exists():
@@ -343,6 +395,8 @@ def analyse_study(config):
         name = selection["model"]
         if name in observed and observed[name][0]["condition_names"].size:
             arrays, record = observed[name]
+            if record["identity"]["selection"] != digest(selection):
+                raise ValueError("Intervention outcomes do not match the frozen selection")
             labels = np.array([row["domain"] for row in record["records"]])
             sources = np.array([row["source"] for row in record["records"]])
             conditions = {
@@ -358,7 +412,13 @@ def analyse_study(config):
                         - conditions[f"{domain}_{mode}_control"]
                     )
                     stats = interaction_inference(
-                        effect, labels, sources, domain, seed=config.analysis.seed + index
+                        effect,
+                        labels,
+                        sources,
+                        domain,
+                        seed=config.analysis.seed + index,
+                        samples=config.analysis.bootstrap_samples,
+                        permutations=config.analysis.permutations,
                     )
                     on = labels == domain
                     features = arrays["features"]
@@ -411,12 +471,16 @@ def analyse_study(config):
         tables / "analysis_record.json",
         {
             "status": "complete for listed outputs",
-            "plan": PLAN,
+            "plan": active_plan,
             "completed_models": list(observed),
             "implementation_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
             "permutation_statistic": "studentized source-stratified interaction",
             "limits": "Intervals condition on one checkpoint. Paired stage contrasts are observational. Failed matching prevents causal-specialization claims.",
             "producers": {name: record["identity"] for name, (_, record) in observed.items()},
+            "table_sha256": {
+                path.name: hashlib.sha256(path.read_bytes()).hexdigest()
+                for path in sorted(tables.glob("*.csv"))
+            },
         },
     )
     return {"completed_models": len(observed), "causal_endpoints": len(effect_rows)}
@@ -439,3 +503,29 @@ def stratified_mean_interval(values, labels, sources, *, seed, samples=10000):
             bootstrap[start : start + len(draws)] += values[draws].mean(1) / len(cells)
     low, high = np.percentile(bootstrap, [2.5, 97.5])
     return float(np.mean([values[indices].mean() for indices in cells])), float(low), float(high)
+
+
+def stage_internal_comparison(base_mass, stage_mass, base_norm, stage_norm):
+    matrices = [
+        np.asarray(value, dtype=float) for value in (base_mass, stage_mass, base_norm, stage_norm)
+    ]
+    if any(
+        value.ndim != 2
+        or value.shape != matrices[0].shape
+        or not np.isfinite(value).all()
+        or (value < 0).any()
+        for value in matrices
+    ):
+        raise ValueError(
+            "Internal comparisons require aligned nonnegative document/expert matrices"
+        )
+    if any((value.sum(1) <= 0).any() for value in matrices):
+        raise ValueError("Cannot normalize empty expert profiles")
+    base_mass, stage_mass, base_norm, stage_norm = matrices
+    divergence = jensen_shannon(
+        base_mass / base_mass.sum(1, keepdims=True), stage_mass / stage_mass.sum(1, keepdims=True)
+    )
+    norm_change = np.log(
+        np.maximum(stage_norm / stage_norm.mean(1, keepdims=True), 1e-12)
+    ) - np.log(np.maximum(base_norm / base_norm.mean(1, keepdims=True), 1e-12))
+    return divergence, norm_change
