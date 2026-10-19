@@ -114,6 +114,20 @@ def write_reader_analysis(root):
                 + "\n",
                 "The source/domain-stratified paired bootstrap uses 10,000 replicates. The two-sided studentized permutation test permutes paired effects within source (9,999 permutations; plus-one tail estimate). Its interpretation requires the label-exchangeability/null assumptions; domain labels were not randomized. Confidence intervals are unadjusted. Failed control overlap remains a causal limitation even if a statistical contrast is positive.\n",
                 "[Per-document contrasts](data/study/causal_paired_documents.csv), [source/domain effects](data/study/causal_by_source_domain.csv), and [half-strength and joint-removal diagnostics](data/study/intervention_diagnostics.csv) are available in full. Source/lexical sensitivity residualizes domain membership on source indicators and standardized recorded token-composition features; this is an exploratory conditional association and does not repair missing control overlap.\n",
+                "[Gate and output diagnostics](data/study/intervention_gate_diagnostics.csv) retain targeted-token counts, selected mass before/after treatment, expert-set changes, and perturbation norms. They are input-token means per batch, including document-final positions; they are not document-weighted loss outcomes.\n",
+                "The [correct-answer-label sensitivity](data/study/answer_label_effects.csv) uses already collected full-vocabulary correct-label losses. It is exploratory and separate from the frozen primary text-loss family, with its own Holm correction across twelve domain × mode tests. A correct-label loss is not task accuracy and does not score generated answers.\n",
+                markdown_table(
+                    load("answer_label_effects"),
+                    [
+                        ("domain", "Domain"),
+                        ("mode", "Mode"),
+                        ("interaction", "Answer-label on−off excess (nats)"),
+                        ("ci_low", "95% low"),
+                        ("ci_high", "95% high"),
+                        ("exploratory_holm_p", "Exploratory Holm p"),
+                    ],
+                )
+                + "\n",
             ]
         )
     else:
@@ -134,11 +148,30 @@ def write_reader_analysis(root):
             )
             + "\n",
             "Routing distributions normalize selected gate mass within each question. The comparison uses identical token IDs across the 0125 stages. A routing shift alone does not demonstrate better reasoning, semantic partitioning, or causal necessity.\n",
+            "[Raw selected gate mass](data/study/selected_gate_mass.csv) reports the per-question sum of selected layer-7 probabilities before that normalization, with source/domain-stratified uncertainty. It keeps gate scale visible alongside distributional changes.\n",
             "Expert-output magnitude uses a deterministic matched token position per question. Raw output norms are divided by the document's mean across experts before computing paired log ratios. Incoming hidden states differ across checkpoints. Expert indices are compared only within the 0125 lineage. This measures relative magnitude, not output direction, functional equivalence, or knowledge.\n",
             "## Native-chat protocol follow-up\n",
         ]
     )
     if formats:
+        document.append(
+            "Native-chat accuracy differences: "
+            + "; ".join(
+                f"{row['model']}: {100 * row['estimate']:+.2f} percentage points (95% interval {100 * row['ci_low']:+.2f} to {100 * row['ci_high']:+.2f})"
+                for row in formats
+                if row["metric"] == "accuracy"
+            )
+            + ". These are protocol effects on forced-letter scoring, not generated-answer quality.\n"
+        )
+        document.append(
+            "Aligned question-span loss changes (chat minus plain): "
+            + "; ".join(
+                f"{row['model']}: {row['estimate']:+.6f} nats/token [{row['ci_low']:.6f}, {row['ci_high']:.6f}]"
+                for row in formats
+                if row["metric"] == "aligned_loss"
+            )
+            + ". A wrapper can change routing and question likelihood even when the measured question tokens are exactly identical.\n"
+        )
         document.extend(
             [
                 markdown_table(

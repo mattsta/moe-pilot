@@ -230,7 +230,7 @@ def analyse_study(config):
     if read_json(root / "plan.json") != active_plan:
         raise ValueError("Configured analysis differs from the frozen research plan")
     tables = root / "tables"
-    baselines, observed = [], {}
+    baselines, observed, observation_inputs = [], {}, {}
     for path in sorted(root.glob("*/evaluation*/manifest.json")):
         if path.parent.name not in ("evaluation", "evaluation-interventions"):
             continue
@@ -239,13 +239,32 @@ def analyse_study(config):
         arrays, record = load_observations(path.parent)
         name = path.parent.parent.name
         observed[name] = (arrays, record)
-    summaries, documents, sources_table = [], [], []
+        observation_inputs[name] = path
+    summaries, documents, sources_table, gate_mass_rows = [], [], [], []
     for name, (arrays, record) in observed.items():
         labels = np.array([row["domain"] for row in record["records"]])
         sources = np.array([row["source"] for row in record["records"]])
         ids = [row["group_id"] for row in record["records"]]
         if len(set(ids)) != len(ids):
             raise ValueError("Repeated content groups require cluster-aware inference")
+        gate_estimate, gate_low, gate_high = stratified_mean_interval(
+            arrays["mass"][0].sum(1),
+            labels,
+            sources,
+            seed=config.analysis.seed,
+            samples=config.analysis.bootstrap_samples,
+        )
+        gate_mass_rows.append(
+            {
+                "model": name,
+                "layer": 7,
+                "mean_selected_gate_mass": gate_estimate,
+                "ci_low": gate_low,
+                "ci_high": gate_high,
+                "documents": len(ids),
+                "interpretation": "raw total selected probability mass before distribution normalization",
+            }
+        )
         for domain in sorted(set(labels)):
             selected = labels == domain
             baselines.append(
@@ -311,6 +330,7 @@ def analyse_study(config):
     write_table(tables / "baseline_by_model_source_domain.csv", sources_table)
     write_table(tables / "model_summary.csv", summaries)
     write_table(tables / "model_paired_documents.csv", documents)
+    write_table(tables / "selected_gate_mass.csv", gate_mass_rows)
     comparisons, routing_rows, norm_rows = [], [], []
     if "olmoe-0125-base" in observed:
         base, bm = observed["olmoe-0125-base"]
@@ -390,7 +410,7 @@ def analyse_study(config):
     write_table(tables / "routing_shift.csv", routing_rows)
     write_table(tables / "expert_norm_changes.csv", norm_rows)
     effect_rows, diagnostic_rows, causal_documents, source_effects = [], [], [], []
-    gate_diagnostics = []
+    gate_diagnostics, answer_effects = [], []
     selection_file = root / "selection.json"
     if selection_file.exists():
         selection = read_json(selection_file)
@@ -417,6 +437,10 @@ def analyse_study(config):
                 str(name): arrays["condition_loss"][index]
                 for index, name in enumerate(arrays["condition_names"])
             }
+            answer_conditions = {
+                str(name): arrays["condition_answer_loss"][index]
+                for index, name in enumerate(arrays["condition_names"])
+            }
             for index, item in enumerate(selection["domains"]):
                 domain = item["domain"]
                 np.testing.assert_array_equal(conditions[f"{domain}_restored"], arrays["loss"])
@@ -433,6 +457,28 @@ def analyse_study(config):
                         seed=config.analysis.seed + index,
                         samples=config.analysis.bootstrap_samples,
                         permutations=config.analysis.permutations,
+                    )
+                    answer_effect = (
+                        answer_conditions[f"{domain}_{mode}_specialist"]
+                        - answer_conditions[f"{domain}_{mode}_control"]
+                    )
+                    answer_stats = interaction_inference(
+                        answer_effect,
+                        labels,
+                        sources,
+                        domain,
+                        seed=config.analysis.seed + index,
+                        samples=config.analysis.bootstrap_samples,
+                        permutations=config.analysis.permutations,
+                    )
+                    answer_effects.append(
+                        {
+                            "domain": domain,
+                            "mode": mode,
+                            **answer_stats,
+                            "balance_passed": item["balance_passed"],
+                            "interpretation": "exploratory correct-answer-label loss sensitivity; not intervention accuracy or semantic necessity",
+                        }
                     )
                     on = labels == domain
                     for document, value in enumerate(effect):
@@ -536,6 +582,11 @@ def analyse_study(config):
             for row, p in zip(primary, holm([row["p"] for row in primary]), strict=True):
                 row["holm_p"] = float(p)
     write_table(tables / "causal_effects.csv", effect_rows)
+    for row, adjusted in zip(
+        answer_effects, holm([row["p"] for row in answer_effects]), strict=True
+    ):
+        row["exploratory_holm_p"] = float(adjusted)
+    write_table(tables / "answer_label_effects.csv", answer_effects)
     write_table(tables / "causal_paired_documents.csv", causal_documents)
     write_table(tables / "causal_by_source_domain.csv", source_effects)
     write_table(tables / "intervention_diagnostics.csv", diagnostic_rows)
@@ -554,6 +605,10 @@ def analyse_study(config):
             )
     write_table(tables / "control_balance.csv", balance)
     format_rows, alignment_rows, pair_rows = analyse_formats(config)
+    for item in alignment_rows:
+        observation_inputs[item["model"] + "-paired-chat"] = (
+            root / item["model"] / "evaluation-paired-chat" / "manifest.json"
+        )
     write_table(tables / "format_effects.csv", format_rows)
     write_table(tables / "format_alignment.csv", alignment_rows)
     write_table(tables / "format_paired_documents.csv", pair_rows)
@@ -566,7 +621,12 @@ def analyse_study(config):
             "implementation_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
             "permutation_statistic": "studentized source-stratified interaction",
             "limits": "Intervals condition on one checkpoint. Paired stage contrasts are observational. Failed matching prevents causal-specialization claims.",
+            "additional_outcomes": "Correct-answer-label loss is an exploratory sensitivity analysis, separate from the frozen six-test primary text-loss family; its twelve tests receive their own Holm correction. It does not measure intervention accuracy.",
             "producers": {name: record["identity"] for name, (_, record) in observed.items()},
+            "observation_manifests": {
+                str(path.relative_to(root)): hashlib.sha256(path.read_bytes()).hexdigest()
+                for path in observation_inputs.values()
+            },
             "table_sha256": {
                 path.name: hashlib.sha256(path.read_bytes()).hexdigest()
                 for path in sorted(tables.glob("*.csv"))

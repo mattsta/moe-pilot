@@ -123,11 +123,13 @@ def test_analysis_preserves_all_intervention_modes_and_separates_diagnostics(tmp
         path,
         {
             "loss": np.ones(12),
+            "mass": np.full((1, 12, 4), 0.25),
             "answer_loss": np.ones(12),
             "choice_accuracy": np.zeros(12),
             "choice_log_probability": -np.ones(12),
             "condition_names": np.array(names),
             "condition_loss": losses,
+            "condition_answer_loss": losses,
             "features": np.zeros((12, 2)),
         },
     )
