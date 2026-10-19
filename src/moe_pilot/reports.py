@@ -2,17 +2,21 @@
 
 import csv
 import hashlib
+import io
 import json
 import math
 import shutil
+import tempfile
 from datetime import UTC, datetime
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
 
-def read_table(path):
-    with path.open(newline="", encoding="utf-8") as stream:
-        result = list(csv.DictReader(stream))
+def read_table(path, *, expected_sha256=None):
+    content = path.read_bytes()
+    if expected_sha256 is not None and hashlib.sha256(content).hexdigest() != expected_sha256:
+        raise ValueError(f"Report table changed after validation: {path}")
+    result = list(csv.DictReader(io.StringIO(content.decode("utf-8"), newline="")))
     for row in result:
         for key, value in row.items():
             if value == "":
@@ -55,6 +59,7 @@ def study_snapshot(study):
                 "partition": path.parent.name,
                 "status": "complete" if record.get("status") == "complete" else "saved partial",
                 "documents": record.get("documents", 0),
+                "conditions": len(record.get("identity", {}).get("conditions", {})),
                 "completed": sum(item.get("documents", 0) for item in chunks),
                 "seconds": sum(item.get("seconds", 0) for item in chunks),
                 "peak_gib": max((item.get("peak_process_bytes", 0) for item in chunks), default=0)
@@ -75,16 +80,20 @@ def study_snapshot(study):
         record = json.loads(analysis.read_text())
         if "table_sha256" not in record:
             raise ValueError("Rebuild study analysis before publishing its tables")
-        for name, expected in record["table_sha256"].items():
-            path = (study / "tables" / name).resolve()
+        for relative, expected in record.get("observation_manifests", {}).items():
+            path = (study / relative).resolve()
             if (
-                path.parent != (study / "tables").resolve()
+                not path.is_relative_to(study.resolve())
                 or hashlib.sha256(path.read_bytes()).hexdigest() != expected
             ):
+                raise ValueError(
+                    "Analysed observations changed; rebuild analysis before publication"
+                )
+        for name, expected in record["table_sha256"].items():
+            path = (study / "tables" / name).resolve()
+            if path.parent != (study / "tables").resolve():
                 raise ValueError("Study analysis table changed after validation")
-        for name in record["table_sha256"]:
-            path = study / "tables" / name
-            result["study"][path.stem] = read_table(path)
+            result["study"][path.stem] = read_table(path, expected_sha256=expected)
     return result
 
 
@@ -121,17 +130,7 @@ def build_report(reconstruction, study, output):
     }
     payload["record"] = evidence["derived"]
     payload.update(study_snapshot(study))
-    output.mkdir(parents=True, exist_ok=True)
-    for directory in ("tables", "figures"):
-        shutil.copytree(
-            reconstruction / directory,
-            output / "data" / "reconstruction" / directory,
-            dirs_exist_ok=True,
-        )
-    if (study / "tables").exists():
-        shutil.copytree(study / "tables", output / "data" / "study", dirs_exist_ok=True)
     if (study / "figures").exists():
-        shutil.copytree(study / "figures", output / "figures", dirs_exist_ok=True)
         manifest = json.loads((study / "figures" / "manifest.json").read_text())
         for item in manifest.values():
             for filename, expected in item["sources"].items():
@@ -149,6 +148,17 @@ def build_report(reconstruction, study, output):
                 ):
                     raise ValueError("Exported study figure changed after validation")
         payload["figures"] = manifest
+    output.mkdir(parents=True, exist_ok=True)
+    for directory in ("tables", "figures"):
+        shutil.copytree(
+            reconstruction / directory,
+            output / "data" / "reconstruction" / directory,
+            dirs_exist_ok=True,
+        )
+    if (study / "tables").exists():
+        shutil.copytree(study / "tables", output / "data" / "study", dirs_exist_ok=True)
+    if (study / "figures").exists():
+        shutil.copytree(study / "figures", output / "figures", dirs_exist_ok=True)
     for path in sorted(study.glob("*/*/manifest.json")):
         if path.parent.name in (
             "discovery",
@@ -176,9 +186,15 @@ def build_report(reconstruction, study, output):
         shutil.copy2(assets / name, output / name)
     encoded = json.dumps(payload, ensure_ascii=False, allow_nan=False).replace("<", "\\u003c")
     template = (assets / "index.html").read_text()
-    (output / "index.html").write_text(
-        template.replace("__RESEARCH_DATA__", encoded), encoding="utf-8"
-    )
+    with tempfile.NamedTemporaryFile(
+        dir=output, suffix=".html", mode="w", encoding="utf-8", delete=False
+    ) as stream:
+        temporary = Path(stream.name)
+        stream.write(template.replace("__RESEARCH_DATA__", encoded))
+    try:
+        temporary.replace(output / "index.html")
+    finally:
+        temporary.unlink(missing_ok=True)
     return output / "index.html"
 
 

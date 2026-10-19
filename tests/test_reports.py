@@ -96,3 +96,21 @@ def test_unvalidated_or_tampered_study_tables_are_not_displayed(tmp_path):
 def test_report_output_cannot_overwrite_or_mix_with_research_inputs(publication, tmp_path):
     with pytest.raises(ValueError, match="separate"):
         build_report(publication, tmp_path / "study", publication / "report")
+
+
+def test_report_rejects_observation_provenance_changed_after_analysis(tmp_path):
+    path = tmp_path / "model" / "evaluation" / "manifest.json"
+    write_json(path, {"status": "complete"})
+    write_json(
+        tmp_path / "tables" / "analysis_record.json",
+        {
+            "table_sha256": {},
+            "observation_manifests": {
+                str(path.relative_to(tmp_path)): hashlib.sha256(path.read_bytes()).hexdigest()
+            },
+        },
+    )
+    study_snapshot(tmp_path)
+    write_json(path, {"status": "changed"})
+    with pytest.raises(ValueError, match="observations changed"):
+        study_snapshot(tmp_path)
