@@ -20,6 +20,10 @@ GIB = 1024**3
 _COMPUTE_LOCK = FileLock(Path(tempfile.gettempdir()) / f"moe-pilot-compute-{os.getuid()}.lock")
 
 
+class ResourceAdmissionError(ValueError):
+    """A smaller batch may fit; model tensors have not been admitted yet."""
+
+
 def bounded_inference(function):
     """Allow one cooperating research process per user on the workstation."""
 
@@ -125,7 +129,7 @@ class ResourcePolicy:
     def check(self, required_bytes=0):
         available = available_memory_bytes()
         if required_bytes + GIB > self.max_memory_gib * GIB:
-            raise ValueError(
+            raise ResourceAdmissionError(
                 f"Estimated job memory {(required_bytes + GIB) / GIB:.2f} GiB exceeds "
                 f"the {self.max_memory_gib} GiB budget; use streaming weights, smaller "
                 "batches/condition groups, or explicitly configure a suitable budget"
@@ -133,7 +137,8 @@ class ResourcePolicy:
         if peak_process_bytes() > self.max_memory_gib * GIB:
             raise ValueError("Process memory exceeded the job budget; stop and use a smaller run")
         if available < self.reserve_bytes + required_bytes:
-            raise ValueError(
+            error_type = ResourceAdmissionError if required_bytes else ValueError
+            raise error_type(
                 f"Insufficient free memory ({available / GIB:.2f} GiB available, "
                 f"{required_bytes / GIB:.2f} GiB estimated additional allocation) "
                 f"to preserve the {self.reserve_bytes / GIB:.1f} GiB "
