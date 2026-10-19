@@ -30,6 +30,13 @@
         ><a href="#formats">Prompt format</a
         ><a href="#methods">Methods & data</a>
       </nav>
+      <section id="latest">
+        <div class="eyebrow">NEW SOURCE-BALANCED STUDY</div>
+        <h2>Measured results at a glance</h2>
+        <div class="metrics" id="study-metrics"></div>
+        <div id="study-overview"></div>
+      </section>
+      <div class="eyebrow">ARCHIVED-INPUT RECONSTRUCTION</div>
       <section class="metrics" id="metrics"></section>
       <section id="findings" class="summary">
         <div class="eyebrow">COMPLETED RECONSTRUCTION</div>
@@ -125,7 +132,7 @@
               aria-label="Centered expert output similarity by layer"
             ></div>
             <p class="note">
-              Centered output cosine is descriptive. Small angles do not
+              Centered output cosine is descriptive. Low similarity does not
               demonstrate independent knowledge or causal necessity.
             </p>
           </article>
@@ -150,6 +157,12 @@
             One accelerator job at a time; streaming weights; 5 GiB job budget;
             8 GiB available-memory reserve for current research. Refused or
             incomplete batches are not counted as scientific results.
+          </p>
+          <p class="note">
+            Peak RSS measures this process and is not the entire system or
+            accelerator footprint. The accelerator allocator is bounded
+            separately, and OS pressure stops inference. Batch durations are
+            operational records, not controlled speedup measurements.
           </p>
         </details>
       </section>
@@ -200,11 +213,11 @@
             </p>
             <p>
               Specialists are ranked on discovery routing only. Controls are
-              selected on calibration mass, usage, and function norms. Primary
-              endpoints compare on- versus off-domain specialist-minus-control
-              effects for fixed-routing removal and rerouting, with paired
-              uncertainty and Holm correction. Failed balance prevents
-              causal-specialization claims.
+              selected on calibration mass, usage, and expert-output norms.
+              Primary endpoints compare on- versus off-domain
+              specialist-minus-control effects for fixed-routing removal and
+              rerouting, with paired uncertainty and Holm correction. Failed
+              balance prevents causal-specialization claims.
             </p>
           </article>
         </div>

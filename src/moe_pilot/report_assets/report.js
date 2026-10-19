@@ -39,7 +39,7 @@ $("metrics").innerHTML = [
   )
   .join("");
 function table(rows, fields) {
-  return `<table><thead><tr>${fields.map(([k, t]) => `<th>${esc(t)}</th>`).join("")}</tr></thead><tbody>${rows.map((r) => `<tr>${fields.map(([k, t, n]) => `<td class="${typeof r[k] === "number" ? "num" : ""}">${typeof r[k] === "number" ? f(r[k], n ?? 4) : esc(r[k])}</td>`).join("")}</tr>`).join("")}</tbody></table>`;
+  return `<div class="table-wrap"><table><thead><tr>${fields.map(([k, t]) => `<th>${esc(t)}</th>`).join("")}</tr></thead><tbody>${rows.map((r) => `<tr>${fields.map(([k, t, n]) => `<td class="${typeof r[k] === "number" ? "num" : ""}">${typeof r[k] === "number" ? f(r[k], n ?? 4) : esc(r[k])}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`;
 }
 function svg(inner, w = 1000, h = 340) {
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}" font-family="system-ui,sans-serif" font-size="13" fill="#182a38">${inner}</svg>`;
@@ -187,6 +187,15 @@ $("reset").onclick = () => {
   render();
 };
 $("print").onclick = () => window.print();
+let printClosed = [];
+window.addEventListener("beforeprint", () => {
+  printClosed = [...document.querySelectorAll("details:not([open])")];
+  printClosed.forEach((item) => (item.open = true));
+});
+window.addEventListener("afterprint", () => {
+  printClosed.forEach((item) => (item.open = false));
+  printClosed = [];
+});
 document.querySelectorAll("[data-download]").forEach(
   (button) =>
     (button.onclick = () => {
@@ -220,6 +229,56 @@ const modelNames = {
 };
 function renderStudy() {
   $("new-effects").innerHTML = "";
+  const summaries = DATA.study.model_summary || [];
+  const accuracies = summaries.filter((row) => row.metric === "accuracy");
+  const formatPairs = (DATA.study.format_alignment || []).reduce(
+    (total, row) => total + row.pairs,
+    0,
+  );
+  const intervention = DATA.progress.find(
+    (row) =>
+      row.partition === "evaluation-interventions" && row.status === "complete",
+  );
+  $("study-metrics").innerHTML = [
+    [accuracies.length, "completed plain-prompt checkpoints"],
+    [
+      accuracies.reduce((total, row) => total + row.documents, 0),
+      "question × checkpoint evaluations",
+    ],
+    [formatPairs, "completed plain/chat question pairs"],
+    [
+      intervention ? intervention.conditions : "In progress",
+      "new held-out intervention conditions",
+    ],
+  ]
+    .map(
+      ([value, label]) =>
+        `<div class="metric"><strong>${esc(value)}</strong><span>${esc(label)}</span></div>`,
+    )
+    .join("");
+  const stageAccuracy = (DATA.study.posttraining_contrasts || []).filter(
+    (row) => row.metric === "accuracy",
+  );
+  const noClearGain =
+    stageAccuracy.length &&
+    stageAccuracy.every((row) => row.ci_low <= 0 && row.ci_high >= 0);
+  $("study-overview").innerHTML = accuracies.length
+    ? "<p>" +
+      accuracies
+        .map(
+          (row) =>
+            esc(modelNames[row.model] || row.model) +
+            ": <strong>" +
+            f(row.estimate * 100, 1) +
+            "%</strong>",
+        )
+        .join(" · ") +
+      ". Same 180 questions, plain-prompt forced-letter scoring.</p>" +
+      (noClearGain
+        ? "<p>Paired accuracy intervals for SFT, DPO, and final versus base all include zero. Routing changes are measurable; this cohort does not establish improved reasoning.</p>"
+        : "") +
+      '<p><a href="#models">Inspect checkpoint intervals and control balance</a> · <a href="#formats">Compare native chat with plain prompts</a> · <a href="analysis.md">Read the detailed analysis</a></p>'
+    : '<p class="pending">No completed source-balanced checkpoint comparison yet.</p>';
   $("progress").innerHTML = DATA.progress.length
     ? table(DATA.progress, [
         ["model", "Model"],
@@ -356,23 +415,77 @@ function renderStudy() {
           })),
       ) +
       '</div><p class="note">Primary endpoints are removal and rerouting across three domains (Holm family of six). Rescaling and substitution are exploratory secondary outcomes. Intervals are unadjusted. Zero-strength restoration is checked exactly before analysis. Source/lexical sensitivity coefficients are available in the complete CSV.</p><a href="data/study/causal_effects.csv">Download all intervention contrasts</a>';
+  const answers = DATA.study.answer_label_effects || [];
+  if (answers.length)
+    $("new-effects").insertAdjacentHTML(
+      "beforeend",
+      "<details><summary>Correct-answer-label loss sensitivity (exploratory)</summary><p>Full-vocabulary correct-label loss, rather than whole-question loss. These twelve additional domain × mode tests form their own exploratory Holm family; they do not measure intervention task accuracy.</p>" +
+        table(answers, [
+          ["domain", "Domain"],
+          ["mode", "Mode"],
+          ["interaction", "On/off label excess", 5],
+          ["ci_low", "95% low", 5],
+          ["ci_high", "95% high", 5],
+          ["exploratory_holm_p", "Exploratory Holm p", 4],
+        ]) +
+        "</details>",
+    );
+  const diagnostics = DATA.study.intervention_diagnostics || [];
+  if (diagnostics.length) {
+    const joint = diagnostics.filter(
+      (row) => row.metric === "joint_nonadditivity" && row.population === "on",
+    );
+    $("new-effects").insertAdjacentHTML(
+      "beforeend",
+      '<details><summary>Joint removal, half-strength response, and restoration</summary><p>Joint nonadditivity is loss(A ∪ B) − loss(A) − loss(B) + baseline. The chart shows on-domain means and unadjusted paired intervals; it does not establish redundant knowledge. Half-strength curvature is the half-strength loss change minus half the full-strength change. Zero-strength restoration must equal baseline exactly.</p><div class="chart" role="img" aria-label="On-domain joint-removal nonadditivity">' +
+        forest(
+          joint.map((row) => ({
+            ...row,
+            paired_difference: row.estimate,
+            ci95_low: row.ci_low,
+            ci95_high: row.ci_high,
+          })),
+        ) +
+        "</div>" +
+        table(diagnostics, [
+          ["domain", "Domain"],
+          ["metric", "Diagnostic"],
+          ["population", "Population"],
+          ["estimate", "Estimate", 6],
+          ["ci_low", "95% low", 6],
+          ["ci_high", "95% high", 6],
+        ]) +
+        '<a href="data/study/intervention_gate_diagnostics.csv">Inspect all per-batch gate and output traces</a><p class="note">Gate traces contain input-token means per batch, including document-final positions, rather than the document-weighted loss endpoints.</p></details>',
+    );
+  }
   renderInternals();
   renderFormats();
 }
 
 function renderInternals() {
+  const mass = DATA.study.selected_gate_mass || [];
   const routing = (DATA.study.routing_shift || []).filter(
     (row) => row.domain === "all",
   );
   const norms = DATA.study.expert_norm_changes || [];
   let html = "";
+  if (mass.length)
+    html +=
+      "<h3>Total selected gate probability mass</h3>" +
+      table(mass, [
+        ["model", "Checkpoint"],
+        ["mean_selected_gate_mass", "Mean selected mass", 5],
+        ["ci_low", "95% low", 5],
+        ["ci_high", "95% high", 5],
+      ]) +
+      '<p class="note">Mean per-question sum of the layer-7 top-k gate probabilities before normalizing the selected distribution. This retains gate scale, which Jensen–Shannon divergence deliberately removes. Intervals are unadjusted and source/domain-stratified.</p>';
   if (routing.length) {
     html +=
       '<h3>Layer-7 routing changes from 0125 base</h3><div class="chart" role="img" aria-label="Routing divergence from base">' +
       bars(
         routing.map((row) => ({
           ...row,
-          label: modelNames[row.model],
+          label: modelNames[row.model] || row.model,
           value: row.mean_jsd_bits,
           lower: row.ci_low,
           upper: row.ci_high,
@@ -390,7 +503,7 @@ function renderInternals() {
     );
     let shapes = "";
     models.forEach((model, i) => {
-      shapes += `<text x="140" y="${65 + i * 55}" text-anchor="end">${esc(modelNames[model])}</text>`;
+      shapes += `<text x="140" y="${65 + i * 55}" text-anchor="end">${esc(modelNames[model] || model)}</text>`;
       norms
         .filter((row) => row.model === model)
         .forEach((row) => {
@@ -400,7 +513,7 @@ function renderInternals() {
             value >= 0
               ? `rgb(${Math.round(255 - 90 * strength)},${Math.round(255 - 186 * strength)},${Math.round(255 - 221 * strength)})`
               : `rgb(${Math.round(255 - 203 * strength)},${Math.round(255 - 163 * strength)},${Math.round(255 - 95 * strength)})`;
-          shapes += `<rect x="${160 + row.expert * 12}" y="${42 + i * 55}" width="12" height="38" fill="${color}"><title>${esc(modelNames[model])} / expert ${row.expert}: log ratio ${f(value, 5)}, fold ${f(row.relative_norm_fold_change, 4)}</title></rect>`;
+          shapes += `<rect x="${160 + row.expert * 12}" y="${42 + i * 55}" width="12" height="38" fill="${color}"><title>${esc(modelNames[model] || model)} / expert ${row.expert}: log ratio ${f(value, 5)}, fold ${f(row.relative_norm_fold_change, 4)}</title></rect>`;
         });
     });
     for (let expert = 0; expert < 64; expert += 8)
@@ -425,7 +538,7 @@ function renderFormats() {
     .filter((row) => row.metric === "accuracy")
     .map((row) => ({
       ...row,
-      domain: modelNames[row.model],
+      domain: modelNames[row.model] || row.model,
       paired_difference: 100 * row.estimate,
       ci95_low: 100 * row.ci_low,
       ci95_high: 100 * row.ci_high,
