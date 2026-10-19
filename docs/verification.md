@@ -1,36 +1,44 @@
-# Migration verification
+# Verification scope
 
-Verified locally on 2026-10-19 on macOS arm64 with Python 3.12.13,
-uv 0.11.19, PyTorch 2.14.1, and Transformers 5.20.1.
+The checked-in suite verifies configuration parsing, path independence,
+numerical inference, experiment provenance, conditions, sampling, statistics,
+and report production. Run `uv run --locked pytest -W error` after changes.
 
-| Check                                       | Result                                                                                       |
-| ------------------------------------------- | -------------------------------------------------------------------------------------------- |
-| `uv sync --locked --all-extras`             | Passed; lockfile and environment agree                                                       |
-| `uv run ruff check .`                       | Passed                                                                                       |
-| `uv run ruff format --check .`              | Passed                                                                                       |
-| `uv run pytest -q -W error::RuntimeWarning` | 46 tests passed; no runtime warnings                                                         |
-| Offline tiny-model smoke command            | Passed; default baseline loss matched Hugging Face exactly on this machine                   |
-| `uv build`                                  | Wheel and source distribution built successfully                                             |
-| `research/pilot/` inventory                 | 500 analysis documents, 200 held-out documents, 1,140 subtopic documents; 37 historical CSVs |
+The end-to-end test invokes the actual configured CLI from an unrelated
+directory while forbidding `os.chdir`. It runs a tiny two-layer/four-expert
+local OLMoE, produces routing and geometry, generates both control families,
+evaluates held-out losses, and writes domain, ablation, and subtopic tables and
+figures. It then verifies that valid completed stages are reused. The tiny
+dimensions exercise the absence of hard-coded pilot expert/layer counts.
 
-Tests verify baseline and masked next-token losses against Hugging Face,
-variable-length document boundaries, top-k normalization and QKV clipping,
-original sharded and packed safetensors layouts, independent engine state,
-checkpoint restart, model/corpus/mask identity rejection, and completed-work
-skipping. Control matching is compared with the original sampling procedure.
+Other tests compare baseline and masked losses with Hugging Face, check router
+normalization/QKV clipping, cover safetensors layouts and document boundaries,
+validate checkpoint resume identities, and reject invalid configuration.
+Experiment lifecycle tests check tampered outputs, changed inputs/settings,
+failed steps, input mutation during execution, and single-writer exclusion.
+Dataset tests use stubbed pinned sources; no source datasets are downloaded.
 
-The offline integration test produces routing and orthogonality arrays, domain
-CSVs/plots, activation probes, condition definitions, held-out ablation losses,
-both control families, summaries, and subtopic CSVs/plots. It uses a synthetic
-16-layer, 64-expert model with a tiny hidden dimension and a reduced control
-search. Corpus builders are exercised with stubbed dataset sources. Tests
-explicitly disable network access through Hugging Face's offline settings.
+The offline smoke command independently exercises tiny-model baseline parity,
+an intervention, and checkpoint resume. It can produce a JSON software-check
+record using `smoke --output PATH`. It is separate from scientific experiments.
 
-The full downloaded OLMoE checkpoint and source datasets were not executed.
-Model weights, original routing/orthogonality arrays, and original per-token
-ablation losses were absent. Historical result tables and plots were preserved;
-the pilot's scientific claims were not independently revalidated. CI is
-configured for Linux and macOS but has not been run by this local verification.
+Local verification uses macOS arm64, Python 3.12.13, uv 0.11.19, PyTorch 2.14.1,
+and Transformers 5.20.1. CI is configured for Linux Python 3.11/3.12 and macOS
+Python 3.12; hosted CI has not been executed locally.
 
-To repeat verification after changes, follow [the runbook](runbook.md). Use
-checked-in tests and the reusable smoke command; no inline Python is needed.
+Local checks passed on 2026-10-19:
+
+| Check | Result |
+| --- | --- |
+| Locked uv synchronization | Passed |
+| Ruff lint and formatting | Passed |
+| `pytest -q -W error` | 78 passed; no warnings |
+| Offline CLI smoke | Passed; baseline loss error 0 on this machine |
+| Configured read-only inventory | Passed without creating input/output directories |
+| Wheel and source distribution | Built; new modules and sample configuration verified |
+| Built-wheel installation outside the checkout | Installed separately; offline CLI smoke passed |
+
+Historical corpora, 37 CSV tables, and plots remain unchanged in `research/pilot`.
+Original model weights, routing/geometry arrays, and per-token ablation losses
+were absent. The full downloaded model and source datasets have not been run;
+the historical pilot's scientific claims are not independently revalidated.

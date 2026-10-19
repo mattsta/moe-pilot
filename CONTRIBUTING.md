@@ -7,7 +7,7 @@ See [the operator runbook](docs/runbook.md) for complete bring-up and
 uv sync --locked --all-extras
 uv run --locked ruff check .
 uv run --locked ruff format --check .
-uv run --locked pytest
+uv run --locked pytest -W error
 uv build
 ```
 
@@ -28,11 +28,19 @@ artifact schemas or document migrations. Changes to sampling/statistical
 methods need an explanation of how reported results may change.
 
 Do not commit downloaded models, virtual environments, caches, logs, or large
-raw arrays. Archived pilot CSVs/plots/corpora live in `research/pilot/`; run
-experiments in separate workspaces. Runtime workspaces belong outside source
-control. Code licensing remains an owner decision; dataset/model terms remain
+raw arrays. Archived pilot CSVs/plots/corpora live in `research/pilot/`; new
+experiments use explicit configuration with separate input/output directories.
+Generated experiment outputs belong outside source control.
+Code licensing remains an owner decision; dataset/model terms remain
 separate from any future code license.
 
 Keep application code under `src/moe_pilot/` and tests under `tests/`; do not
 add root-level Python scripts or compatibility wrappers. Use the documented CLI
 and reusable package APIs for execution.
+
+There is one new-system API: validated `Experiment` settings and
+`ExperimentRunner`. Do not add working-directory changes, legacy command aliases,
+filename-based scientific metadata, or alternate inference implementations.
+Use the engine's observer API for new probes. Add provenance/dependency checks
+and return explicit output paths for new stages. Configuration changes must
+have one source of truth shared by CLI and library callers.

@@ -1,141 +1,153 @@
 # Operator runbook
 
-Run commands from the checkout root after installing
-[uv](https://docs.astral.sh/uv/getting-started/installation/). No GPU, model
-download, authentication, or source-data download is required for local checks.
+## Bring-up and offline checks
 
-## Bring-up and software checks
+Install [uv](https://docs.astral.sh/uv/getting-started/installation/) and run:
 
 ```sh
 uv sync --locked --all-extras
 uv run --locked ruff check .
 uv run --locked ruff format --check .
-uv run --locked pytest
-uv run --locked moe-pilot --workspace research/pilot inventory
-uv run --locked moe-pilot --workspace /tmp/moe-pilot-smoke smoke
+uv run --locked pytest -W error
+uv run --locked moe-pilot smoke --output /tmp/moe-pilot-smoke.json
 uv build
 ```
 
-`uv sync` includes development tools by default. Dataset downloads are in the
-`data` extra. For a runtime-only environment without corpus download support:
+No GPU, source-data download, model weights, or authentication is needed for
+these checks. Smoke constructs a tiny deterministic local model, compares
+baseline losses with Hugging Face, evaluates a mask, and checks checkpoint
+resume. Its result is software verification, not research evidence.
+
+Linux resolves CPU-only PyTorch wheels; macOS uses native PyPI wheels.
+`uv sync --locked --no-dev` installs runtime dependencies. Source-data builders
+additionally require `uv sync --locked --extra data`. No inline Python is needed.
+
+## Define an experiment
+
+Start with `configurations/pilot.toml`. Paths resolve relative to that file,
+regardless of the invoking directory. It defines:
+
+- Separate model, data, and output directories.
+- Model repository and exact commit SHA for explicit downloads.
+- Token limit, CLI CPU threads, and concurrent condition group size.
+- Random seed, permutation/bootstrap counts, probe sampling, and report layers.
+- Expert counts and both control search efforts.
+- Corpus group counts and dataset repository revisions.
+
+Choose a new `paths.output` for different settings. Existing output directories
+are bound to their recorded configuration, including download revisions.
+Set the model's full 40-character commit SHA before downloading:
 
 ```sh
-uv sync --locked --no-dev
-uv run --locked --no-dev moe-pilot --help
+uv run --locked moe-pilot --config configurations/pilot.toml download-model
 ```
 
-The smoke command constructs a tiny random local OLMoE, compares next-token
-losses to Hugging Face, evaluates a mask, and verifies checkpoint resume. It
-writes `results/smoke.json` within the selected workspace. This verifies
-software behavior; it does not reproduce the pilot's research findings.
+Downloads are explicit and can consume many GB. The command writes
+`model_revision.json` alongside the local snapshot. An existing local model can
+be used by setting `paths.model` directly; retain its identity with the run.
 
-Linux uses the PyTorch CPU wheel index to avoid pulling CUDA dependencies.
-macOS uses PyPI's native wheel. The lockfile resolves both. The CLI defaults
-to eight CPU threads; use `--threads 2` on a smaller machine. The library does
-not set process-global thread limits.
+## Prepare corpora
 
-## Full research run
-
-Use a fresh workspace to preserve the supplied historical outputs. Select an
-immutable model commit SHA from the model repository and keep it with the
-experiment record. Replace `MODEL_COMMIT_SHA` below with that actual SHA.
-Model download is explicit and can consume many GB. Do not run this pipeline
-as a routine installation or CI check.
+For the supplied pilot inputs, copy the archived samples into the configured
+data directory (the example config uses `data/pilot`):
 
 ```sh
-uv run --locked moe-pilot --workspace runs/pilot download-model --revision MODEL_COMMIT_SHA
-uv run --locked moe-pilot --workspace runs/pilot build-corpus
-uv run --locked moe-pilot --workspace runs/pilot build-heldout
-uv run --locked moe-pilot --workspace runs/pilot forward 64
-uv run --locked moe-pilot --workspace runs/pilot analyze
-uv run --locked moe-pilot --workspace runs/pilot activation-extra
-uv run --locked moe-pilot --workspace runs/pilot build-conditions
-uv run --locked moe-pilot --workspace runs/pilot ablate
-uv run --locked moe-pilot --workspace runs/pilot analyze-ablations
-uv run --locked moe-pilot --workspace runs/pilot ondomain-controls
-uv run --locked moe-pilot --workspace runs/pilot analyze-ablations
-uv run --locked moe-pilot --workspace runs/pilot build-subtopics
-uv run --locked moe-pilot --workspace runs/pilot subtopics
+mkdir -p data/pilot
+cp research/pilot/corpus.json research/pilot/corpus_sources.json research/pilot/heldout.json research/pilot/heldout_sources.json research/pilot/subtopic_corpus.json data/pilot/
+cp research/pilot/results/subtopics/corpus_sources.json data/pilot/subtopic_sources.json
 ```
 
-Global options (`--workspace`, `--model-dir`, `--threads`) precede the command.
-`--model-dir` defaults to `models/olmoe` inside the workspace. An absolute path
-can share one immutable model between workspaces. A shortened forward, such as
-`forward 16 2`, is useful for debugging but cannot feed the fixed full-model
-ablation and subtopic workflows.
+The JSON texts are the inputs. Historical tables and plots stay in the archive
+and are not loaded as active results. Preserving sampled JSON avoids silently
+replacing the population of the historical pilot.
 
-To reuse the supplied sampled corpora, copy `corpus.json`, `heldout.json`,
-`subtopic_corpus.json`, and their source metadata from `research/pilot/` into
-the new workspace and skip their builders. Subtopic source metadata is stored
-at `research/pilot/results/subtopics/corpus_sources.json`. New builds
-deduplicate samples and reject short source pools;
-they may differ from the historical samples. There is no silent fallback to a
-different math dataset. Dataset repository revisions are not yet pinned by the
-builders; archive the actual JSON files and source revisions used in a paper.
+To build new corpora, specify exact repository commit SHAs in the config's
+`[datasets]` table. Required repositories are listed in the example config.
+Then run:
 
-The first ablation analysis expands aliases into `conditions_expanded.csv`.
-On-domain controls depend on that file, so the two analysis invocations in the
-sequence are intentional. Condition generation does not perform inference.
-Both control builders accept `--control-candidates` to set random subset search
-effort (defaults: 4,000 overall-mass and 6,000 on-domain-mass candidates). Reduced
-values support software checks and change matching quality; record this
-parameter with any reported experiment.
+```sh
+uv run --locked moe-pilot --config configurations/pilot.toml build-corpus
+uv run --locked moe-pilot --config configurations/pilot.toml build-heldout
+uv run --locked moe-pilot --config configurations/pilot.toml build-subtopics
+```
 
-## Inputs and outputs
+Builders record source repository, revision, dataset configuration, split, and
+fingerprint with group attribution. Samples are deduplicated, held-out texts
+exclude the analysis corpus, and short source pools fail explicitly. Builders
+never silently substitute datasets. Building samples uses seeds `analysis.seed`,
+`analysis.seed + 1`, and `analysis.seed + 2` respectively.
 
-| Step                | Required inputs                                                 | Main outputs                                           |
-| ------------------- | --------------------------------------------------------------- | ------------------------------------------------------ |
-| `forward`           | local model/tokenizer, `corpus.json`                            | `routing.npz`, `ortho_raw.npz`, `probe_moe_inputs.npy` |
-| `analyze`           | those two NPZs, tokenizer                                       | `results/*.csv`, `results/counts/`, `plots/*.png`      |
-| `activation-extra`  | model, probe NPY                                                | `results/activation_orthogonality_extra.csv`           |
-| `build-conditions`  | routing NPZ, expert domain CSV                                  | `results/ablations/conditions.{json,csv}`              |
-| `ablate`            | local model, held-out corpus, conditions                        | checkpoint manifest, losses/cache NPYs, delta-loss CSV |
-| `analyze-ablations` | routing, condition metadata, held-out losses                    | summaries, expanded aliases, ablation plots            |
-| `ondomain-controls` | routing, expert distribution, expanded aliases, held-out corpus | extra masks and checkpointed losses                    |
-| `subtopics`         | local model, subtopic corpus, original expert distribution      | subtopic routing, CSVs, plots                          |
+## Execute and inspect
+
+```sh
+uv run --locked moe-pilot --config configurations/pilot.toml inventory
+uv run --locked moe-pilot --config configurations/pilot.toml run
+```
+
+`inventory` is read-only. `run` executes these configured stages in order:
+
+```sh
+uv run --locked moe-pilot --config configurations/pilot.toml routing
+uv run --locked moe-pilot --config configurations/pilot.toml domain-report
+uv run --locked moe-pilot --config configurations/pilot.toml build-conditions
+uv run --locked moe-pilot --config configurations/pilot.toml ablate
+uv run --locked moe-pilot --config configurations/pilot.toml ablation-report
+uv run --locked moe-pilot --config configurations/pilot.toml subtopic-report
+```
+
+The separate commands are equivalent to the ordered `run`. Global `--config`
+precedes the command. Dataset construction and model downloading are separate
+explicit operations; `run` does not fetch missing inputs.
+
+| Stage | Principal outputs within `paths.output` |
+| --- | --- |
+| `routing` | `artifacts/routing.npz`, `orthogonality.npz`, `probe_inputs.npy`; `tables/activation_orthogonality.csv` |
+| `domain-report` | `tables/*.csv`, `tables/counts/`, `figures/*.png` |
+| `build-conditions` | `ablations/conditions.json` with specialists and both control families |
+| `ablate` | `ablations/checkpoint/`, token/document metadata |
+| `ablation-report` | `tables/ablations/delta_loss.csv`, summary/matrix CSVs, `figures/ablations/delta_loss.png` |
+| `subtopic-report` | `artifacts/subtopics.npz`, `tables/subtopics/`, `figures/subtopics/` |
+
+`experiment.json` records stage state, resolved configuration, implementation
+and input identities, dependency versions, and output hashes. Reports require
+valid upstream records and artifacts. Changing files by hand makes dependent
+results stale; rerun the upstream stage instead of editing provenance records.
 
 ## Stop, resume, and recover
 
-Interrupt inference normally; finished checkpoint arrays remain reusable. Rerun
-the same `ablate` or `ondomain-controls` command. Baseline caches and finished
-conditions are skipped. Loss arrays are written using temporary files and
-atomic replacement. The delta-loss summary deduplicates condition/domain keys
-and repairs rows after a completed restart.
+Interrupt normally and rerun `run` or the interrupted command. Completed stages
+are skipped only after validating their dependencies and file hashes. Failed
+and interrupted stages are never treated as completed output. A file lock
+prevents concurrent writers to one experiment; the OS releases it after a crash.
 
-Checkpoints are single-writer. Do not run two processes against the same
-workspace. The manifest binds inference implementation source, numerical dependency versions, model identity,
-ordered token IDs, token limit, and named masks. A different model, corpus,
-engine implementation, or changed mask requires a new output directory.
-Legacy checkpoint directories without manifests are rejected, not adopted.
-Moving model shards also changes their identity. A new earlier-starting
-condition may require another baseline pass to populate its hidden-state cache.
+The ablation engine additionally persists atomic per-condition loss arrays and
+hidden-state caches. Completed conditions are skipped on restart. Model,
+tokenized inputs, named masks, inference source, and numerical dependency
+versions are checked. Changed settings/inputs require a new experiment output
+directory; stale checkpoint files are not adopted. A crash after saving losses
+can resume inference, then regenerate complete report tables deterministically.
 
-CSV/plot workflows are rerunnable and replace their outputs. They do not have
-transactional multi-file publication. Subtopic routing is cached by filename;
-use a fresh workspace if its model, corpus, or tokenization changes. Interrupted
-non-checkpointed forward/subtopic runs must be restarted. Keep raw artifacts
-and the model immutable when producing a report.
+Non-checkpointed routing and subtopic inference restart as a whole. CSV/figure
+production is stage-scoped rather than a multi-file atomic transaction; a
+failed stage's partial files cannot be consumed through the runner. Preserve
+immutable inputs and use fresh output directories for changed experiments.
 
-## Troubleshooting
+## Troubleshooting and release records
 
-- **Missing local model config:** download the checkpoint explicitly or pass
-  the correct `--model-dir`. For installation verification, use `smoke`.
-- **Missing routing/orthogonality arrays:** the supplied CSVs are archived
-  outputs; the raw arrays were not supplied. Run `forward` first.
-- **Missing dataset library:** use `uv sync --locked --all-extras`.
-- **Source has too few texts:** inspect the named dataset and split; do not
-  silently substitute a source or relax a research corpus definition.
-- **Memory pressure:** use fewer threads, smaller debug corpora/token limits,
-  or smaller `group` values in the engine API. Full ablations retain multiple
-  hidden states; disk caches also require substantial capacity.
-- **Checkpoint inputs changed:** use a fresh workspace. Do not copy a manifest
-  onto old arrays to bypass identity checks.
+- **Missing input/model:** inspect the resolved paths with `inventory`; prepare
+  the local inputs or use `smoke` for installation verification.
+- **Missing/stale dependency:** run the named upstream stage, or use `run`.
+- **Configuration changed:** select a new output directory.
+- **Too many expert masks/control seeds:** masks must leave top-k experts, and
+  the excluded pool must contain enough disjoint controls. Choose counts and
+  seed counts appropriate to the configured model.
+- **Memory pressure:** reduce condition groups, corpus/token/probe counts, or
+  use a larger host. Geometry and multiple conditions retain additional tensors.
+- **Unpinned dataset/model revision:** fill the exact repository commit SHA
+  before downloading; there is no mutable-revision fallback.
 
-## Research release record
-
-Archive the code commit, `uv.lock`, interpreter and dependency versions, model
-commit, dataset revisions/source metadata, exact corpus files and hashes,
-commands, token limits, seeds, hardware, raw arrays, checkpoint manifest, and
-final tables/plots. Report exclusions, permutation counts, bootstrap procedure,
-and uncertainty. The pilot uses short texts, modest sample counts, and selected
-specialists; avoid generalizing its findings beyond that experiment.
+Archive code commit, `uv.lock`, config, `experiment.json`, checkpoint manifests,
+model/dataset revisions, corpus/source files, hardware, raw arrays, final tables,
+and figures. Loss is in nats/token; information metrics are bits. Ablation
+bootstrap intervals are document-level and unadjusted for multiple comparisons.
+Short sampled texts and selected interventions limit scientific generalization.

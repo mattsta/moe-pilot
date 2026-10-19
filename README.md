@@ -1,9 +1,8 @@
 # MoE Pilot
 
 A Python library and executable research pipeline for studying expert routing,
-specialization, orthogonality, and causal ablations in
-`allenai/OLMoE-1B-7B-0924`. CPU inference streams one decoder layer at a time
-from local safetensors rather than loading the full model into RAM.
+specialization, geometry, and causal ablations in OLMoE. CPU inference streams
+one decoder layer at a time from a local safetensors checkpoint.
 
 ## Start here
 
@@ -12,40 +11,56 @@ Install [uv](https://docs.astral.sh/uv/getting-started/installation/), then:
 ```sh
 uv sync --locked --all-extras
 uv run --locked moe-pilot --help
-uv run --locked moe-pilot --workspace research/pilot inventory
-uv run --locked moe-pilot --workspace /tmp/moe-pilot-smoke smoke
-uv run --locked pytest
+uv run --locked moe-pilot smoke
+uv run --locked pytest -W error
+uv run --locked moe-pilot --config configurations/pilot.toml inventory
 ```
 
-The smoke check runs offline with a tiny random model and compares losses with
-Hugging Face. It needs no model download or GPU. Development uses Python 3.12;
-uv manages `.venv` and exact dependencies in `uv.lock`. Runtime installation
-without development tools or dataset downloads is `uv sync --locked --no-dev`.
+The smoke check is offline and uses a tiny random model. The experiment pipeline
+uses one validated [TOML configuration](configurations/pilot.toml) for model,
+data, output paths, sampling, inference, controls, and reporting. Paths resolve
+relative to that file. The CLI and library share the same experiment runner;
+execution does not depend on the working directory.
 
-## Documentation
+## Run an experiment
 
-- [Operator runbook](docs/runbook.md): full bring-up, research pipeline,
-  prerequisites, outputs, checkpoint recovery, and release records.
-- [Architecture and API](docs/architecture.md): module responsibilities,
-  reusable engine, supported configurations, and compatibility changes.
-- [Contributing](CONTRIBUTING.md): development checks and change guidelines.
-- [Verification record](docs/verification.md): tested behavior and remaining limits.
-- [Historical pilot notes](docs/pilot-notes.md): original experiment claims and
-  hardware context, retained separately from software verification.
+Prepare the local model and input corpora using the [operator runbook](docs/runbook.md),
+then execute:
 
-## Repository contents and verification limits
+```sh
+uv run --locked moe-pilot --config configurations/pilot.toml run
+```
 
-`src/moe_pilot/` contains all application code; `tests/` contains offline tests.
-`research/pilot/` preserves the original sampled corpora, source metadata, CSV
-tables, and plots. Use the installed `moe-pilot` command to run workflows.
+The runner performs routing/geometry inference, domain reporting, condition
+generation, checkpointed ablations, ablation reporting, and subtopic reporting.
+It records configuration, source identities, dependency versions, input/output
+hashes, and stage status. Completed stages are reused only while their inputs,
+outputs, and dependencies remain valid. Different settings require a new output
+directory. Inference and probes use the same engine.
 
-The supplied checkout has no model weights, `routing.npz`, `ortho_raw.npz`, or
-per-token ablation losses. Existing tables are historical evidence. Software
-checks exercise tiny synthetic inputs and do not independently revalidate the
-published pilot numbers. See the runbook to regenerate the full experiment in
-a fresh workspace. The experiment-specific reports target the original
-16-layer, 64-expert model; the reusable engine has broader configuration support.
+## Library and repository
 
-Before public release, choose a code license and review redistribution terms
-for bundled source texts and model artifacts. No license has been inferred or
-assigned on the owner's behalf.
+```python
+from moe_pilot.config import load_experiment
+from moe_pilot.experiment import ExperimentRunner
+
+experiment = load_experiment("configurations/pilot.toml")
+ExperimentRunner(experiment).run_pipeline()
+```
+
+- `src/moe_pilot/`: reusable inference, experiment infrastructure, and workflows.
+- `configurations/`: checked-in experiment definitions.
+- `tests/`: offline numerical and end-to-end regression checks.
+- `research/pilot/`: unchanged historical corpora, attribution, tables, and plots.
+- [Architecture](docs/architecture.md), [runbook](docs/runbook.md),
+  [contributing](CONTRIBUTING.md), and [verification](docs/verification.md).
+
+Development uses Python 3.12, `pyproject.toml`, and `uv.lock`. Runtime-only
+installation is `uv sync --locked --no-dev`. Downloading source datasets also
+requires the `data` extra. Linux installs CPU PyTorch wheels.
+
+The historical pilot's model weights, raw routing/geometry arrays, and per-token
+ablation losses were not supplied. Software checks use synthetic local models
+and do not independently validate the historical scientific claims. The archived
+outputs are evidence; they are not active experiment inputs or cache formats.
+Code licensing remains an owner decision; dataset and model terms remain separate.

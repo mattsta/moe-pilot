@@ -1,105 +1,133 @@
-# Architecture
+# Architecture and correctness contracts
 
-`moe-pilot` has an installable library and an executable research pipeline. It
-uses the standard [uv project layout](https://docs.astral.sh/uv/guides/projects/)
-with exact dependency resolution in `uv.lock`. Python 3.12 is the development
-default; package metadata permits 3.11–3.14. CI checks 3.11 and 3.12 on Linux and
-3.12 on macOS. Other permitted interpreters are not yet CI-verified.
+All application code lives under `src/moe_pilot/`. `Experiment` is the immutable,
+validated definition of a run; `ExperimentRunner` is its orchestration API.
+The CLI loads the same definition and calls that API. There are no compatibility
+wrappers, legacy command aliases, or implicit relative-file execution paths.
 
-## Module responsibilities
+## Configuration and paths
 
-| Module           | Responsibility                                                       |
-| ---------------- | -------------------------------------------------------------------- |
-| `model.py`       | Local configuration, safetensors mapping, model identity             |
-| `engine.py`      | Batches, attention, expert routing, losses, condition execution      |
-| `checkpoints.py` | Atomic arrays, resume manifest, condition identities                 |
-| `corpora.py`     | Seeded sampling, deduplication, exclusions, group-size checks        |
-| `controls.py`    | Specialist ranking and routing-mass-matched control selection        |
-| `artifacts.py`   | UTF-8 JSON artifact reads and writes                                 |
-| `metrics.py`     | Entropy and Jensen–Shannon divergence in bits                        |
-| `inventory.py`   | Read-only inventory of inputs and historical tables                  |
-| `smoke.py`       | Offline numerical and checkpoint verification infrastructure         |
-| `workflows/`     | Explicit research steps retaining the original artifact schemas      |
-| `cli.py`         | Arguments, CPU thread policy, workspace selection, workflow dispatch |
+`load_experiment(filename)` parses schema version 1 TOML, rejects unknown
+settings and invalid parameter types, and resolves paths against the config
+file's directory. Parsing creates no directories or model instances. The
+library's `Paths` constructor accepts absolute paths only. Model, data, and
+outputs have distinct responsibilities; output paths cannot contain or be
+contained by model/data paths.
 
-Imports never download datasets, load a checkpoint, or execute an experiment.
-`Engine` loads local configuration when constructed; tokenizer loading is lazy.
-Only `download-model` and the three corpus builders intentionally access the
-network. Each engine owns its state; multiple engines can coexist.
+| Location | Responsibility |
+| --- | --- |
+| `paths.model` | Immutable local checkpoint, tokenizer, and model revision record |
+| `paths.data` | Analysis, held-out, and subtopic JSON corpora and source records |
+| `paths.output/artifacts` | Routing, geometry, and probe arrays |
+| `paths.output/tables` | Domain, ablation, and subtopic CSV tables |
+| `paths.output/figures` | Exported research figures |
+| `paths.output/ablations` | Explicit condition definitions and inference checkpoints |
+| `paths.output/experiment.json` | Configuration, stage state, identities, and output hashes |
 
-## Library use
+The TOML groups execution parameters, statistical analysis settings, ablation
+counts/control search, corpus sample counts, and pinned download revisions.
+With no analysis layers specified, reports select the first, middle, and last
+model layers. Explicit layer indices are validated against the actual model.
 
-Place reusable application code in a module. For example:
+## Module boundaries
+
+| Module | Responsibility |
+| --- | --- |
+| `config.py` | Frozen settings, validation, explicit path layout |
+| `experiment.py` | Stage graph, writer lock, manifests, reuse/invalidation |
+| `engine.py` | CPU attention, expert routing, batches, and token losses |
+| `model.py` | Local configuration and safetensors tensor access |
+| `checkpoints.py` | Atomic arrays and inference resume identities |
+| `probes.py` | Read-only geometry observer of the shared engine |
+| `plotting.py` | Headless figures without process-wide plotting state |
+| `interventions.py` | Versioned, validated specialist/control metadata |
+| `controls.py` | Specialist ranking and routing-mass matching |
+| `corpora.py`, `datasets.py` | Seeded sampling and pinned source downloads |
+| `metrics.py`, `statistics.py` | Probability metrics and document-level inference |
+| `artifacts.py` | Corpus validation and atomic JSON writes |
+| `workflows/` | Configured stages returning explicit output paths |
+| `cli.py` | Arguments, CLI CPU-thread policy, and API invocation |
+
+Imports never download data, load model weights, or start experiments. Optional
+dataset dependencies are imported only by source-download workflows. The CLI
+sets the configured CPU-thread count; library embedding leaves process-wide
+thread policy with the caller. Engine objects own independent local model state.
+
+## Experiment lifecycle
+
+```mermaid
+flowchart LR
+  routing --> domain-report
+  domain-report --> build-conditions
+  build-conditions --> ablate
+  ablate --> ablation-report
+  domain-report --> subtopic-report
+```
+
+Corpus construction and explicit model download precede this graph. Supplied
+corpus JSON files can be used directly without rerunning builders. Stage reuse
+requires a completed record, matching source/input identities and numerical
+dependency versions, valid output hashes, and recursively valid dependencies.
+An output directory is bound to one configuration. Failed/interrupted steps
+cannot feed reports, and input changes during execution invalidate that step.
+A process-safe file lock admits a single writer per experiment.
+
+Model identity includes configuration/tokenizer JSON contents and local shard
+sizes/mtime. This guards ordinary local changes without repeatedly reading GBs
+of weights. It is not a cryptographic attestation of every model byte. Use
+immutable downloaded revisions and preserve the model snapshot for research.
+
+Routing and geometry share `Engine.run`; an `OrthogonalityProbe` observes the
+same per-layer expert inputs. It has a private RNG and does not replace the
+engine's attention/router computations. Full router probabilities and selected
+weights are stored in float16; losses and computation use float32.
+
+## Interventions and statistics
+
+Condition JSON explicitly stores its schema, model dimensions, domain, scope,
+expert count, family, mask, seed, and specialist parent. Reports never infer
+meaning from names. Both global-mass and on-domain-mass controls are generated
+with specialists, so report generation is not a prerequisite for controls.
+Specialists are ranked from measured routing distributions; no expert IDs,
+domain names, model depth, or expert count are hard-coded into execution.
+Condition definitions and ablation summaries include masked routing masses so
+control-matching quality remains inspectable alongside the loss contrasts.
+
+The engine always returns a baseline. Each document's final token has zero loss
+and `valid=False`; apply that mask before averaging. Empty engine conditions
+reproduce the baseline. Conditions must leave at least top-k experts available.
+The condition builder also requires equally sized disjoint control masks.
+Held-out evaluation rejects texts overlapping the analysis corpus.
+
+Losses are nats per token. Domain/subtopic entropy and JSD are bits. Ablation
+tables distinguish token-weighted means from equal-document means. Confidence
+intervals are paired document bootstraps with unadjusted 95% coverage; they do
+not imply multiple-comparison correction or broad claims of expert necessity.
+Unused experts have undefined conditional probabilities/SI (`NaN`), aggregate
+statistics exclude those undefined values, and heatmaps use neutral lift.
+
+## Engine API
 
 ```python
 from moe_pilot.engine import Engine
 
 
-def evaluate_documents(model_directory, documents):
+def compare_documents(model_directory, documents):
     engine = Engine(model_directory)
-    token_ids = [engine.tok(text).input_ids for text in documents]
-    batch = engine.batch(token_ids, max_tokens=64)
-    losses, valid, routing = engine.run(batch, {"mask_expert_21": {0: [21]}}, log_routing=True)
+    batch = engine.batch([engine.tok(text).input_ids for text in documents], 64)
+    losses, valid, routing = engine.run(batch, {"masked": {0: [1]}}, log_routing=True)
     return {name: float(values[valid].mean()) for name, values in losses.items()}
 ```
 
-`run` returns a condition-to-loss mapping, a valid-target Boolean mask, and an
-optional baseline routing list. Each routing entry contains top-k indices,
-top-k weights, and full probabilities. Loss vectors are flattened in document
-order. The final token of each document has zero loss and `valid=False`.
-Always apply the valid mask before averaging. Loss is in nats per token;
-reporting entropy and JSD are in bits.
+The engine supports standard OLMoE multi-head attention, SiLU, default unscaled
+RoPE, optional QKV clipping, and both top-k normalization settings. It accepts
+sharded or single-file safetensors with per-expert or packed expert tensors.
+Unsupported attention bias, grouped-query attention, scaled RoPE, or activation
+types fail explicitly. Layer streaming reduces resident weight memory; hidden
+states and optional geometry probes still require substantial RAM.
 
-Unused experts have undefined conditional domain/subtopic probabilities and
-specialization (`NaN` in CSVs). Aggregate statistics exclude those undefined
-values; lift heatmaps render them neutrally. This avoids divide-by-zero warnings
-or assigning an arbitrary preferred domain to an expert with no observations.
-
-`run_ckpt(batch, conditions, directory)` persists the same losses. It supports
-adding conditions but refuses changes to an existing named mask or input batch.
-An empty condition explicitly reproduces the baseline. `base` is reserved.
-Model shards are identified by local path, size, and modification time; this
-detects routine changes but is not a cryptographic weight-content guarantee.
-Use immutable model revisions for published research.
-
-## Boundaries and supported model configurations
-
-The engine computes on CPU in float32, streams one decoder layer at a time,
-and executes under `torch.inference_mode`. It supports the original per-expert
-safetensors and newer Transformers packed expert tensors, sharded or unsharded.
-It supports SiLU, standard multi-head attention, unscaled RoPE, optional QKV
-clipping, and either top-k normalization setting. Unsupported grouped-query
-attention, attention bias, scaled RoPE, and non-SiLU activations fail explicitly.
-
-The engine is configurable; the pilot's ablation and subtopic reports retain
-experiment-specific choices: 16 layers, 64 experts, fixed specialist IDs,
-selected layers 0/7/15, and the original domain names. They are reference
-workflows for this checkpoint, not a generic framework for arbitrary MoEs.
-The forward and main domain-analysis steps also support smaller models for
-offline verification. Layer streaming reduces resident weights, but retaining
-many conditions' hidden states and baseline caches still consumes RAM/disk.
-
-The CLI temporarily selects its workspace with `contextlib.chdir` and restores
-the caller's directory. Workflow functions use relative research paths and
-are intended for the CLI's single-threaded orchestration. Use `Engine`, corpus
-sampling, and metric APIs for embedding in services or concurrent applications.
-There is no server or background worker requirement.
-
-## Entry points and preservation
-
-All application code lives under `src/moe_pilot/`; the root contains project
-metadata and documentation entry points. Run workflows through the installed
-`moe-pilot` CLI. The former top-level script names are no longer entry points.
-Library callers import `Engine` and `Batch` from `moe_pilot.engine` and construct
-an engine explicitly. `build-conditions` only generates masks; `ablate` performs
-inference. `smoke` runs the offline engine check; regression tests live in `tests/`.
-
-`research/pilot/` preserves archived results, plots, sampled corpora, and source
-attribution as a self-contained historical workspace. Inspect it with
-`moe-pilot --workspace research/pilot inventory`. Create new experiments in
-fresh workspaces so archived evidence remains unchanged.
-The old environment dump is retained in `docs/requirements-original.txt` solely
-as historical evidence; `pyproject.toml` and `uv.lock` define the new environment.
-
-Verification code belongs in reusable package modules or checked-in tests.
-Do not use inline Python commands or throwaway validation scripts.
+Use `ExperimentRunner` for public workflow orchestration and provenance. Low-level
+`workflows.*.run(config)` functions are stage implementations; bypassing the
+runner bypasses dependency and provenance checks. Reusable application logic
+belongs in package modules and verification in checked-in tests, never inline
+Python commands or root-level scripts.
