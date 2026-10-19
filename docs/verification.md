@@ -61,7 +61,7 @@ Local checks passed on 2026-10-19:
 | --------------------------------------------- | ---------------------------------------------------- |
 | Locked uv synchronization                     | Passed                                               |
 | Ruff lint and formatting                      | Passed                                               |
-| `pytest -q -W error`                          | 178 passed; 2 absent CUDA/ROCm hardware tests skipped; no warnings |
+| `pytest -q -W error`                          | 207 passed in 18.22 seconds; 2 absent CUDA/ROCm hardware tests skipped; no warnings |
 | Historical CPU/MPS performance measurement    | 24 cases, 7 timed repeats each; retained from the original conversion; not repeated for release |
 | Offline CLI smoke                             | CPU and real MPS passed against CPU/Hugging Face |
 | Configured read-only inventory                | Passed without creating input/output directories     |
@@ -88,5 +88,23 @@ per-process MPS allocator limit, and prevent implicit CPU reference engines in
 benchmarks. Default release validation uses tiny offline fixtures and two host
 threads. Full-model parity is an explicitly budgeted diagnostic on the selected
 device; existing conversion evidence is retained without rerunning CPU work.
-The final suite completed in 16.13 seconds with two host threads; macOS
-`time -l` recorded 846,921,728 bytes (0.79 GiB) maximum RSS and zero swaps.
+The earlier 178-test release run completed in 16.13 seconds with two host
+threads; macOS `time -l` recorded 846,921,728 bytes (0.79 GiB) maximum RSS and
+zero swaps. The expanded 207-test suite completed in 18.22 seconds. That final
+run did not collect a new suite RSS measurement.
+
+The expanded checks cover exact paired native-chat token alignment, aligned-span
+loss against the tiny Transformers reference, batch-invariant probes, checkpoint
+coverage/hashes, all twelve intervention contrasts and their six-test primary
+family, restoration/gate traces, observation-backed report publication, and
+repeatable PNG/SVG/PDF export hashes. Firefox validation confirmed the live
+overview and primary-interaction intervals, and changing the model metric
+redrew the chart with the measured choice-loss values.
+
+Scientific execution is separate: five checkpoints completed 180 plain-prompt
+questions each; SFT and final completed 360 paired plain/native-chat questions;
+0924 completed all 33 intervention conditions on 180 questions. The final
+intervention process peaked at 1.39 GiB RSS under its 5 GiB budget and 8 GiB
+available-memory reserve. The [interactive report](../research/report/index.html)
+and [detailed analysis](../research/report/analysis.md) include failed matching
+and the resulting limits on causal interpretation.

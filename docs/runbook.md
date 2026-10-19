@@ -130,7 +130,7 @@ See [local measurements and limitations](performance.md).
 ## Shared-workstation resource policy
 
 All engine workflows default to streaming weights and an 8 GiB job budget.
-They preserve 16 GiB of immediately free host memory on this Mac; on smaller
+They preserve 16 GiB of available host memory on this Mac; on smaller
 hosts the reserve is capped at a quarter of physical memory. The reusable
 `ResourcePolicy` checks weights, staging, activations, and routing estimates
 before inference and checks memory again between layers. Budget or pressure
@@ -140,6 +140,14 @@ local jobs from running inference concurrently, even across output directories.
 These conservative admission checks cannot
 guarantee a total RSS ceiling under every framework allocation or other apps'
 concurrent allocations.
+
+The source-balanced research configuration uses a smaller **5 GiB process
+budget and 8 GiB available-memory reserve**, two host threads, and streaming
+weights. Available memory counts free pages and bounded reclaimable file cache,
+not all inactive anonymous pages. Any macOS pressure warning stops inference.
+An estimated admission failure can halve a document batch **before inference**;
+actual pressure or a failed inference stops the run. Research collection refuses
+CPU selection and does not silently turn accelerator failures into CPU jobs.
 
 `execution.max_memory_gib` and `execution.reserve_memory_gib` configure the
 policy. Benchmark equivalents are `--max-memory-gib` and
@@ -337,6 +345,57 @@ bootstrap intervals are document-level and unadjusted for multiple comparisons.
 Short sampled texts and selected interventions limit scientific generalization.
 
 ## Export validated research evidence
+
+### Source-balanced research and the results interface
+
+After the pinned sources and models are acquired and the cohort prepared
+([data design](studies/data-design.md)), use the reusable study commands:
+
+```sh
+uv run --locked moe-pilot --config configurations/causal-study.toml study-observe --catalog configurations/models.toml --names olmoe-0924 --partition discovery
+uv run --locked moe-pilot --config configurations/causal-study.toml study-observe --catalog configurations/models.toml --names olmoe-0924 --partition calibration
+uv run --locked moe-pilot --config configurations/causal-study.toml study-select
+uv run --locked moe-pilot --config configurations/causal-study.toml study-observe --catalog configurations/models.toml --names olmoe-0924 --partition evaluation --interventions
+uv run --locked moe-pilot --config configurations/causal-study.toml study-observe --catalog configurations/models.toml --names olmoe-0125-base olmoe-0125-sft olmoe-0125-dpo olmoe-0125-instruct --partition evaluation
+uv run --locked moe-pilot --config configurations/causal-study.toml study-observe --catalog configurations/models.toml --names olmoe-0125-sft olmoe-0125-instruct --partition evaluation --formatting paired-chat
+uv run --locked moe-pilot --config configurations/causal-study.toml study-analyse
+uv run --locked moe-pilot report
+uv run --locked moe-pilot serve-report
+```
+
+Open **http://127.0.0.1:8765**. The checked-in `research/report/index.html`
+also opens directly offline. Use domain, layer, and control filters for the
+reconstruction and the metric selector for checkpoint comparisons. Every
+chart has numeric tables or linked figure-source data; study figures export
+PNG, SVG, and PDF. The paired-format panel contrasts native chat with plain
+prompts on exactly aligned question tokens. Print/save PDF exports the page.
+The generated `research/report/analysis.md` explains the outcomes and limits.
+
+`study-analyse` reads only completed, hash-validated observations; it does not
+run models. It regenerates tables, intervals, figures, and reader documents.
+`report` builds the static interface; `serve-report` imports no model framework
+and binds loopback only. The preview refreshes progress and validated study
+tables every 30 seconds. Rebuild `report` after analysis to update offline
+snapshots, source downloads, and figure exports. API refresh failures preserve
+the last displayed results and are visible on the refresh button.
+
+Collection runs checkpoints sequentially under the shared inference lock.
+Set `OMP_NUM_THREADS=2 VECLIB_MAXIMUM_THREADS=2 HF_HUB_OFFLINE=1
+HF_DATASETS_OFFLINE=1` and launch with `nice -n 10` on a busy Mac. Stop with a
+normal interrupt and rerun the identical frozen command to resume. Saved
+batches retain document order, hashes, timings, actual counts, and peak RSS.
+`--max-batches 1` is an admission-sized checkpoint, not a completed study.
+Changing the runtime, configuration, tokenization, or protocol requires a new
+output directory. Use a frozen package as described below for long runs.
+
+The study declares six primary interaction tests (three domains × removal and
+rerouting), with source/domain-stratified paired bootstrap intervals and Holm
+correction. Calibrated control matching is a measured prerequisite for a
+semantic-specialization interpretation; failed balance is retained visibly.
+Plain-prompt stage contrasts and the subsequently chosen native-chat follow-up
+are observational/exploratory. They are not official benchmark scores.
+
+### Archived-input reconstruction
 
 After every reconstruction stage completes:
 

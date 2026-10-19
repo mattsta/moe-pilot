@@ -9,7 +9,23 @@ Experiments inspect and intervene on model internals during local execution.
 The [research program](docs/research-program.md) defines the project purpose,
 audits current capabilities, and prioritizes additional models and studies.
 The [causal specialization protocol](docs/studies/causal-specialization.md)
-specifies the next proposed experiment and its analysis requirements.
+specifies the source-balanced experiment and its analysis requirements.
+
+**Read the results:** [interactive report](research/report/index.html),
+[detailed analysis](research/report/analysis.md), and
+[PNG/SVG/PDF figure exports](research/report/index.html#figure-downloads).
+The report has domain/layer/control filters, checkpoint metric comparisons,
+paired chat-format effects, numeric tables, and PNG/SVG/PDF exports. It opens
+offline and does not load model weights. For a localhost preview:
+
+```sh
+uv run --locked moe-pilot serve-report
+```
+
+Open **http://127.0.0.1:8765**. The
+[runbook](docs/runbook.md#source-balanced-research-and-the-results-interface)
+documents acquisition, sequential inference, checkpoint resume, analysis,
+and rebuilding the report.
 
 ## Start here
 
@@ -42,6 +58,37 @@ relative to that file. The CLI and library share the same experiment runner;
 execution does not depend on the working directory.
 
 ## Measured research results
+
+The new source-balanced cohort has **180 held-out questions** across computing,
+mathematics, and science from two pinned dataset sources. OLMoE 0125 base, SFT,
+DPO, and final have all completed the identical plain-prompt evaluation:
+**23.3%, 21.7%, 22.2%, and 21.7% forced-choice accuracy**, respectively.
+Every paired accuracy interval versus base includes zero. These are selected
+zero-shot question/answer-letter measurements, not official benchmark scores.
+Layer-7 routing changes across stages are visible, but do not establish improved
+reasoning or semantic specialization. See [the charts and paired intervals](research/report/index.html#models).
+
+Discovery (180 questions) and calibration (120) are separate from evaluation.
+**All three proposed specialist/control matches failed** the frozen mass,
+usage, and output-norm balance requirements. The study retains this failure
+and treats subsequent intervention contrasts as exploratory. The
+[detailed report](research/report/analysis.md) includes all completed outcomes,
+source/lexical sensitivity, and protocol limits.
+
+The 0924 follow-up completed **33 intervention conditions on all 180 questions**.
+Science on/off specialist-minus-control interactions are **+0.003378 nats/token**
+for removal (95% CI 0.001092–0.005820; Holm p=0.0318) and **+0.003476** for
+rerouting (0.000968–0.006208; Holm p=0.0405). Computing and mathematics
+primary intervals include zero. Failed matching still prevents a
+semantic-specialization claim. Correct-answer-label sensitivity is reported
+separately and does not show the same positive harm pattern.
+
+SFT and final also completed **360 paired plain/native-chat questions**.
+Neither shows a clear forced-letter accuracy gain from the native wrapper.
+The final model's loss on identical question tokens increases by 0.1562
+nats/token (95% CI 0.1356–0.1767). The
+[paired charts](research/report/index.html#formats) distinguish context effects,
+routing changes, and task scoring.
 
 The [full OLMoE 0924 reconstruction](research/reconstruction-0924/README.md)
 completed locally on MPS with a pinned 6.9B-parameter checkpoint: 500 analysis

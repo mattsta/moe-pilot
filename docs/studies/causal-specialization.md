@@ -1,12 +1,19 @@
 # Causal specialization study protocol
 
-This proposed local experiment tests whether domain-related expert routing
+This local experiment tests whether domain-related expert routing
 predicts domain-selective loss effects after accounting for routing mass,
 lexical composition, and source. Its primary target is a pinned OLMoE
 checkpoint. The implementation supplies the intervention modes below,
 checkpointed diagnostics, mass controls, and the
-[source-balanced data preparation](data-design.md). Confirmatory statistics
-and measured matching criteria remain prerequisites for final evaluation.
+[source-balanced data preparation](data-design.md). The frozen plan is recorded
+before the held-out intervention evaluation. The current implementation and
+results are in the [interactive report](../../research/report/index.html) and
+[detailed analysis](../../research/report/analysis.md).
+
+The executed selection/calibration stage found **no admissible controls for
+any of the three domains** under its frozen five-feature calipers. The retained
+contrasts are explicitly exploratory; final evaluation does not turn those
+failed matches into a causal-specialization finding.
 
 ## Hypotheses and observations
 
@@ -159,7 +166,10 @@ counts, and figure-source tables with the local run. Produce summaries from
 validated completed artifacts. Keep large arrays and model downloads outside
 version control, following the existing runbook and contribution rules.
 
-The experiment is ready for a scientific summary when baseline/intervention
+The experiment is ready for a causal-specialization summary when baseline/intervention
 checks pass, discovery and evaluation are separated, controls meet declared
 balance criteria, and every primary outcome and sensitivity analysis has a
 traceable result. A null result with that evidence is a completed study.
+A completed protocol can also report failed control overlap and exploratory
+outcomes; that is a valid scientific result with a narrower interpretation,
+not a successful confirmatory test of semantic specialization.

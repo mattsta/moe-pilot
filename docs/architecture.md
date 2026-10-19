@@ -43,6 +43,11 @@ model layers. Explicit layer indices are validated against the actual model.
 | `probes.py`                   | Read-only geometry observer of the shared engine         |
 | `benchmark.py`                | Repeated synchronized engine measurements and parity checks |
 | `observations.py`             | Document-level routing, norms, features, and target losses |
+| `study.py`, `study_data.py`    | Frozen source-balanced cohorts, selection, and resumable study collection |
+| `study_formats.py`            | Checkpoint-native chat wrappers and exact paired token alignment |
+| `study_analysis.py`           | Paired source-aware uncertainty, intervention contrasts, and diagnostics |
+| `study_figures.py`, `study_publication.py` | Exportable scientific plots and generated reader analyses |
+| `reports.py`, `report_assets/` | Offline interactive results UI and lightweight loopback preview |
 | `acquisition.py`, `catalog.py` | Immutable local checkpoints and declared model lineages |
 | `publication.py`              | Evidence validation and generated local research reports |
 | `plotting.py`                 | Headless figures without process-wide plotting state     |
@@ -98,7 +103,7 @@ the host, so the full embedding table is not cached. An engine rejects changed
 model shards or configuration after construction. A failed allocation remains
 an error; the engine does not silently change its cache or device policy.
 
-`ResourcePolicy` admits estimates before loading weights, preserves free host
+`ResourcePolicy` admits estimates before loading weights, preserves available host
 memory, limits this process's accelerator allocator, and rechecks between
 layers. Engine calls, explicit reference verification, and benchmarks share a
 per-user compute lease. Budget failures stop execution without switching to
@@ -109,6 +114,11 @@ longest retained document. Padding uses the latter to avoid allocating context
 windows larger than the observations require. Checkpoints retain both values.
 Study observations can also use `execution.microbatch_documents`, with fixed
 document/answer mapping and deterministic probe samples across batch sizes.
+The collector halves only an unadmitted batch on a `ResourceAdmissionError`.
+It saves actual document counts and resumes by those counts; OS pressure,
+allocation, and inference failures propagate. Research collection requires a
+compliant accelerator, retaining CPU support for general library use and tiny
+software checks without recurring full-model CPU research.
 
 Backend, concrete device, device name, platform, CUDA/HIP build versions, and
 float32 precision are included in runtime identity. Stage records also preserve
@@ -187,6 +197,10 @@ Losses are nats per token. Domain/subtopic entropy and JSD are bits. Ablation
 tables distinguish token-weighted means from equal-document means. Confidence
 intervals are paired document bootstraps with unadjusted 95% coverage; they do
 not imply multiple-comparison correction or broad claims of expert necessity.
+The source-balanced study declares a separate six-endpoint primary family
+with Holm-adjusted studentized source-stratified permutation tests. Paired
+bootstrap intervals remain unadjusted and condition on the sampled checkpoint
+and source/domain cells. Matching failures block semantic-specialization claims.
 Unused experts have undefined conditional probabilities/SI (`NaN`), aggregate
 statistics exclude those undefined values, and heatmaps use neutral lift.
 
@@ -218,3 +232,31 @@ Use `ExperimentRunner` for public workflow orchestration and provenance. Low-lev
 runner bypasses dependency and provenance checks. Reusable application logic
 belongs in package modules and verification in checked-in tests, never inline
 Python commands or root-level scripts.
+
+## Study publication and reader interface
+
+Study manifests retain exact row/token identities, pinned checkpoint lineage,
+numerical dependencies, resource policy, frozen analysis/selection digests,
+producer module hashes, and per-batch array/trace hashes. Collection from a
+frozen wheel keeps continued report development from changing experiment
+provenance. Source-balanced selection, intervention evaluation, plain-prompt
+stage comparison, and the exploratory native-chat follow-up have explicit
+separate identities.
+
+Analysis accepts only completed, contiguous, hash-validated observations.
+Plain/chat pairing additionally checks the content group, source/domain,
+matching token-span hash and length, checkpoint, and original baseline cohort.
+Loss and routing for the follow-up use the aligned span, avoiding role-token
+composition changes. Intervention restoration must equal baseline exactly.
+Gate diagnostics report input-token means per batch, including document-final
+positions; they are not document-weighted loss endpoints.
+
+Analysed CSVs carry a hash inventory. Figures are generated from those tables
+using headless matplotlib and retain their source hashes and export hashes.
+The HTML publisher checks tables, reconstruction inputs, and figure sources
+before embedding the values. It copies the traceable tables and manifests
+beside offline JS/CSS, figures, and the detailed analysis. No external assets,
+frontend build service, or model imports are required to view or serve it.
+The loopback preview exposes read-only progress and validated table snapshots;
+transient analysis updates return a visible refresh failure while keeping the
+last successfully displayed results.

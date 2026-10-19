@@ -64,9 +64,19 @@ The resulting 360 observations are paired measurements of 180 documents.
 
 Each observation retains source revision, origin, subject, answer index,
 group identity, and the answer's character offset. Overall language-model loss
-and answer-target loss are distinct endpoints. Task accuracy needs a separately
-specified scoring implementation. No machine-generated paraphrases or
+and answer-target loss are distinct endpoints. Task accuracy uses separately
+validated, context-stable next-token answer-letter scoring over the displayed
+options. No machine-generated paraphrases or
 unreviewed translations are presented as validated semantic controls.
+
+The executed protocol follow-up uses the checkpoint's native chat wrapper
+rather than the prepared spaced variant. It was selected after the plain-prompt
+stage comparison and is explicitly exploratory. Both members keep question,
+choice, and response-label strings fixed. Tokenizer offsets and exact sequence
+matching identify a common contiguous question-token span covering at least
+90% of the plain prefix. Routing and span loss use only that shared span,
+with identical deterministic probe positions inside each pair. Plain and
+chat observations retain the original content group, source, and domain.
 
 ## Acquisition and validation
 
