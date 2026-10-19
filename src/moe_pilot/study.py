@@ -139,6 +139,8 @@ def collect(config, catalog, names, partition, *, max_batches=None, intervention
         raise ValueError("Research plan changed; use a new run directory")
     write_json(plan, PLAN)
     selection = read_json(root / "selection.json") if interventions else None
+    if selection and (names != [selection["model"]] or selection.get("plan") != PLAN):
+        raise ValueError("Interventions require their frozen selection model and exact plan")
     if interventions and partition != "evaluation":
         raise ValueError("Frozen interventions are evaluated only on the evaluation split")
     conditions = conditions_from_selection(selection) if selection else {}
@@ -185,6 +187,11 @@ def collect(config, catalog, names, partition, *, max_batches=None, intervention
             "max_tokens": config.execution.max_tokens,
             "batch_documents": width,
             "condition_group": config.execution.condition_group,
+            "seed": config.analysis.seed,
+            "resources": {
+                "max_memory_gib": config.execution.max_memory_gib,
+                "reserve_memory_gib": config.execution.reserve_memory_gib,
+            },
             "conditions": {key: value.record() for key, value in conditions.items()},
             "selection": digest(selection),
             "plan": digest(PLAN),

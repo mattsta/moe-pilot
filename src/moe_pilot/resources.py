@@ -55,9 +55,20 @@ def physical_memory_bytes():
 
 
 def available_memory_bytes():
-    """Read immediately free host memory without counting reclaimable caches."""
+    """Read headroom, including conservatively bounded reclaimable file cache."""
     if platform.system() == "Darwin":
         try:
+            pressure = subprocess.run(
+                ["/usr/sbin/sysctl", "-n", "kern.memorystatus_vm_pressure_level"],
+                capture_output=True,
+                text=True,
+                check=True,
+                timeout=2,
+            )
+            if int(pressure.stdout) != 1:
+                raise ValueError(
+                    "macOS reports memory pressure; research stopped without allocating more memory"
+                )
             result = subprocess.run(
                 ["/usr/bin/vm_stat"], capture_output=True, text=True, check=True, timeout=2
             )
@@ -70,7 +81,14 @@ def available_memory_bytes():
             if ":" in line:
                 name, value = line.split(":", 1)
                 pages[name] = int(value.strip().rstrip("."))
-        return page_size * (pages["Pages free"] + pages.get("Pages speculative", 0))
+        # File-backed inactive cache can be reclaimed without compressing an
+        # application's anonymous working set. Do not count all inactive pages.
+        # Subtract speculative pages from file cache before adding them once.
+        speculative = pages.get("Pages speculative", 0)
+        file_cache = min(
+            pages.get("Pages inactive", 0), max(0, pages.get("File-backed pages", 0) - speculative)
+        )
+        return page_size * (pages["Pages free"] + speculative + file_cache)
     memory = Path("/proc/meminfo")
     if memory.exists():
         for line in memory.read_text().splitlines():

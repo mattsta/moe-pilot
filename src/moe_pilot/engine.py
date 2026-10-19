@@ -122,6 +122,18 @@ class Engine:
         # embedding table just to retain a small corpus's hidden states.
         return self.store.embedding_rows(batch.tok).to(self.device)
 
+    def release_stream_memory(self):
+        """Complete a layer and release unused allocator cache on shared GPUs."""
+        if self.weight_cache != "stream":
+            return
+        if self.device.type == "mps":
+            torch.mps.synchronize()
+            torch.mps.empty_cache()
+        elif self.device.type == "cuda":
+            torch.cuda.synchronize(self.device)
+            with torch.cuda.device(self.device):
+                torch.cuda.empty_cache()
+
     def rms(self, x, weight):
         return x * torch.rsqrt(x.pow(2).mean(-1, keepdim=True) + self.cfg.rms_norm_eps) * weight
 
@@ -381,6 +393,7 @@ class Engine:
             hidden = self.moe(attended, weights, log=routing)
             del attended
             del weights
+            self.release_stream_memory()
         if on_output is not None:
             on_output(hidden, batch, norm, head)
         results["base"], valid = self.token_losses(hidden, batch, norm, head)
@@ -427,6 +440,7 @@ class Engine:
                     on_trace=trace if on_intervention is not None else None,
                 )
             del weights
+            self.release_stream_memory()
         return hidden
 
     @bounded_inference
@@ -504,6 +518,7 @@ class Engine:
                 weights = self.load_layer(layer)
                 hidden = self.moe(self.attn(hidden, weights, batch), weights)
                 del weights
+                self.release_stream_memory()
             losses, valid = self.token_losses(hidden, batch, norm, head)
             checkpoint.save("valid.npy", valid)
             checkpoint.save("losses/base.npy", losses)

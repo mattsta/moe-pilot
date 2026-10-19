@@ -1,4 +1,5 @@
 from dataclasses import replace
+from types import SimpleNamespace
 
 import pytest
 import torch
@@ -102,3 +103,29 @@ def test_reference_rejected_before_transformers_load(local_model, memory, monkey
     monkeypatch.setattr(AutoModelForCausalLM, "from_pretrained", forbidden)
     with pytest.raises(ValueError, match="budget"):
         verify_local_model(engine.store.directory, [[2, 3, 4]], device="cpu")
+
+
+def test_macos_headroom_counts_file_cache_once_but_never_anonymous_pages(monkeypatch):
+    from moe_pilot import resources
+
+    monkeypatch.setattr(resources.platform, "system", lambda: "Darwin")
+    stats = "Mach Virtual Memory Statistics: (page size of 4096 bytes)\nPages free: 100.\nPages speculative: 20.\nPages inactive: 1000.\nFile-backed pages: 200.\nAnonymous pages: 50000.\n"
+    monkeypatch.setattr(
+        resources.subprocess,
+        "run",
+        lambda command, **kwargs: SimpleNamespace(
+            stdout="1" if command[0].endswith("sysctl") else stats
+        ),
+    )
+    assert resources.available_memory_bytes() == 300 * 4096
+
+
+def test_macos_warning_pressure_stops_before_reading_cache_counters(monkeypatch):
+    from moe_pilot import resources
+
+    monkeypatch.setattr(resources.platform, "system", lambda: "Darwin")
+    monkeypatch.setattr(
+        resources.subprocess, "run", lambda *args, **kwargs: SimpleNamespace(stdout="2")
+    )
+    with pytest.raises(ValueError, match="macOS reports memory pressure"):
+        resources.available_memory_bytes()
