@@ -35,7 +35,8 @@ model layers. Explicit layer indices are validated against the actual model.
 | ----------------------------- | -------------------------------------------------------- |
 | `config.py`                   | Frozen settings, validation, explicit path layout        |
 | `experiment.py`               | Stage graph, writer lock, manifests, reuse/invalidation  |
-| `engine.py`                   | CPU attention, expert routing, batches, and token losses |
+| `engine.py`                   | Device-aware attention, expert routing, and token losses |
+| `devices.py`                  | Backend selection, capability probes, host array transfer |
 | `model.py`                    | Local configuration and safetensors tensor access        |
 | `checkpoints.py`              | Atomic arrays and inference resume identities            |
 | `probes.py`                   | Read-only geometry observer of the shared engine         |
@@ -52,6 +53,40 @@ Imports never download data, load model weights, or start experiments. Optional
 dataset dependencies are imported only by source-download workflows. The CLI
 sets the configured CPU-thread count; library embedding leaves process-wide
 thread policy with the caller. Engine objects own independent local model state.
+
+## Compute device selection
+
+`execution.device` defaults to `auto`. The runner resolves one device for its
+stages and passes that exact selection into every engine. Standalone library
+callers use `Engine(model_directory, device="auto")`. Selection tries CUDA/ROCm
+GPU indices before MPS and reaches CPU only after accelerator checks fail.
+Explicit `cuda[:index]`, `rocm[:index]`, `mps`, and `cpu` requests fail clearly
+if that backend is unavailable or noncompliant; they do not silently switch.
+
+[ROCm uses PyTorch's CUDA API](https://docs.pytorch.org/docs/stable/notes/hip.html):
+`torch.version.hip` distinguishes an AMD build, whose tensor device is still
+`cuda:N`. CUDA and ROCm are distinct wheel builds. The default package source
+supports NVIDIA CUDA on Linux and native MPS on macOS; AMD installs use the
+locked `rocm` extra. CPU-only Linux wheels are an optional `cpu` extra.
+
+Availability alone is insufficient. A synchronized numerical probe checks the
+float32 attention, RMS/router, indexed accumulation, geometry, and loss kernels
+used by inference against CPU reference results. A failed candidate is recorded,
+and automatic selection continues to the next accelerator before CPU.
+The project does not globally enable MPS's per-operation CPU fallback.
+
+Weights and temporary activations use the selected device. Disk reads, compact
+batch/document metadata, and persisted NumPy arrays are host-side. Checkpoint
+hidden states are saved on the host and restored to the selected compute device.
+Geometry uses a private host RNG and transfers random tensors to that device;
+it does not depend on MPS supporting `torch.Generator`.
+
+Backend, concrete device, device name, platform, CUDA/HIP build versions, and
+float32 precision are included in runtime identity. Stage records also preserve
+rejected candidates and the requested policy. Moving from CPU to MPS/CUDA/ROCm,
+or between GPU indices, invalidates stage/checkpoint reuse. Selection is fixed
+for an invocation; errors during a long experiment are propagated rather than
+silently recomputing partial results on another backend.
 
 ## Experiment lifecycle
 

@@ -1,22 +1,29 @@
 # MoE Pilot
 
 A Python library and executable research pipeline for studying expert routing,
-specialization, geometry, and causal ablations in OLMoE. CPU inference streams
-one decoder layer at a time from a local safetensors checkpoint.
+specialization, geometry, and causal ablations in OLMoE. Inference streams
+one decoder layer at a time onto CUDA, ROCm, MPS, or CPU from local safetensors.
 
 ## Start here
 
 Install [uv](https://docs.astral.sh/uv/getting-started/installation/), then:
 
 ```sh
-uv sync --locked --all-extras
+uv sync --locked --extra data
 uv run --locked moe-pilot --help
+uv run --locked moe-pilot devices
 uv run --locked moe-pilot smoke
 uv run --locked pytest -W error
 uv run --locked moe-pilot --config configurations/pilot.toml inventory
 ```
 
-The smoke check is offline and uses a tiny random model. The experiment pipeline
+The default `execution.device = "auto"` tries available CUDA/ROCm GPUs, then
+Apple MPS, and uses CPU only after accelerator availability/capability checks
+fail. Explicit `cuda[:index]`, `rocm[:index]`, `mps`, and `cpu` choices are also
+supported. `devices` reports the selected backend and rejected candidates.
+
+The smoke check is offline and uses a tiny random model on the selected device.
+The experiment pipeline
 uses one validated [TOML configuration](configurations/pilot.toml) for model,
 data, output paths, sampling, inference, controls, and reporting. Paths resolve
 relative to that file. The CLI and library share the same experiment runner;
@@ -57,7 +64,10 @@ ExperimentRunner(experiment).run_pipeline()
 
 Development uses Python 3.12, `pyproject.toml`, and `uv.lock`. Runtime-only
 installation is `uv sync --locked --no-dev`. Downloading source datasets also
-requires the `data` extra. Linux installs CPU PyTorch wheels.
+requires the `data` extra. Default wheels support CUDA on Linux and native MPS
+on macOS. Linux AMD users select `--extra rocm`; CPU-only Linux wheels are an
+opt-in `--extra cpu` profile. Use the same profile on `uv sync` and `uv run`;
+see [backend installation and validation](docs/runbook.md#devices-and-pytorch-installation).
 
 The historical pilot's model weights, raw routing/geometry arrays, and per-token
 ablation losses were not supplied. Software checks use synthetic local models

@@ -4,7 +4,7 @@ See [the operator runbook](docs/runbook.md) for complete bring-up and
 [the architecture](docs/architecture.md) for module boundaries and library use.
 
 ```sh
-uv sync --locked --all-extras
+uv sync --locked --extra data
 uv run --locked ruff check .
 uv run --locked ruff format --check .
 uv run --locked pytest -W error
@@ -44,3 +44,10 @@ filename-based scientific metadata, or alternate inference implementations.
 Use the engine's observer API for new probes. Add provenance/dependency checks
 and return explicit output paths for new stages. Configuration changes must
 have one source of truth shared by CLI and library callers.
+
+Preserve automatic CUDA/ROCm → MPS → CPU selection and capability validation.
+Keep temporary tensors on the chosen compute device and artifacts on the host.
+Add accelerator tests for new operations; tests skip only hardware absent from
+the host and fail when an advertised backend cannot execute required kernels.
+Use `--extra rocm` consistently for AMD installs, or `--extra cpu` for optional
+CPU-only Linux installs. Do not use `--all-extras`: those wheel profiles conflict.
