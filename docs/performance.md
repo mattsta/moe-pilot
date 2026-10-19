@@ -20,20 +20,20 @@ Times below are medians of seven synchronized runs after two warmups per case
 and backend. CPU/MPS order alternates between repetitions. Speedup is CPU time
 divided by MPS time; values below 1 mean MPS was slower.
 
-| Input tokens | Workload | CPU (ms) | MPS (ms) | MPS speedup |
-| ---: | --- | ---: | ---: | ---: |
-| 64 | Baseline | 7.90 | 21.49 | 0.37× |
-| 64 | Routing + geometry | 261.25 | 389.90 | 0.67× |
-| 64 | Ablations | 18.42 | 64.03 | 0.29× |
-| 1,024 | Baseline | 25.83 | 37.31 | 0.69× |
-| 1,024 | Routing + geometry | 283.01 | 398.83 | 0.71× |
-| 1,024 | Ablations | 59.65 | 66.19 | 0.90× |
-| 8,192 | Baseline | 114.26 | 53.43 | 2.14× |
-| 8,192 | Routing + geometry | 367.74 | 370.70 | 0.99× |
-| 8,192 | Ablations | 281.17 | 117.85 | 2.39× |
-| 16,384 | Baseline | 209.21 | 74.29 | 2.82× |
-| 16,384 | Routing + geometry | 468.60 | 384.17 | 1.22× |
-| 16,384 | Ablations | 526.51 | 168.11 | 3.13× |
+| Input tokens | Workload           | CPU (ms) | MPS (ms) | MPS speedup |
+| -----------: | ------------------ | -------: | -------: | ----------: |
+|           64 | Baseline           |     7.90 |    21.49 |       0.37× |
+|           64 | Routing + geometry |   261.25 |   389.90 |       0.67× |
+|           64 | Ablations          |    18.42 |    64.03 |       0.29× |
+|        1,024 | Baseline           |    25.83 |    37.31 |       0.69× |
+|        1,024 | Routing + geometry |   283.01 |   398.83 |       0.71× |
+|        1,024 | Ablations          |    59.65 |    66.19 |       0.90× |
+|        8,192 | Baseline           |   114.26 |    53.43 |       2.14× |
+|        8,192 | Routing + geometry |   367.74 |   370.70 |       0.99× |
+|        8,192 | Ablations          |   281.17 |   117.85 |       2.39× |
+|       16,384 | Baseline           |   209.21 |    74.29 |       2.82× |
+|       16,384 | Routing + geometry |   468.60 |   384.17 |       1.22× |
+|       16,384 | Ablations          |   526.51 |   168.11 |       3.13× |
 
 At 16,384 input tokens, baseline throughput was approximately 78,314 input
 tokens/second on CPU and 220,536 on MPS. This is evaluation throughput, not

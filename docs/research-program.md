@@ -29,17 +29,17 @@ memory and storage. Synthetic MPS speedups do not predict full-model runtime.
 
 ## Audit of the current project
 
-| Area | Existing evidence or implementation | Consequence for further research |
-| --- | --- | --- |
-| Historical pilot | Five domains; 500 analysis, 200 held-out, and 1,140 subtopic documents; archived tables and plots | Useful hypotheses and a fixed input population for a new measured run |
-| Historical provenance | Original weights, raw routing/geometry arrays, and per-token ablation losses are absent; the notes identify no exact model commit | A newly pinned checkpoint can reconstruct the study, but cannot establish exact original-checkpoint replication |
-| Inference | `Engine` explicitly supports OLMoE, full multi-head attention, and float32 tensor staging | Other model families require architecture work and numerical validation |
-| Routing analysis | Domain divergence, expert usage, token categories, and same-token routing comparisons | Association and lexical diagnostics exist; matched semantic/source interventions do not |
-| Geometry | Flattened weight cosine, functional output cosine, centered outputs, Gaussian and norm-matched random controls | Low cosine alone does not establish distinct knowledge or causal independence |
-| Ablation | Explicit rerouting, fixed-routing removal/rescaling, substitution, and strength/restoration modes with diagnostics | Software modes are validated against Transformers; their scientific comparison requires the frozen study |
-| Controls | Global-mass and on-domain-mass matching, held-out evaluation, document bootstrap intervals | Control balance, selection independence, source clustering, and multiplicity need stronger confirmatory treatment |
-| Study scale | Sample config uses 64 tokens, 20 permutations, and three control seeds | These are pilot settings, not a justified confirmatory sample size or null distribution |
-| Local verification | Synthetic numerical tests and synchronized CPU/MPS benchmarks | Establish software behavior and small-model timing; full-model scientific findings require new runs |
+| Area                  | Existing evidence or implementation                                                                                               | Consequence for further research                                                                                  |
+| --------------------- | --------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| Historical pilot      | Five domains; 500 analysis, 200 held-out, and 1,140 subtopic documents; archived tables and plots                                 | Useful hypotheses and a fixed input population for a new measured run                                             |
+| Historical provenance | Original weights, raw routing/geometry arrays, and per-token ablation losses are absent; the notes identify no exact model commit | A newly pinned checkpoint can reconstruct the study, but cannot establish exact original-checkpoint replication   |
+| Inference             | `Engine` explicitly supports OLMoE, full multi-head attention, and float32 tensor staging                                         | Other model families require architecture work and numerical validation                                           |
+| Routing analysis      | Domain divergence, expert usage, token categories, and same-token routing comparisons                                             | Association and lexical diagnostics exist; matched semantic/source interventions do not                           |
+| Geometry              | Flattened weight cosine, functional output cosine, centered outputs, Gaussian and norm-matched random controls                    | Low cosine alone does not establish distinct knowledge or causal independence                                     |
+| Ablation              | Explicit rerouting, fixed-routing removal/rescaling, substitution, and strength/restoration modes with diagnostics                | Software modes are validated against Transformers; their scientific comparison requires the frozen study          |
+| Controls              | Global-mass and on-domain-mass matching, held-out evaluation, document bootstrap intervals                                        | Control balance, selection independence, source clustering, and multiplicity need stronger confirmatory treatment |
+| Study scale           | Sample config uses 64 tokens, 20 permutations, and three control seeds                                                            | These are pilot settings, not a justified confirmatory sample size or null distribution                           |
+| Local verification    | Synthetic numerical tests and synchronized CPU/MPS benchmarks                                                                     | Establish software behavior and small-model timing; full-model scientific findings require new runs               |
 
 The audit follows [pilot records](pilot-notes.md), the
 [archive inventory](../research/pilot/README.md), [verification](verification.md),
@@ -51,14 +51,14 @@ and the current [engine](../src/moe_pilot/engine.py),
 
 ## Model priorities
 
-| Priority | Local model comparison | Scientific purpose | Implementation status |
-| --- | --- | --- | --- |
-| 1 | OLMoE 0924 base with several checkpoints from its released training trajectory | Reconstruct the pilot and test when routing preferences and ablation effects emerge | Closest to current support; pin each available checkpoint and verify compatibility/parity |
-| 1 | OLMoE 0125 base, SFT, DPO, and final Instruct | Measure how post-training changes routing, functional geometry, and intervention effects | Same model family; validate each checkpoint and record its lineage and input formatting |
-| 2 | Granite 3.1 1B-A400M and 3B-A800M base models | Affordable architecture/scale comparisons and repeated study development | New Granite adapter, including grouped-query attention and model-specific scaling |
-| 3 | Qwen3-30B-A3B-Base and a matched post-trained variant | Test whether findings extend to a larger 128-expert model | New adapter, including attention projection geometry, grouped-query attention, and gate normalization |
-| 4 | DeepSeekMoE-16B base | Compare routed experts with explicitly shared experts | New adapter for shared experts and mixed layer structure; preserve model-specific terms |
-| Later | Qwen3.5-35B-A3B | Compare hybrid attention/state architectures with routed and shared experts | Substantial new hybrid architecture support; a separate research extension |
+| Priority | Local model comparison                                                         | Scientific purpose                                                                       | Implementation status                                                                                 |
+| -------- | ------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| 1        | OLMoE 0924 base with several checkpoints from its released training trajectory | Reconstruct the pilot and test when routing preferences and ablation effects emerge      | Closest to current support; pin each available checkpoint and verify compatibility/parity             |
+| 1        | OLMoE 0125 base, SFT, DPO, and final Instruct                                  | Measure how post-training changes routing, functional geometry, and intervention effects | Same model family; validate each checkpoint and record its lineage and input formatting               |
+| 2        | Granite 3.1 1B-A400M and 3B-A800M base models                                  | Affordable architecture/scale comparisons and repeated study development                 | New Granite adapter, including grouped-query attention and model-specific scaling                     |
+| 3        | Qwen3-30B-A3B-Base and a matched post-trained variant                          | Test whether findings extend to a larger 128-expert model                                | New adapter, including attention projection geometry, grouped-query attention, and gate normalization |
+| 4        | DeepSeekMoE-16B base                                                           | Compare routed experts with explicitly shared experts                                    | New adapter for shared experts and mixed layer structure; preserve model-specific terms               |
+| Later    | Qwen3.5-35B-A3B                                                                | Compare hybrid attention/state architectures with routed and shared experts              | Substantial new hybrid architecture support; a separate research extension                            |
 
 The [OLMoE base card](https://huggingface.co/allenai/OLMoE-1B-7B-0924)
 documents intermediate checkpoint branches. The

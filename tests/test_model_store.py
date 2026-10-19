@@ -13,11 +13,11 @@ def test_bounded_reader_matches_native_safetensors_exactly(tmp_path, dtype):
     tiny_model(tmp_path)
     path = tmp_path / "model.safetensors"
     with safe_open(path, framework="pt") as source:
-        tensors = {key: source.get_tensor(key).to(dtype).clone() for key in source.keys()}
+        tensors = {key: source.get_tensor(key).to(dtype).clone() for key in source}
     save_file(tensors, path)
     store = ModelStore(tmp_path)
     with safe_open(path, framework="pt") as source:
-        for name in source.keys():
+        for name in source:
             actual = store.get(name)
             np.testing.assert_array_equal(actual.numpy(), source.get_tensor(name).float().numpy())
             assert store.tensor_bytes(name) == actual.numel() * 4

@@ -8,10 +8,10 @@ five-domain reconstruction remains a separate study.
 
 ## Sources and eligible population
 
-| Dataset | Immutable revision | Computing | Mathematics | Science |
-| --- | --- | ---: | ---: | ---: |
-| cais/mmlu | c30699e8356da336a370243923dbaf21066bb9fe | 288 | 848 | 1,239 |
-| TIGER-Lab/MMLU-Pro | b189ec765aa7ed75c8acfea42df31fdae71f97be | 94 | 503 | 1,923 |
+| Dataset            | Immutable revision                       | Computing | Mathematics | Science |
+| ------------------ | ---------------------------------------- | --------: | ----------: | ------: |
+| cais/mmlu          | c30699e8356da336a370243923dbaf21066bb9fe |       288 |         848 |   1,239 |
+| TIGER-Lab/MMLU-Pro | b189ec765aa7ed75c8acfea42df31fdae71f97be |        94 |         503 |   1,923 |
 
 Counts are eligible local records after subject selection, origin filtering,
 and a 900-byte rendered-input limit, before duplicate grouping. The limit also

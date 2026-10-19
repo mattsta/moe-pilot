@@ -76,13 +76,13 @@ accounted bits per byte when comparing likelihood across tokenizers.
 
 ## Intervention definitions
 
-| Intervention | Operation | Interpretation |
-| --- | --- | --- |
-| Exclusion with rerouting | Mask selected expert logits before softmax/top-k | Effect of excluding those experts while allowing gate redistribution and replacements |
-| Fixed-routing output removal | Preserve router choices on incoming states at each target site; zero selected output contributions | Effect of removing contributions without replacement; removed output mass is part of the treatment |
-| Fixed-routing removal with explicit rescaling | Remove contributions and rescale according to a declared rule | Sensitivity to output magnitude; rescaling is a separate treatment |
-| Controlled substitution or patch | Replace a selected contribution with a declared donor/control contribution | Tests whether the specific contribution matters beyond comparable activity; donor validity needs checks |
-| Strength sweep and restoration | Vary intervention strength, then restore the original contribution | Checks response shape and implementation consistency; exact restoration alone does not establish semantic specificity |
+| Intervention                                  | Operation                                                                                          | Interpretation                                                                                                        |
+| --------------------------------------------- | -------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| Exclusion with rerouting                      | Mask selected expert logits before softmax/top-k                                                   | Effect of excluding those experts while allowing gate redistribution and replacements                                 |
+| Fixed-routing output removal                  | Preserve router choices on incoming states at each target site; zero selected output contributions | Effect of removing contributions without replacement; removed output mass is part of the treatment                    |
+| Fixed-routing removal with explicit rescaling | Remove contributions and rescale according to a declared rule                                      | Sensitivity to output magnitude; rescaling is a separate treatment                                                    |
+| Controlled substitution or patch              | Replace a selected contribution with a declared donor/control contribution                         | Tests whether the specific contribution matters beyond comparable activity; donor validity needs checks               |
+| Strength sweep and restoration                | Vary intervention strength, then restore the original contribution                                 | Checks response shape and implementation consistency; exact restoration alone does not establish semantic specificity |
 
 For OLMoE configurations with unnormalized selected gate weights, pre-softmax
 masking can change both selected experts and gate scale. Save the relevant

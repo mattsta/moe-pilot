@@ -57,16 +57,16 @@ running the suite, so an absent expected GPU cannot be hidden by skipped tests.
 
 Local checks passed on 2026-10-19:
 
-| Check                                         | Result                                               |
-| --------------------------------------------- | ---------------------------------------------------- |
-| Locked uv synchronization                     | Passed                                               |
-| Ruff lint and formatting                      | Passed                                               |
-| `pytest -q -W error`                          | 208 passed in 22.77 seconds; 2 absent CUDA/ROCm hardware tests skipped; no warnings |
+| Check                                         | Result                                                                                          |
+| --------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| Locked uv synchronization                     | Passed                                                                                          |
+| Ruff lint and formatting                      | Passed                                                                                          |
+| `pytest -q -W error`                          | 208 passed in 22.77 seconds; 2 absent CUDA/ROCm hardware tests skipped; no warnings             |
 | Historical CPU/MPS performance measurement    | 24 cases, 7 timed repeats each; retained from the original conversion; not repeated for release |
-| Offline CLI smoke                             | CPU and real MPS passed against CPU/Hugging Face |
-| Configured read-only inventory                | Passed without creating input/output directories     |
-| Wheel and source distribution                 | Built; new modules and sample configuration verified |
-| Built-wheel installation outside the checkout | Installed separately; offline CLI smoke passed       |
+| Offline CLI smoke                             | CPU and real MPS passed against CPU/Hugging Face                                                |
+| Configured read-only inventory                | Passed without creating input/output directories                                                |
+| Wheel and source distribution                 | Built; new modules and sample configuration verified                                            |
+| Built-wheel installation outside the checkout | Installed separately; offline CLI smoke passed                                                  |
 
 Historical corpora, 37 CSV tables, and plots remain unchanged in `research/pilot`.
 Original model weights, routing/geometry arrays, and per-token ablation losses

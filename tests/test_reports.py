@@ -44,7 +44,7 @@ def test_report_embeds_verified_tables_and_runs_without_external_scripts(publica
     path = build_report(publication, tmp_path / "study", tmp_path / "report")
     text = path.read_text()
     match = re.search(
-        r'<script id="research-data" type="application/json">(.*?)</script>', text, re.S
+        r'<script id="research-data" type="application/json">(.*?)</script>', text, re.DOTALL
     )
     assert match
     data = json.loads(match.group(1))

@@ -84,9 +84,8 @@ def test_concurrent_job_rejected_and_nested_calls_allowed(tmp_path, monkeypatch)
     def outer():
         return inner()
 
-    with FileLock(filename):
-        with pytest.raises(ValueError, match="concurrent inference"):
-            outer()
+    with FileLock(filename), pytest.raises(ValueError, match="concurrent inference"):
+        outer()
     assert outer() == 42
 
 

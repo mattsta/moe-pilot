@@ -31,35 +31,35 @@ model layers. Explicit layer indices are validated against the actual model.
 
 ## Module boundaries
 
-| Module                        | Responsibility                                           |
-| ----------------------------- | -------------------------------------------------------- |
-| `config.py`                   | Frozen settings, validation, explicit path layout        |
-| `experiment.py`               | Stage graph, writer lock, manifests, reuse/invalidation  |
-| `engine.py`                   | Device-aware attention, expert routing, and token losses |
-| `devices.py`                  | Backend selection, capability probes, host array transfer |
-| `resources.py`                | Shared-host admission checks and per-process allocator limits |
-| `model.py`                    | Local configuration and safetensors tensor access        |
-| `checkpoints.py`              | Atomic arrays and inference resume identities            |
-| `probes.py`                   | Read-only geometry observer of the shared engine         |
-| `benchmark.py`                | Repeated synchronized engine measurements and parity checks |
-| `observations.py`             | Document-level routing, norms, features, and target losses |
-| `study.py`, `study_data.py`    | Frozen source-balanced cohorts, selection, and resumable study collection |
-| `study_formats.py`            | Checkpoint-native chat wrappers and exact paired token alignment |
-| `study_analysis.py`           | Paired source-aware uncertainty, intervention contrasts, and diagnostics |
-| `study_figures.py`, `study_publication.py` | Exportable scientific plots and generated reader analyses |
-| `reports.py`, `report_assets/` | Offline interactive results UI and lightweight loopback preview |
-| `acquisition.py`, `catalog.py` | Immutable local checkpoints and declared model lineages |
-| `publication.py`              | Evidence validation and generated local research reports |
-| `plotting.py`                 | Headless figures without process-wide plotting state     |
-| `interventions.py`            | Versioned, validated specialist/control metadata         |
-| `perturbations.py`            | Immutable mode, strength, expert mask, and donor semantics |
-| `verification.py`             | Full-depth local checkpoint checks against Transformers |
-| `controls.py`                 | Specialist ranking and routing-mass matching             |
-| `corpora.py`, `datasets.py`   | Seeded sampling and pinned source downloads              |
-| `metrics.py`, `statistics.py` | Probability metrics and document-level inference         |
-| `artifacts.py`                | Corpus validation and atomic JSON writes                 |
-| `workflows/`                  | Configured stages returning explicit output paths        |
-| `cli.py`                      | Arguments, CLI CPU-thread policy, and API invocation     |
+| Module                                     | Responsibility                                                            |
+| ------------------------------------------ | ------------------------------------------------------------------------- |
+| `config.py`                                | Frozen settings, validation, explicit path layout                         |
+| `experiment.py`                            | Stage graph, writer lock, manifests, reuse/invalidation                   |
+| `engine.py`                                | Device-aware attention, expert routing, and token losses                  |
+| `devices.py`                               | Backend selection, capability probes, host array transfer                 |
+| `resources.py`                             | Shared-host admission checks and per-process allocator limits             |
+| `model.py`                                 | Local configuration and safetensors tensor access                         |
+| `checkpoints.py`                           | Atomic arrays and inference resume identities                             |
+| `probes.py`                                | Read-only geometry observer of the shared engine                          |
+| `benchmark.py`                             | Repeated synchronized engine measurements and parity checks               |
+| `observations.py`                          | Document-level routing, norms, features, and target losses                |
+| `study.py`, `study_data.py`                | Frozen source-balanced cohorts, selection, and resumable study collection |
+| `study_formats.py`                         | Checkpoint-native chat wrappers and exact paired token alignment          |
+| `study_analysis.py`                        | Paired source-aware uncertainty, intervention contrasts, and diagnostics  |
+| `study_figures.py`, `study_publication.py` | Exportable scientific plots and generated reader analyses                 |
+| `reports.py`, `report_assets/`             | Offline interactive results UI and lightweight loopback preview           |
+| `acquisition.py`, `catalog.py`             | Immutable local checkpoints and declared model lineages                   |
+| `publication.py`                           | Evidence validation and generated local research reports                  |
+| `plotting.py`                              | Headless figures without process-wide plotting state                      |
+| `interventions.py`                         | Versioned, validated specialist/control metadata                          |
+| `perturbations.py`                         | Immutable mode, strength, expert mask, and donor semantics                |
+| `verification.py`                          | Full-depth local checkpoint checks against Transformers                   |
+| `controls.py`                              | Specialist ranking and routing-mass matching                              |
+| `corpora.py`, `datasets.py`                | Seeded sampling and pinned source downloads                               |
+| `metrics.py`, `statistics.py`              | Probability metrics and document-level inference                          |
+| `artifacts.py`                             | Corpus validation and atomic JSON writes                                  |
+| `workflows/`                               | Configured stages returning explicit output paths                         |
+| `cli.py`                                   | Arguments, CLI CPU-thread policy, and API invocation                      |
 
 Imports never download data, load model weights, or start experiments. Optional
 dataset dependencies are imported only by source-download workflows. The CLI
