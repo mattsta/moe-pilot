@@ -18,6 +18,6 @@ results/**/cache/
 results/**/losses/
 runs/
 smoke-output/
-data/
+/data/
 *.lock.tmp
 !.python-version

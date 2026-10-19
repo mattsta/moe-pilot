@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "layer": 7,
+  "primary_modes": [
+    "remove",
+    "reroute"
+  ],
+  "secondary_modes": [
+    "rescale",
+    "substitute"
+  ],
+  "primary_metric": "document-mean next-token loss, nats/token",
+  "primary_contrast": "specialist-minus-control effect on-domain minus equally weighted off-domains",
+  "primary_family": "three domains by two primary modes; Holm adjustment",
+  "bootstrap": "paired documents stratified by source and domain; 10000 replicates",
+  "permutation": "domain labels permuted within source; 9999 replicates; plus-one two-sided p",
+  "selection": "rank by discovery on/off mass ratio; first of top eight admitting a calibration-matched control; otherwise top expert with failed balance explicitly retained",
+  "control_pool": "discovery specificity at or below its median, excluding discovery top eight",
+  "matching": "calibration on/off mass, on/off usage, and raw output norm; relative gaps <=10%, norm <=20%",
+  "weighting": "equal documents; frozen balanced source/domain cells",
+  "format": "identical plain question/choices/answer-label text across stages; no model-specific chat template",
+  "interpretation": "post-training comparisons are observational; failed matching blocks causal-specialization claims"
+}

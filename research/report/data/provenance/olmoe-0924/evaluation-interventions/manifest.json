@@ -1,0 +1,1695 @@
+{
+  "schema": 1,
+  "identity": {
+    "model": "96655392614d3098627e50d14922335c52c6d78907a7a89ac7bb4ae64fdd9a2d",
+    "target": {
+      "name": "olmoe-0924",
+      "repository": "allenai/OLMoE-1B-7B-0924",
+      "revision": "6d84c48581ece794365f2b8e9cfb043c68ade9c5",
+      "stage": "base",
+      "lineage": "olmoe-0924"
+    },
+    "rows": "ffd144e780a1017b012823eb3594eaac157277bc4098cc12e97284f82d3f3413",
+    "source_rows": "ffd144e780a1017b012823eb3594eaac157277bc4098cc12e97284f82d3f3413",
+    "formatting": "plain",
+    "format_plan": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+    "token_ids_sha256": "3c5b240b861f8321071a12ecf3745c3711c238fb77704f25b52082a22b0ece1a",
+    "model_directory": "/Users/matt/Downloads/p/eschaton-research/moe-pilot/models/olmoe-0924",
+    "versions": {
+      "torch": "2.14.1",
+      "transformers": "5.20.1",
+      "numpy": "2.5.4",
+      "safetensors": "0.8.0"
+    },
+    "threads": 2,
+    "matmul_precision": "highest",
+    "tokenizer_files": {
+      "special_tokens_map.json": "b77491e270c6fcc5b2ecf22370f7318a6a18d3cabea09ba7bab92e9bf12656c2",
+      "tokenizer.json": "a094266ac6c4982efba277bc251349a5a6d6ad37efb39a2a90f53d8be2a40a40",
+      "tokenizer_config.json": "78a839c7851f14f9fb30e664c2b46166dc0628f2900679e5ec160656f702edff"
+    },
+    "frequency": "ac3c14af5f31e0f1c26fe290f9834520111a9bd89aeea13579049e4f616b568a",
+    "implementation": {
+      "study.py": "83f6df01967d1401e35f52fb653d88cc959d649d37eb8aa1e6f78918ff6c44b3",
+      "engine.py": "bce5432c62b4e352a6239a85f9351aad3d4243616c0df0178e450d1efc345ecb",
+      "model.py": "e4d9291f8b2aba8112dc6ea851dff5e0e463181e225042b43ccefbb366277388",
+      "devices.py": "b9c4a3315fe0b1ef499edfb3c3b2deb2eaf527b681257d0ad07dc4bfd6528c07",
+      "resources.py": "27ff93d52906c829eb6c376f2b547c26fbe5cf838d7c5b12addb084e665e7afc",
+      "observations.py": "d52b3134dd95648ca1fa4e4c7ba2c2a37946e062a699ac35ef80ecdaad12f04e",
+      "perturbations.py": "bc06c394b2b234e16e4ec6afbe731bba7c6b10f55661f39fb19d2e765073bfc3",
+      "study_data.py": "95edfed59ac8173f6510195aff07cb9aa7fee1679281ddcc676c99570d9d2c09",
+      "study_formats.py": "e5992f6578d91ece7a87f37a83785b914b53c2650107789c92370d036f9e2034"
+    },
+    "device": {
+      "backend": "mps",
+      "device": "mps:0",
+      "name": "Apple Metal",
+      "machine": "arm64",
+      "platform": "macOS-26.5.1-arm64-arm-64bit",
+      "torch_cuda": null,
+      "torch_hip": null,
+      "dtype": "float32"
+    },
+    "max_tokens": 1024,
+    "batch_documents": 16,
+    "condition_group": 4,
+    "seed": 20261019,
+    "resources": {
+      "max_memory_gib": 5,
+      "reserve_memory_gib": 8
+    },
+    "conditions": {
+      "computing_remove_specialist": {
+        "mode": "remove",
+        "strength": 1.0,
+        "mask": {
+          "7": [
+            6
+          ]
+        },
+        "donors": {},
+        "fixed_routing": "router choices on incoming states at each target site",
+        "zero_mass_rescaling": "zero output when every selected contribution is removed"
+      },
+      "computing_remove_control": {
+        "mode": "remove",
+        "strength": 1.0,
+        "mask": {
+          "7": [
+            27
+          ]
+        },
+        "donors": {},
+        "fixed_routing": "router choices on incoming states at each target site",
+        "zero_mass_rescaling": "zero output when every selected contribution is removed"
+      },
+      "computing_reroute_specialist": {
+        "mode": "reroute",
+        "strength": 1.0,
+        "mask": {
+          "7": [
+            6
+          ]
+        },
+        "donors": {},
+        "fixed_routing": "router choices on incoming states at each target site",
+        "zero_mass_rescaling": "zero output when every selected contribution is removed"
+      },
+      "computing_reroute_control": {
+        "mode": "reroute",
+        "strength": 1.0,
+        "mask": {
+          "7": [
+            27
+          ]
+        },
+        "donors": {},
+        "fixed_routing": "router choices on incoming states at each target site",
+        "zero_mass_rescaling": "zero output when every selected contribution is removed"
+      },
+      "computing_rescale_specialist": {
+        "mode": "rescale",
+        "strength": 1.0,
+        "mask": {
+          "7": [
+            6
+          ]
+        },
+        "donors": {},
+        "fixed_routing": "router choices on incoming states at each target site",
+        "zero_mass_rescaling": "zero output when every selected contribution is removed"
+      },
+      "computing_rescale_control": {
+        "mode": "rescale",
+        "strength": 1.0,
+        "mask": {
+          "7": [
+            27
+          ]
+        },
+        "donors": {},
+        "fixed_routing": "router choices on incoming states at each target site",
+        "zero_mass_rescaling": "zero output when every selected contribution is removed"
+      },
+      "computing_substitute_specialist": {
+        "mode": "substitute",
+        "strength": 1.0,
+        "mask": {
+          "7": [
+            6
+          ]
+        },
+        "donors": {
+          "7": {
+            "6": 27
+          }
+        },
+        "fixed_routing": "router choices on incoming states at each target site",
+        "zero_mass_rescaling": "zero output when every selected contribution is removed"
+      },
+      "computing_substitute_control": {
+        "mode": "substitute",
+        "strength": 1.0,
+        "mask": {
+          "7": [
+            27
+          ]
+        },
+        "donors": {
+          "7": {
+            "27": 6
+          }
+        },
+        "fixed_routing": "router choices on incoming states at each target site",
+        "zero_mass_rescaling": "zero output when every selected contribution is removed"
+      },
+      "computing_half": {
+        "mode": "remove",
+        "strength": 0.5,
+        "mask": {
+          "7": [
+            6
+          ]
+        },
+        "donors": {},
+        "fixed_routing": "router choices on incoming states at each target site",
+        "zero_mass_rescaling": "zero output when every selected contribution is removed"
+      },
+      "computing_restored": {
+        "mode": "remove",
+        "strength": 0.0,
+        "mask": {
+          "7": [
+            6
+          ]
+        },
+        "donors": {},
+        "fixed_routing": "router choices on incoming states at each target site",
+        "zero_mass_rescaling": "zero output when every selected contribution is removed"
+      },
+      "computing_joint": {
+        "mode": "remove",
+        "strength": 1.0,
+        "mask": {
+          "7": [
+            6,
+            27
+          ]
+        },
+        "donors": {},
+        "fixed_routing": "router choices on incoming states at each target site",
+        "zero_mass_rescaling": "zero output when every selected contribution is removed"
+      },
+      "mathematics_remove_specialist": {
+        "mode": "remove",
+        "strength": 1.0,
+        "mask": {
+          "7": [
+            37
+          ]
+        },
+        "donors": {},
+        "fixed_routing": "router choices on incoming states at each target site",
+        "zero_mass_rescaling": "zero output when every selected contribution is removed"
+      },
+      "mathematics_remove_control": {
+        "mode": "remove",
+        "strength": 1.0,
+        "mask": {
+          "7": [
+            27
+          ]
+        },
+        "donors": {},
+        "fixed_routing": "router choices on incoming states at each target site",
+        "zero_mass_rescaling": "zero output when every selected contribution is removed"
+      },
+      "mathematics_reroute_specialist": {
+        "mode": "reroute",
+        "strength": 1.0,
+        "mask": {
+          "7": [
+            37
+          ]
+        },
+        "donors": {},
+        "fixed_routing": "router choices on incoming states at each target site",
+        "zero_mass_rescaling": "zero output when every selected contribution is removed"
+      },
+      "mathematics_reroute_control": {
+        "mode": "reroute",
+        "strength": 1.0,
+        "mask": {
+          "7": [
+            27
+          ]
+        },
+        "donors": {},
+        "fixed_routing": "router choices on incoming states at each target site",
+        "zero_mass_rescaling": "zero output when every selected contribution is removed"
+      },
+      "mathematics_rescale_specialist": {
+        "mode": "rescale",
+        "strength": 1.0,
+        "mask": {
+          "7": [
+            37
+          ]
+        },
+        "donors": {},
+        "fixed_routing": "router choices on incoming states at each target site",
+        "zero_mass_rescaling": "zero output when every selected contribution is removed"
+      },
+      "mathematics_rescale_control": {
+        "mode": "rescale",
+        "strength": 1.0,
+        "mask": {
+          "7": [
+            27
+          ]
+        },
+        "donors": {},
+        "fixed_routing": "router choices on incoming states at each target site",
+        "zero_mass_rescaling": "zero output when every selected contribution is removed"
+      },
+      "mathematics_substitute_specialist": {
+        "mode": "substitute",
+        "strength": 1.0,
+        "mask": {
+          "7": [
+            37
+          ]
+        },
+        "donors": {
+          "7": {
+            "37": 27
+          }
+        },
+        "fixed_routing": "router choices on incoming states at each target site",
+        "zero_mass_rescaling": "zero output when every selected contribution is removed"
+      },
+      "mathematics_substitute_control": {
+        "mode": "substitute",
+        "strength": 1.0,
+        "mask": {
+          "7": [
+            27
+          ]
+        },
+        "donors": {
+          "7": {
+            "27": 37
+          }
+        },
+        "fixed_routing": "router choices on incoming states at each target site",
+        "zero_mass_rescaling": "zero output when every selected contribution is removed"
+      },
+      "mathematics_half": {
+        "mode": "remove",
+        "strength": 0.5,
+        "mask": {
+          "7": [
+            37
+          ]
+        },
+        "donors": {},
+        "fixed_routing": "router choices on incoming states at each target site",
+        "zero_mass_rescaling": "zero output when every selected contribution is removed"
+      },
+      "mathematics_restored": {
+        "mode": "remove",
+        "strength": 0.0,
+        "mask": {
+          "7": [
+            37
+          ]
+        },
+        "donors": {},
+        "fixed_routing": "router choices on incoming states at each target site",
+        "zero_mass_rescaling": "zero output when every selected contribution is removed"
+      },
+      "mathematics_joint": {
+        "mode": "remove",
+        "strength": 1.0,
+        "mask": {
+          "7": [
+            27,
+            37
+          ]
+        },
+        "donors": {},
+        "fixed_routing": "router choices on incoming states at each target site",
+        "zero_mass_rescaling": "zero output when every selected contribution is removed"
+      },
+      "science_remove_specialist": {
+        "mode": "remove",
+        "strength": 1.0,
+        "mask": {
+          "7": [
+            63
+          ]
+        },
+        "donors": {},
+        "fixed_routing": "router choices on incoming states at each target site",
+        "zero_mass_rescaling": "zero output when every selected contribution is removed"
+      },
+      "science_remove_control": {
+        "mode": "remove",
+        "strength": 1.0,
+        "mask": {
+          "7": [
+            16
+          ]
+        },
+        "donors": {},
+        "fixed_routing": "router choices on incoming states at each target site",
+        "zero_mass_rescaling": "zero output when every selected contribution is removed"
+      },
+      "science_reroute_specialist": {
+        "mode": "reroute",
+        "strength": 1.0,
+        "mask": {
+          "7": [
+            63
+          ]
+        },
+        "donors": {},
+        "fixed_routing": "router choices on incoming states at each target site",
+        "zero_mass_rescaling": "zero output when every selected contribution is removed"
+      },
+      "science_reroute_control": {
+        "mode": "reroute",
+        "strength": 1.0,
+        "mask": {
+          "7": [
+            16
+          ]
+        },
+        "donors": {},
+        "fixed_routing": "router choices on incoming states at each target site",
+        "zero_mass_rescaling": "zero output when every selected contribution is removed"
+      },
+      "science_rescale_specialist": {
+        "mode": "rescale",
+        "strength": 1.0,
+        "mask": {
+          "7": [
+            63
+          ]
+        },
+        "donors": {},
+        "fixed_routing": "router choices on incoming states at each target site",
+        "zero_mass_rescaling": "zero output when every selected contribution is removed"
+      },
+      "science_rescale_control": {
+        "mode": "rescale",
+        "strength": 1.0,
+        "mask": {
+          "7": [
+            16
+          ]
+        },
+        "donors": {},
+        "fixed_routing": "router choices on incoming states at each target site",
+        "zero_mass_rescaling": "zero output when every selected contribution is removed"
+      },
+      "science_substitute_specialist": {
+        "mode": "substitute",
+        "strength": 1.0,
+        "mask": {
+          "7": [
+            63
+          ]
+        },
+        "donors": {
+          "7": {
+            "63": 16
+          }
+        },
+        "fixed_routing": "router choices on incoming states at each target site",
+        "zero_mass_rescaling": "zero output when every selected contribution is removed"
+      },
+      "science_substitute_control": {
+        "mode": "substitute",
+        "strength": 1.0,
+        "mask": {
+          "7": [
+            16
+          ]
+        },
+        "donors": {
+          "7": {
+            "16": 63
+          }
+        },
+        "fixed_routing": "router choices on incoming states at each target site",
+        "zero_mass_rescaling": "zero output when every selected contribution is removed"
+      },
+      "science_half": {
+        "mode": "remove",
+        "strength": 0.5,
+        "mask": {
+          "7": [
+            63
+          ]
+        },
+        "donors": {},
+        "fixed_routing": "router choices on incoming states at each target site",
+        "zero_mass_rescaling": "zero output when every selected contribution is removed"
+      },
+      "science_restored": {
+        "mode": "remove",
+        "strength": 0.0,
+        "mask": {
+          "7": [
+            63
+          ]
+        },
+        "donors": {},
+        "fixed_routing": "router choices on incoming states at each target site",
+        "zero_mass_rescaling": "zero output when every selected contribution is removed"
+      },
+      "science_joint": {
+        "mode": "remove",
+        "strength": 1.0,
+        "mask": {
+          "7": [
+            16,
+            63
+          ]
+        },
+        "donors": {},
+        "fixed_routing": "router choices on incoming states at each target site",
+        "zero_mass_rescaling": "zero output when every selected contribution is removed"
+      }
+    },
+    "selection": "d0bfcb01a81d7f2e161c8d5603c175db798d4176088b243322c84220ad39e078",
+    "plan": "20930caa1f259f8c72c5f3f053cf5b7319d0d67fdc37e0d355e672742c66adc6"
+  },
+  "status": "complete",
+  "chunks": [
+    {
+      "file": "chunk-00000.npz",
+      "start": 0,
+      "documents": 16,
+      "sha256": "8081efc34f2ff396ada9fb77d3af4e302cf0ae8b9811da35bd9b747cf3acabbf",
+      "seconds": 130.98149370774627,
+      "peak_process_bytes": 1301528576,
+      "trace_file": "trace-00000.json",
+      "trace_sha256": "b688747be995f57db23b761d0f6ed5abe1e4acc59ece909bbee0a978544ca175"
+    },
+    {
+      "file": "chunk-00016.npz",
+      "start": 16,
+      "documents": 16,
+      "sha256": "45ea3da93efddd39a3c2cf9893132d6b9191c6722753b7c80c85f7d4fdbc43dc",
+      "seconds": 113.75710337422788,
+      "peak_process_bytes": 1478361088,
+      "trace_file": "trace-00016.json",
+      "trace_sha256": "2672bafbad65f6998216676ee8b5aeb70fbacd8129afb97698ba5d8cb55f374c"
+    },
+    {
+      "file": "chunk-00032.npz",
+      "start": 32,
+      "documents": 16,
+      "sha256": "c629dd5f345450b5dab1bbcc299cf79eecd5ab45ef948d0b303e24284163615d",
+      "seconds": 112.75475491583347,
+      "peak_process_bytes": 1493172224,
+      "trace_file": "trace-00032.json",
+      "trace_sha256": "50edb317be6eba20f9cd1358301843a7cd561d1bb66b2abdc78147e35fce6f00"
+    },
+    {
+      "file": "chunk-00048.npz",
+      "start": 48,
+      "documents": 16,
+      "sha256": "0d54e4ce734361245d7297c1450b5ab9e5b983ce835e55b3e3c0eaa62746c7b2",
+      "seconds": 91.38258075155318,
+      "peak_process_bytes": 1493172224,
+      "trace_file": "trace-00048.json",
+      "trace_sha256": "2f5422b4baae333212161c0f9e57dde4cd34ac0642b74ad95a8267b4358e0499"
+    },
+    {
+      "file": "chunk-00064.npz",
+      "start": 64,
+      "documents": 16,
+      "sha256": "5f3c57f6b4d6ffc6c8bf7167409641c183b7acdaf46f9cf24c0b219fd5ea58db",
+      "seconds": 93.91266991756856,
+      "peak_process_bytes": 1493172224,
+      "trace_file": "trace-00064.json",
+      "trace_sha256": "ba027ce8ab74818b023333c606d254351a431d7b2f55f05ae0f7e2c19e0557e5"
+    },
+    {
+      "file": "chunk-00080.npz",
+      "start": 80,
+      "documents": 16,
+      "sha256": "59362366afda65ab6bf062e0e38a7615a48e00a8ac5e647ed1d00545973b64e8",
+      "seconds": 66.6847772076726,
+      "peak_process_bytes": 1493172224,
+      "trace_file": "trace-00080.json",
+      "trace_sha256": "0d6dab2db5e621e7043778ee0c2b42c609e030aa27845a4b7553644feeba4398"
+    },
+    {
+      "file": "chunk-00096.npz",
+      "start": 96,
+      "documents": 16,
+      "sha256": "b3a8360174b37a2cab13121784e7cf1b97cb4dc7577233542cd08e125679721f",
+      "seconds": 65.76484137400985,
+      "peak_process_bytes": 1493172224,
+      "trace_file": "trace-00096.json",
+      "trace_sha256": "f0812f6bbcd9bdf32f089e84f34a33cb18c5ecffa6d4a4cbe04aa29c42fee970"
+    },
+    {
+      "file": "chunk-00112.npz",
+      "start": 112,
+      "documents": 16,
+      "sha256": "6a14d5485aa53ff84600261c60951bc55710e2084b5b4dd287a2f9a7eaa889bf",
+      "seconds": 91.16326720826328,
+      "peak_process_bytes": 1493172224,
+      "trace_file": "trace-00112.json",
+      "trace_sha256": "7dfe23f9f2c1906d6dac82d52931451296bf57c872ed5be31b23cc77bef9be57"
+    },
+    {
+      "file": "chunk-00128.npz",
+      "start": 128,
+      "documents": 16,
+      "sha256": "6b129134e6c772be138d408243ae67dcf7f88981aafa186ebe81b0b21b818a90",
+      "seconds": 89.15603687241673,
+      "peak_process_bytes": 1493172224,
+      "trace_file": "trace-00128.json",
+      "trace_sha256": "fef969671b30bcede2463e1110bea61322da6db4f78254184d0ef72478fe5439"
+    },
+    {
+      "file": "chunk-00144.npz",
+      "start": 144,
+      "documents": 16,
+      "sha256": "29fa2d5033124cec08f0e39ad3ba1849a13fdd2ad639eb54a354090a766d6764",
+      "seconds": 89.64965358376503,
+      "peak_process_bytes": 1493172224,
+      "trace_file": "trace-00144.json",
+      "trace_sha256": "5b358372b8ed9a79c1b8432bcef36e2c2debb61e0f5651236f47ca4652fdf101"
+    },
+    {
+      "file": "chunk-00160.npz",
+      "start": 160,
+      "documents": 16,
+      "sha256": "6938d5aad9a64d4d54ec202449488c6705db26178aa82f22a6967e3b75769e2c",
+      "seconds": 75.3754462916404,
+      "peak_process_bytes": 1493172224,
+      "trace_file": "trace-00160.json",
+      "trace_sha256": "9e1b8897b0ba22d3bd146e3eb0f66c6b91eaffc2ce04749fab997ff499d4598a"
+    },
+    {
+      "file": "chunk-00176.npz",
+      "start": 176,
+      "documents": 4,
+      "sha256": "f0a60a8c5692ac2975039ccb809554a2a6318eb82671b9c47a6d226907972971",
+      "seconds": 49.32088133133948,
+      "peak_process_bytes": 1493172224,
+      "trace_file": "trace-00176.json",
+      "trace_sha256": "2c80723d876545c1b0c5d99369ff17a3fc153e66c7643aa55aa785120b57dfa9"
+    }
+  ],
+  "documents": 180,
+  "records": [
+    {
+      "id": "TIGER-Lab/MMLU-Pro:4286",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "949e316dd58ab941e9274f36b9cec3bfe28f45282b7a109b08035d782f17bcaf"
+    },
+    {
+      "id": "cais/mmlu:2105",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "cdc2d76bdf3cfcc5149087e171febe2ee8763a6e2f573b7309fd134d953cf637"
+    },
+    {
+      "id": "cais/mmlu:2884",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "6025c53efa651c6056eaefca44394a2efeba6d2287555e006f9ecf6b1cae40f3"
+    },
+    {
+      "id": "cais/mmlu:2190",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "c56fadb66dc6fad7e58a88594e76f9b8cb5e5713d7ad896dd6e55b3aa5b4e49c"
+    },
+    {
+      "id": "cais/mmlu:914",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "7ee071398710cb69e222fdf9814d5d77a81548eaf79a731e01c0c51a522eaab6"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:3283",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "ae85a3be9490f2f2415e9f5e8156684801cfa9d8606dc0954041da4594840bf6"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:8870",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "5014870ef999e40078de1e91356e34fbc6887ab7f304858eafe9d1e73ea86578"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:3232",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "df6065a06001c6daf7b50a20845abf7955756d7ea0937761fdc267bc71c144a5"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:8417",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "26195766c904b23d95c69efbaa1ad37bbd408aac372a3a05a35c651b7cc91cae"
+    },
+    {
+      "id": "cais/mmlu:3184",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "011111b63d9d92b345a63375fd249bbb6c67ffdf32a82539a49d6f3ee424f323"
+    },
+    {
+      "id": "cais/mmlu:844",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "915d7bbd282485697839bab8898f1e9bf88d7ffd55d54d35ba74622c7768b630"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:9296",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "4205e58d274b15507eb740dcc81bf120f5e1b9a8afd00744a2299a2adf8b6ef5"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:4587",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "16237f53bfc36f501924c0507987c6a0361c20a9f9861d330e2f5b7e445fcd3b"
+    },
+    {
+      "id": "cais/mmlu:2100",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "0d423f9d0864a3e33d005c6e370b45df2d1efea1ba1b88078136ef57a3dd01f3"
+    },
+    {
+      "id": "cais/mmlu:1643",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "2a95b66c4c5a657e610d055529d2bfc5ea1b931067cfd885641f276ba7aca12e"
+    },
+    {
+      "id": "cais/mmlu:2111",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "a829f471fccf53a7bf5adf8f169413c351a04a0f70bc0a5a461d99b000f7185b"
+    },
+    {
+      "id": "cais/mmlu:4497",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "26fe6e7266ce58676f374b7416e05cfadc7d813af051f16dbe0ddf313eb402fb"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10028",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "329479e3668789b02016d0ea367f5a31652ebd5577072b6b2ce92c8e274fbd3c"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:4450",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "56f216852f3a42fba4c6fd8bedba072f6832df2d758e963185a5c84cf0fb8d4d"
+    },
+    {
+      "id": "cais/mmlu:4798",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "8ba7c16e9f58d9ec778bd5eee168c9190256da1b72b6ef303b92cc2551d96828"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:8099",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "a2ec6482c694025628210687154a1a03e8b4e9ff01ba7d0e0a6f34322dbe3bf5"
+    },
+    {
+      "id": "cais/mmlu:94",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "506fd235f48773c6ec64c9a84016f1de9d4ca790fb75c6e96d19f33152e90ce6"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10200",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "d57a273e186022d9a9f6e8f61daa5e1284dddf03c2452ef3722ee6a0545890a3"
+    },
+    {
+      "id": "cais/mmlu:3093",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "766a77a69d2397e5a642c656bf960bb6bac4ce8f724ee2c6027960055c159130"
+    },
+    {
+      "id": "cais/mmlu:1548",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "afc7a5c5e55461a7bed85e730e2b8c7d030ebb4a5ceef867db7a7704eb230d67"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:9865",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "fd13c0158ae54e89bc54818435cd8eb351ed72635078550ede736e545068087e"
+    },
+    {
+      "id": "cais/mmlu:3058",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "e2560fa8c5b7a5ba49f6f876b9ed430fd93e932ef48f6b537a4700c99180bc56"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:3419",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "6dfa0c8d4d5d2f97647f08b51f7ed2fd8cdcb25e0ec5a8e120df24ae42bb676a"
+    },
+    {
+      "id": "cais/mmlu:1672",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "2273ffe684ffb2b0ca2aa466411e5d1441dd10756992019d76a7c6d54a05619f"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:4396",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "45c0717ada31f189d01fca4f16956e269d0b8194e53c07825599288e5e805e91"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:9896",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "92f9753d5fc489995eeae7a9eaa2f08fe8cef108e903b9cc0e60285dae9b1ed4"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:9138",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "354b10312f6a55d1957bec8300e0582f4af5b804516a5ec8b44b5065de7539d9"
+    },
+    {
+      "id": "cais/mmlu:4797",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "5a2f8a13dd0cd4a153828e2daa56581f5fff7a407fa43284e30637b85aecf186"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:8414",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "758bad4fb255a50b41801f8dabf2fede99bf9ede2d2f7210ac7cd097ed2263ec"
+    },
+    {
+      "id": "cais/mmlu:2069",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "db9e4d7964005eba408963b7e05a561f15e7e3d70e7e0da1fda73c62d58c8230"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:9740",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "f926cba4988a133979f91cf1acb72d3fcd065ea98d312ebb4c1eeb800bb2aed4"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:8533",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "19cc07b8966e69502d92a02dafde3157c8aafc93e1eb589388575864ee253222"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:3847",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "d77aa845e64333677af40b5da9019e64f6f4761a7e9d7ba3fc981dd0a5a8e8cf"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:8959",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "2bd93932968330c2ae10d717246b33a40dccb1f20b21625fde0d0bd859b85c6a"
+    },
+    {
+      "id": "cais/mmlu:2182",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "f884b0a9d05454dd3de95b45ae6d92bb3bda13f2eb7e75cb6370f663d1df4847"
+    },
+    {
+      "id": "cais/mmlu:2095",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "19114be7a87725cf47cc54667e36a1ac52bbef4b4a9a491a43e37824fea8c5e1"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:3995",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "e1080d8872ce9890f255942b02626fc4b36014ecae463530f69f81bf9bd4969d"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:7978",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "df1589a4deaab1c8931c7ba0c7adf8a03920b7beafa4190ab8dccd8255eec416"
+    },
+    {
+      "id": "cais/mmlu:1748",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "fde5751bdc539ce047144e3a8d1d232867c170bd978663426d6476de22ef40c1"
+    },
+    {
+      "id": "cais/mmlu:1377",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "5b33256a63b2c6e239fff62f7e05630c137913bbae97a30160c305f5fda25d7a"
+    },
+    {
+      "id": "cais/mmlu:72",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "1ac2b74976238a07eb4d1432cf937025d9e26e140f932edcb02e8aefd1bf8d00"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:8934",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "96ee5fe0b80ad92f3c77eb3c3f33ea7403bf76810c17eb56558b35f210a9a3d6"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10307",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "1f824501d0dd6baf6951c68a2455b889541a949e27d60062db01b48b2fc85ecf"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:3746",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "1df71a8334aba85b79bd92cc3d261eeb272886da93dcec972e12c81a47d5da2b"
+    },
+    {
+      "id": "cais/mmlu:2073",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "1f26d3ec1e0db00cb2bd4d004311fd3667dacb210cabe911c07c49a4a761e3ba"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:3935",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "b3a2d138ccddf3616bdfb1794e53b3ad3f4c8a6a31c92994f91cb60471effcfe"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10464",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "b17228ebad87de47b2e529511029840d31d4e5f615d5544fce08ef18dccd7a8f"
+    },
+    {
+      "id": "cais/mmlu:1732",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "2fbe640c35303c56d8002f26babc517777b86487c110a034cb76e90b3988582f"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:9248",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "22f81df3c6273e55e45c6d1e4f9dd4bf88de4c29d6ac2c5611305f513f5c49ec"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:7968",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "0638b501c0bf788b41cf293801da032a72f60fdbb2b9c75cd5fbbdb21ff8443b"
+    },
+    {
+      "id": "cais/mmlu:997",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "604630dbb88ee2b9261f5f110357f12fa14aab3d0669c9f9d45b1b3bf7db3072"
+    },
+    {
+      "id": "cais/mmlu:1783",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "53629987ecea7e61f8508dfec716c7d395a9b856b8d331c375395968c06f83ef"
+    },
+    {
+      "id": "cais/mmlu:2089",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "8e27cfbe350d1254140351c2c4616607145ee624f0575918acce76fab97fb920"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:3866",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "861cc193929e302dccd5e31c83d0a9809a359caa6b4f937fc06409a9422bed86"
+    },
+    {
+      "id": "cais/mmlu:1699",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "94ea86306558f032d17347abe123281fb5d02651b123a0b7552c5a151d442009"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10087",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "e36dde8aee546bc6575ab6952d7f63bc364a8b041b7483584a87c2f7308015e6"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:9388",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "f4bd7cc34ac6041ffd626ef5c541ee75286a71d5ff07797aec93cc453eab389f"
+    },
+    {
+      "id": "cais/mmlu:2255",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "ebf0dd31fd287c593957db55b107f3d11e9ebd03e6ef0d4a6af9ba080ba70cf4"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:3352",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "3b5ad5bcb81f0e4dc5cddeac483f27fb5ab0b7d576a6fa5dacc19d117d8df64c"
+    },
+    {
+      "id": "cais/mmlu:3224",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "6faab9adb8fda0542a6ea2c933b346377eb47581a450c375a1dcbadc89c15bf1"
+    },
+    {
+      "id": "cais/mmlu:1447",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "06d6ed4a99686c37f401938681c16ee7dd17feacff5a7960f4a22b747f3fdc79"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10643",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "c41079684ab83351bc73a362b9925dc59a08c68393b0c219838e5863cda2aad8"
+    },
+    {
+      "id": "cais/mmlu:1159",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "7c2892235e77066f5fd9ac5f3bdb7f5617feb444e8711946cb83743a182631a4"
+    },
+    {
+      "id": "cais/mmlu:1599",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "668619309bed324dbeb0ce088e9f05937830ab68e25df0980003d701ed9e4e8a"
+    },
+    {
+      "id": "cais/mmlu:2320",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "87a4cf061b1aaa4731fd59ef16c25d40226198ec7e58381ea0f0d769bb588312"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:9379",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "53c7c51ac1debaa8b216e74ef31c7224ad1eea39e70e7d21a64fc646d682061c"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:8618",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "9e083df5372a915b48c817a75101078339f8a88097a0acc6a3eeaedc66c42296"
+    },
+    {
+      "id": "cais/mmlu:1422",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "2a4c07fc21ec93a41bb01b958046cfde8c5b8db8e8d51033aaf9a6ef8c3d9bb9"
+    },
+    {
+      "id": "cais/mmlu:3272",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "124166fb160a3ba862b153190fdc1de0cba8c3fdc532dc873f64cf5532e71419"
+    },
+    {
+      "id": "cais/mmlu:2889",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "b85f47fab07749d81c02f29ddb14a3675872775b3d163197add2e138536b912d"
+    },
+    {
+      "id": "cais/mmlu:1605",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "20ae8cf5326161a2b3086acac7718cca3d65f7f99b7329b642cb12dab9fb2666"
+    },
+    {
+      "id": "cais/mmlu:2144",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "10946682f57995b7095cb8ff0832bcc5a200735d307738b0509bed286986a8d7"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:9970",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "026e83b394ca4f70bce49a10b057cb14a7cb3a94a43e2825d44106a134267fd0"
+    },
+    {
+      "id": "cais/mmlu:2988",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "4883c0be62626d43dbc4550d9eb8c9d2682552b266ea71306bd34db398d68d4f"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:4118",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "cd04908edca9bbee2e05e6084098051bdc46011769973ce4913cec150b490b02"
+    },
+    {
+      "id": "cais/mmlu:1165",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "a1833ad43306c462f6673a1fa12de73006f0bb8b6adf85102e1eaab0cfa4ddcb"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:4280",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "053919662363ff2469e267064398d82c73e65c947224a7248a0281b2de643259"
+    },
+    {
+      "id": "cais/mmlu:1504",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "e8d32cfb3b1829530c61f7af20a2b5748e9b098033c187effffe97d0d69dcdf3"
+    },
+    {
+      "id": "cais/mmlu:876",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "7a230fe6a79b22201580fc4c449ab3e6273d9dbddaaa5376e096fd33b620374d"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10203",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "66b629b6f924bdb08cd1a4aade2fe1e3f0f81bc5c209ddb4417a9d0ae5fb5f91"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:7996",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "fbbe57ddeea70a5bc0d1beb63f886bdfc2034d05b92db89036edd86c0831c270"
+    },
+    {
+      "id": "cais/mmlu:1604",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "98b46450a99a4802a225c9bb5e7cfab68d15562dc17cbde92471243f732959e0"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:2834",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "7cf709064c5de4c0e22cf6f3269cf8763c27a1ae0db1fe5926e07169f2c4f14a"
+    },
+    {
+      "id": "cais/mmlu:1143",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "95a4cbe1ea7db19e65387ea681ca8cb846cc13a44907b583d3f873f4fe0a579f"
+    },
+    {
+      "id": "cais/mmlu:2954",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "0985bf80719494b87b94c399def4326ff51358810db9a439e83df8e57ac81569"
+    },
+    {
+      "id": "cais/mmlu:4258",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "2cb04908dad51682d2553e68a3d9764c7eb7016cf4145fddda1fe5ae3336d2f2"
+    },
+    {
+      "id": "cais/mmlu:1594",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "c114103b912a4c1a2c168eb3ac109d1e3ea821aa27af6ddc3a73981372a09ab8"
+    },
+    {
+      "id": "cais/mmlu:2346",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "46b694585f449c61619194373bef2f19cb9071a80ce56932a2479b324dee145d"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:8750",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "c6bc632a75789e270cba2202d817b2aeef4796530fa75e2afa235b18887e2b0b"
+    },
+    {
+      "id": "cais/mmlu:2841",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "76794144f6c4a1fd2f8ed7efefcc862cc66746e3634da82c18f09d17468b12fb"
+    },
+    {
+      "id": "cais/mmlu:3275",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "d15503abfd4e36e7c2aab24eb9a41590ac0c650de35d015065f17aa33f1239f2"
+    },
+    {
+      "id": "cais/mmlu:4828",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "74f5da7a9489b65ef7e0d44f4e462745876393340d239b61b974d5b09124969d"
+    },
+    {
+      "id": "cais/mmlu:1753",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "e60811cd7d6713a087362846ea7ab0fdeaa16fbd7c2147b0b59e475abe776c77"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10371",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "2766bce275cd4f051b069f7479c771d0b65dd84b096b0750321fbcf7c4c9b082"
+    },
+    {
+      "id": "cais/mmlu:1128",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "25fe113879da554658df4ebe31622f747c79910a90ba2654bdbe5fbbce74633c"
+    },
+    {
+      "id": "cais/mmlu:2968",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "bfb92af844d696965f51de7f2512013ec9107824051c53856eb052fadf2474f9"
+    },
+    {
+      "id": "cais/mmlu:3064",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "05f8fc251016104b833c072c5abad2e874201a56195c2c88a71c001aeb66ef14"
+    },
+    {
+      "id": "cais/mmlu:4235",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "22ca0e814af9cca144d4747be04b9eaea703ba307f5c1e29e74cd84ab57df0b3"
+    },
+    {
+      "id": "cais/mmlu:3038",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "dcdb797e3cffb0762a211d30e44bd505a60ecaae48bb0270639e4a016def9753"
+    },
+    {
+      "id": "cais/mmlu:3209",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "dfb1a995813d25a6e2f5ea4b28575c60e05831200742b6a91e316d60a9a81cc0"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:8622",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "1359430b5ddedacb735ecbda7aca9427f7f3f261e1d99b157dfe26bf3eb04e94"
+    },
+    {
+      "id": "cais/mmlu:2239",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "6cd6a2c44bf90414c40ba8cb4a0118f28e79c49ecff930c4b76b9cbd9aca3f9e"
+    },
+    {
+      "id": "cais/mmlu:1186",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "0f526f85e5a16b0b5b33acfefaf416901e4d2f8a0eaefec9c8b91ba54f16466d"
+    },
+    {
+      "id": "cais/mmlu:4234",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "3d13f6acb5573547aebe77a947c3186833427713407439080b8af99af1b183b5"
+    },
+    {
+      "id": "cais/mmlu:4461",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "b7d032b1d827938fa044786ad76909e39c840ec396053ee13d0c989e3dd773b4"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:8529",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "06c45a77a1727d61ee90433083f0180e8afa79257e5931a9303d9d0f095159c9"
+    },
+    {
+      "id": "cais/mmlu:41",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "4691858620d97bb68ac21c701dc0d1fa0b38e2ac8a651aa1bb9614387fe04ca2"
+    },
+    {
+      "id": "cais/mmlu:1038",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "3b2fbcc3b27db80da03245dc441cf05fd570e2efd74512c2a3a25b79316352fe"
+    },
+    {
+      "id": "cais/mmlu:2193",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "cd7c63994ac635bbb25392e8408b950fa7206567576768f118c50a9384f72111"
+    },
+    {
+      "id": "cais/mmlu:1044",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "4c36c84824280cd44cadd05acd68f739dc0a3993ec19d946245eba1943746b80"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:8624",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "723fdd911fbdc1f7f86e6e65cdc24c0fd95bb864ea2ca48cd6174cdab94596a1"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:8758",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "56e2219777072a9ba73788ebf46c52403f4f0759a8276cccc1d6f1c54b6764a9"
+    },
+    {
+      "id": "cais/mmlu:7",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "7c2b478371c2232c2c019bb77f5a6f4ef53a2f3940d7899807afdd550328a101"
+    },
+    {
+      "id": "cais/mmlu:3233",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "a35f7726ab41483bf45e13ecb610b946b9c4d8febeae04353b9fdc4ceb9b521a"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10576",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "c06c2a8d507963b82ec14fbbae8068f2cf1c7e7eb8784459bc0740305715485c"
+    },
+    {
+      "id": "cais/mmlu:4264",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "854e7e546f512b01197639283b8af2318de9ce12ba174dcd61a70faa8cc041fb"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:8768",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "2adab32328dbc7648082aba05a373c6281a8f496f704e158129eef8fee3f6d4b"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:8076",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "fae7f4c24b233b15031dfe458ac0f87234a2d6de5938929c1f59585191e45492"
+    },
+    {
+      "id": "cais/mmlu:1030",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "ecb1e435bc1928bd7c0b55c0f3f27cc77d531ff4a7db0fb7131cb4af881889a8"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:8636",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "612352f033432451630aac93f2e83315342172080313baebeb80eb8dee999afa"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:8943",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "ffdb4052d2b5dcee30a304cfa36bf4c49517b66d13bacd60e67fc9bde599b470"
+    },
+    {
+      "id": "cais/mmlu:1570",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "b274da8153bedf512e761c626369773c858d1b3fc328dc5e390df651901a96fa"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:8952",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "df55a595d48665b4e0bb4fd286956239d26a9b2154d7b59c76c83cc0f27360aa"
+    },
+    {
+      "id": "cais/mmlu:3255",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "f7e0ca5d96587c0d91a678cc8136dbcd158782f99cd87692748c52edda9a52be"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:8321",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "f57d1ab793ed30f83d0d3d3ffe1605f407e485c5e05ab712b62bdd421eaf540b"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:7862",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "47554a96391e15eeb11b8980d036d672452d76743499646c27890d8f9df7fe04"
+    },
+    {
+      "id": "cais/mmlu:1011",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "839b58d52fbd39bf4f96a1016433bf16975cbd5f2723982f1bb28fbf0e8cbcaa"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:8755",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "a8b26b8739d7831f7f9503322e43a34a925791a612aae8cda8d1abdc91396f77"
+    },
+    {
+      "id": "cais/mmlu:1522",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "bc6747701bfc0fac4458e1b09d5368313a6750708df7f0ea4613d72eb5af9438"
+    },
+    {
+      "id": "cais/mmlu:3227",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "70151736be5d1264109f39c509547e793b817703f3eaf67a8c4bdb107c3d2a2e"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:9033",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "a839a7c48e8e6e62a1a351ca7a0beda52867cfd0a6ea1139dbc951056b210bde"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:9023",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "c64fc60d4e0667fb6bcc4946df7ac6db73086955c198a7bd2bf38a5235092d76"
+    },
+    {
+      "id": "cais/mmlu:1002",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "2f88311506bff7da2badc47abd2bdc4b6f314dc12b3d057e21f54f458331178d"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:8062",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "ac767e26ed2f4946ba1b02a49b6d96e9a9f6dd1a67d20804a330431dd6156f24"
+    },
+    {
+      "id": "cais/mmlu:1564",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "f18b0386068d510bc8fe91c5e49cb6fb8e409139840332024a7dccd1a8567748"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:7988",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "0737644c5067fa32e0c4bdf8d0b09b1bb999fdde4fd3bf494a574a31b1d09d08"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10574",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "6d5f18ebd6db25bfa5d48164c4a19d94f0fe15fa4bb8782872e946885eed94d6"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:8294",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "681700ef1d3d6503ed79148cbcbac5f8731653f6e40f53c71ac11230661a130f"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10440",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "6b7419f478a314e959ddad1097e01d7e93c96d59ced8f821df9fc32b5c728b27"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:8738",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "3f8c9f81cd74c736771d86f0355db1c9e5c10ea801a42946cf05349291d8fe9d"
+    },
+    {
+      "id": "cais/mmlu:996",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "f722137b46e18ebde26490af426044d1e616c842e8369cb3d49634b069cdedcd"
+    },
+    {
+      "id": "cais/mmlu:1009",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "b12ae7c008d1be1f3275efccaa397c388b337476413a7b161a03c48c601ab216"
+    },
+    {
+      "id": "cais/mmlu:3207",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "d4ef4d824d426f067fe1827062d248de6806145078f1e37ca50e62be49d2b49b"
+    },
+    {
+      "id": "cais/mmlu:1486",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "6259328380c81c1677bbd470275de640dc17f48a4e1c9fd788ccec071f03753a"
+    },
+    {
+      "id": "cais/mmlu:1040",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "d3d004e215778d54819fc75befa2745a79f5db08efc84a088f692a61c0979569"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10506",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "5c133fe742d7c3b33df93315275954f555ec46ec369f1b1acf2f94575a8c4155"
+    },
+    {
+      "id": "cais/mmlu:1095",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "15999f3f964222c6e060a0bd61754c2c3b971c937f207d0411ee3ad52ea8b59d"
+    },
+    {
+      "id": "cais/mmlu:3253",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "0cc90949719e64076c0ff73fbebdb95eedbb3d582ca483f129e49829497c95fd"
+    },
+    {
+      "id": "cais/mmlu:3246",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "0a541eed9fc346ca306444cc1d7773749fd2b59cba9d936c0b9cae087fe60706"
+    },
+    {
+      "id": "cais/mmlu:1558",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "baac8723047b432f064993d97d2836a67ea040fe037625f996e159f05062ae05"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10641",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "7aac04d401542ce016d0a958e900c94bc8631324a1c1f18168081e26d4fb466c"
+    },
+    {
+      "id": "cais/mmlu:1069",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "ab880cc1ef0c55cea6dad8b6e935e6d954b131de26e5e0dce40a809244bdbe88"
+    },
+    {
+      "id": "cais/mmlu:1052",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "4e99cfef4c81e6560308bc61341fc7467d1535ffe8d6ba059e90fde0ea6b8e97"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10765",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "eca8e59463c5e87b6ef710b6f15791d55e2cd3d0d72d2d1ba5f78d4ca6510e5c"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10498",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "ab83526b66e0f355a2257dd06f9f059aaa4de13e156b4c027f9430731d4e4f94"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10608",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "4f404b43ec1818957d665eff05376abc0fecaf021912df2e1ec4c85233e644c9"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10740",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "07f22384aeebceb7ba2c941243adc09fb3dde5dc331cffcdf09f435d5b9110a2"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10375",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "6b07fbcff3824052c6685c437819267b22fe0e5c01e1f5d0c4a98b377b8fa8a9"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10612",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "9076dbba08796d1b243ecb7022d68b1862be20453c5b0657e79154f9b0dc4294"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10741",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "af46469ed4f469463940a7dfbcdbd5254c64022b815d6c6ad5fe1432416fceb5"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10747",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "b625d409a481fb8a76892cd031dc94114f361afeb962a80f6bd09128e469b54d"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10466",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "68b0f715f03c0ab6b5dbf0bc25687b5f32b9723cecbfe7c53410e1dd18565f72"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10502",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "ff2166f3b8950e489d4bed84961ad2bba834c69f81ac651a97a8111dc57ee1de"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10739",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "d1809bf0875f1b60f59e8350d83ccc18a005d3a18c8904caca5235b78f794164"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10401",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "08d9acf9ce4b0da2b5c4b055699b9bdc0e77a44ec4345ad1495182b24b530ab3"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10500",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "52e578281ec90563adf8e0dfd97129581f8c783da7df002e64b424e5fa89312d"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10436",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "3e03e10cdfa88efd53d4812a4ffa3b6ae2e479e6a6d35fc5ec011dd414520a40"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10575",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "2e5897c8b32f5a29b3213f6ec971968ae4881e3cefeeb371b38c1e8601ef0e3b"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10400",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "8d2ec8c5b715ce12a07f7d3c55d6309da27cf2d25c652fa1db259931fce93a47"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10699",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "8117a20e18be99bab4b3ae7e1adf4bfc007d1e8a587762a77e43ffce38f8490a"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10700",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "24a7c2f912deaea1700a8d3e025d3d0caf238bfa0536e5708e7436ec9570382e"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10433",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "5bb4e15bff8e0e0b017e8c24ccd688b170d978740a2f2eac438384119408b889"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10702",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "be67e581d22f57fee9b8dd983a774b2f27352f3cb351c37d8f672015be73ef14"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10501",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "8c4835cedc2b9dc51694f8876052c59853d6916d6b548350d6f37ef65cf12400"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10462",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "00f0423bf5577e898970f5d40c0d65d7fe83b271a3e85499f00536377f349d2e"
+    }
+  ]
+}

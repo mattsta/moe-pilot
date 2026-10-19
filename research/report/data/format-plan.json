@@ -1,0 +1,10 @@
+{
+  "schema": 1,
+  "status": "exploratory follow-up selected after plain-prompt stage evaluation",
+  "factor": "plain versus checkpoint-native user/assistant wrapper; identical question and response-label strings",
+  "alignment": "longest identical contiguous question-token span, at least 90% of the plain prefix",
+  "sampling": "same deterministic token index inside the aligned span for each paired content group",
+  "outcomes": "paired forced-choice accuracy, normalized choice log loss, aligned-span next-token loss, and selected-gate routing divergence",
+  "uncertainty": "10000 paired content-group bootstrap replicates stratified by source and domain",
+  "limits": "protocol effects within a fixed checkpoint and cohort; not a training-algorithm effect or official benchmark score"
+}

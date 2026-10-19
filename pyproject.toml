@@ -38,7 +38,7 @@ dev = ["build>=1.2,<2", "pytest>=8.3,<10", "ruff>=0.11,<1"]
 packages = ["src/moe_pilot"]
 
 [tool.hatch.build.targets.sdist]
-include = ["src/", "tests/", "docs/", "configurations/", "README.md", "CONTRIBUTING.md", "pyproject.toml", "uv.lock", ".python-version"]
+include = ["src/", "tests/", "docs/", "configurations/", "research/report/", "README.md", "CONTRIBUTING.md", "pyproject.toml", "uv.lock", ".python-version"]
 
 [tool.uv]
 conflicts = [[{ extra = "cpu" }, { extra = "rocm" }]]

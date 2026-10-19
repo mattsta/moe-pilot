@@ -1,0 +1,3855 @@
+{
+  "schema": 1,
+  "identity": {
+    "model": "16d07f607efc2825b3373944fc537f55f0eeb413d2ca283c43ad36247036903c",
+    "target": {
+      "name": "olmoe-0125-sft",
+      "repository": "allenai/OLMoE-1B-7B-0125-SFT",
+      "revision": "6f7a5b02aa069fdcb8d0cb6b837b9905a3d995d7",
+      "stage": "sft",
+      "lineage": "olmoe-0125"
+    },
+    "rows": "667fa75739c5454ad7884d9762f1935f3b6bfedb21ec65ac6c2e835cc711f50c",
+    "source_rows": "ffd144e780a1017b012823eb3594eaac157277bc4098cc12e97284f82d3f3413",
+    "formatting": "paired-chat",
+    "format_plan": "cb31ce4d53e8cf0def62d9f1274ffe7a1b8aeb6322dacedd7d5beba2ea0768d5",
+    "token_ids_sha256": "5725b33a7cedd03fd3c80a5fdfc538ca94cce22b524d1635290e152df17aec11",
+    "model_directory": "/Users/matt/Downloads/p/eschaton-research/moe-pilot/models/olmoe-0125-sft",
+    "versions": {
+      "torch": "2.14.1",
+      "transformers": "5.20.1",
+      "numpy": "2.5.4",
+      "safetensors": "0.8.0"
+    },
+    "threads": 2,
+    "matmul_precision": "highest",
+    "tokenizer_files": {
+      "special_tokens_map.json": "f9d45be58536a0fa36e01bf0d6f6c36c6200d2974f48b6e8ad7d28f68ee9b9da",
+      "tokenizer.json": "8e2c49673774cc96724c2b8e92327a32f99e821d9baf33ef789ac5811736f2e0",
+      "tokenizer_config.json": "6b31e8ac577b9567427518d28febfa31c78df27aca20c8cb8cc09333ca495d08"
+    },
+    "frequency": "ac3c14af5f31e0f1c26fe290f9834520111a9bd89aeea13579049e4f616b568a",
+    "implementation": {
+      "study.py": "df126d718db54ddec0b6d2e3ee69e03a54db4ff08a312dbdd1ebf5b2c09f8282",
+      "engine.py": "bce5432c62b4e352a6239a85f9351aad3d4243616c0df0178e450d1efc345ecb",
+      "model.py": "e4d9291f8b2aba8112dc6ea851dff5e0e463181e225042b43ccefbb366277388",
+      "devices.py": "b9c4a3315fe0b1ef499edfb3c3b2deb2eaf527b681257d0ad07dc4bfd6528c07",
+      "resources.py": "27ff93d52906c829eb6c376f2b547c26fbe5cf838d7c5b12addb084e665e7afc",
+      "observations.py": "55e5c3192bc6174bcfbfebb64ada4f205c733780988a4d183e94cf0f1e458992",
+      "perturbations.py": "bc06c394b2b234e16e4ec6afbe731bba7c6b10f55661f39fb19d2e765073bfc3",
+      "study_data.py": "95edfed59ac8173f6510195aff07cb9aa7fee1679281ddcc676c99570d9d2c09",
+      "study_formats.py": "e5992f6578d91ece7a87f37a83785b914b53c2650107789c92370d036f9e2034"
+    },
+    "device": {
+      "backend": "mps",
+      "device": "mps:0",
+      "name": "Apple Metal",
+      "machine": "arm64",
+      "platform": "macOS-26.5.1-arm64-arm-64bit",
+      "torch_cuda": null,
+      "torch_hip": null,
+      "dtype": "float32"
+    },
+    "max_tokens": 1024,
+    "batch_documents": 16,
+    "condition_group": 4,
+    "seed": 20261019,
+    "resources": {
+      "max_memory_gib": 5,
+      "reserve_memory_gib": 8
+    },
+    "conditions": {},
+    "selection": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+    "plan": "20930caa1f259f8c72c5f3f053cf5b7319d0d67fdc37e0d355e672742c66adc6"
+  },
+  "status": "complete",
+  "chunks": [
+    {
+      "file": "chunk-00000.npz",
+      "start": 0,
+      "documents": 16,
+      "sha256": "92ca8905c22c1d2cd7251d593f6d33f19aba46a6736d8c759663033dbf078cf3",
+      "seconds": 11.65228508412838,
+      "peak_process_bytes": 1322434560
+    },
+    {
+      "file": "chunk-00016.npz",
+      "start": 16,
+      "documents": 16,
+      "sha256": "19530584b75e1345f23148ae8b52196f80fae8ffb059d0de1810797cc5dcd025",
+      "seconds": 9.950845248997211,
+      "peak_process_bytes": 1327513600
+    },
+    {
+      "file": "chunk-00032.npz",
+      "start": 32,
+      "documents": 16,
+      "sha256": "00506f2d35acc715deeef627df22850aa657c6f190ad3fbb57b7e088c6060f72",
+      "seconds": 12.171802040189505,
+      "peak_process_bytes": 1353023488
+    },
+    {
+      "file": "chunk-00048.npz",
+      "start": 48,
+      "documents": 16,
+      "sha256": "f3b8d6dd6951d9c942e2eac864d484614c4d977aa3b01647992f3c77a3dffab7",
+      "seconds": 11.515619166195393,
+      "peak_process_bytes": 1357840384
+    },
+    {
+      "file": "chunk-00064.npz",
+      "start": 64,
+      "documents": 16,
+      "sha256": "d3b48d0da84aa80390f68b2f55b3adcb7f27fd25046828fa5e127df9ca97609f",
+      "seconds": 12.427248124033213,
+      "peak_process_bytes": 1357840384
+    },
+    {
+      "file": "chunk-00080.npz",
+      "start": 80,
+      "documents": 16,
+      "sha256": "f6dc435ef345bf3b89e14cee5328c1e0582278bff9205773cc44574cf1e4a325",
+      "seconds": 10.672301335260272,
+      "peak_process_bytes": 1359740928
+    },
+    {
+      "file": "chunk-00096.npz",
+      "start": 96,
+      "documents": 16,
+      "sha256": "c4585e16c93017c5ea1b6dbdf3d962b08329a7e2ca8e378ed70f8c5784158a35",
+      "seconds": 10.868228167295456,
+      "peak_process_bytes": 1360183296
+    },
+    {
+      "file": "chunk-00112.npz",
+      "start": 112,
+      "documents": 16,
+      "sha256": "684556db87244af7a1d3e33901832c61d617c3235ac51366747afcce2cc59d53",
+      "seconds": 10.895406914874911,
+      "peak_process_bytes": 1360183296
+    },
+    {
+      "file": "chunk-00128.npz",
+      "start": 128,
+      "documents": 16,
+      "sha256": "dc2a0e3161a613fa41242a2d3c1ab4817db66b53c7850dbffae5eb0aea998d3d",
+      "seconds": 15.16835954040289,
+      "peak_process_bytes": 1364525056
+    },
+    {
+      "file": "chunk-00144.npz",
+      "start": 144,
+      "documents": 16,
+      "sha256": "78fe357bc714b7cedb2c5907e8df83baad8b73b537dbda3cda1767fd4373fc6a",
+      "seconds": 18.404732460156083,
+      "peak_process_bytes": 1370701824
+    },
+    {
+      "file": "chunk-00160.npz",
+      "start": 160,
+      "documents": 16,
+      "sha256": "82a32b3dd706b2d884effef043b2448b5d51d3d161b44e4eaedafcb879ad2a4d",
+      "seconds": 21.606765292584896,
+      "peak_process_bytes": 1376026624
+    },
+    {
+      "file": "chunk-00176.npz",
+      "start": 176,
+      "documents": 16,
+      "sha256": "78df7bce95f7e264084f90f22fb10b0128f37003fee7a8c5e83bfd4b8e04ee27",
+      "seconds": 30.426670206710696,
+      "peak_process_bytes": 1376026624
+    },
+    {
+      "file": "chunk-00192.npz",
+      "start": 192,
+      "documents": 16,
+      "sha256": "e29bf7390bf106d257bec4561c0c31d7edb377f839aa32cd1b8bf9785db32eba",
+      "seconds": 15.178747000172734,
+      "peak_process_bytes": 1376026624
+    },
+    {
+      "file": "chunk-00208.npz",
+      "start": 208,
+      "documents": 16,
+      "sha256": "00d85a7908092916ea91a399abd8a738aea5aff3469550168943340726d08987",
+      "seconds": 17.357996750622988,
+      "peak_process_bytes": 1376026624
+    },
+    {
+      "file": "chunk-00224.npz",
+      "start": 224,
+      "documents": 16,
+      "sha256": "0f42975891187a940eaaa46181f7f7b355b0fb2e9f27fa4339eee7b4cb4751d6",
+      "seconds": 23.655536582693458,
+      "peak_process_bytes": 1376026624
+    },
+    {
+      "file": "chunk-00240.npz",
+      "start": 240,
+      "documents": 16,
+      "sha256": "1acef267cf0660e55c700fa0954a3b78636a302a1debfddd0d2ea6868ac173d4",
+      "seconds": 20.02205296047032,
+      "peak_process_bytes": 1376026624
+    },
+    {
+      "file": "chunk-00256.npz",
+      "start": 256,
+      "documents": 16,
+      "sha256": "1abecfea7e29e7ba5ca9ff39b7c294e20808fa282ec8e78f796c7a9e83fc5184",
+      "seconds": 12.544891791418195,
+      "peak_process_bytes": 1376026624
+    },
+    {
+      "file": "chunk-00272.npz",
+      "start": 272,
+      "documents": 16,
+      "sha256": "9bbe728957cf783aaaed2ed858812b70ed1bc18d1cd7730dc8b1bbf5fe275029",
+      "seconds": 15.53294133208692,
+      "peak_process_bytes": 1376026624
+    },
+    {
+      "file": "chunk-00288.npz",
+      "start": 288,
+      "documents": 16,
+      "sha256": "7ef0e400a2073d372c30f09b2faded6a302733aed1b5c13e5f21b251a73e2e99",
+      "seconds": 12.301189541816711,
+      "peak_process_bytes": 1376026624
+    },
+    {
+      "file": "chunk-00304.npz",
+      "start": 304,
+      "documents": 16,
+      "sha256": "e6942984490714192a9d669efc3343d40f77d2c72b58c7df44773d8b38c212a7",
+      "seconds": 14.545238332822919,
+      "peak_process_bytes": 1376026624
+    },
+    {
+      "file": "chunk-00320.npz",
+      "start": 320,
+      "documents": 16,
+      "sha256": "da830e1afde0a6469d81349f584e2f16cb5eac2145f53f86c10232f40de5d2bb",
+      "seconds": 14.724513333290815,
+      "peak_process_bytes": 1376026624
+    },
+    {
+      "file": "chunk-00336.npz",
+      "start": 336,
+      "documents": 16,
+      "sha256": "f4da52724c268a0aa9f3a43d4c8e656046f13330c896e6641a5876109729c3a7",
+      "seconds": 11.883262457326055,
+      "peak_process_bytes": 1376026624
+    },
+    {
+      "file": "chunk-00352.npz",
+      "start": 352,
+      "documents": 8,
+      "sha256": "5a4583f5d12279755680b7aa99eae16e368ce283e7dd929e503848e51b3caf0b",
+      "seconds": 9.84834666736424,
+      "peak_process_bytes": 1376026624
+    }
+  ],
+  "documents": 360,
+  "records": [
+    {
+      "id": "TIGER-Lab/MMLU-Pro:4286--plain",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "949e316dd58ab941e9274f36b9cec3bfe28f45282b7a109b08035d782f17bcaf",
+      "source_id": "TIGER-Lab/MMLU-Pro:4286",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "b008de4cde306dc7ca4c6c4ca3f4c8a272531beab1d852f432d5dc681ba5054a"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:4286--chat",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "949e316dd58ab941e9274f36b9cec3bfe28f45282b7a109b08035d782f17bcaf",
+      "source_id": "TIGER-Lab/MMLU-Pro:4286",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "b008de4cde306dc7ca4c6c4ca3f4c8a272531beab1d852f432d5dc681ba5054a"
+    },
+    {
+      "id": "cais/mmlu:2105--plain",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "cdc2d76bdf3cfcc5149087e171febe2ee8763a6e2f573b7309fd134d953cf637",
+      "source_id": "cais/mmlu:2105",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "634fa69e26b2940e12b76ef16527e4f5434d93bc235e1f999717aacde0124bc4"
+    },
+    {
+      "id": "cais/mmlu:2105--chat",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "cdc2d76bdf3cfcc5149087e171febe2ee8763a6e2f573b7309fd134d953cf637",
+      "source_id": "cais/mmlu:2105",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "634fa69e26b2940e12b76ef16527e4f5434d93bc235e1f999717aacde0124bc4"
+    },
+    {
+      "id": "cais/mmlu:2884--plain",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "6025c53efa651c6056eaefca44394a2efeba6d2287555e006f9ecf6b1cae40f3",
+      "source_id": "cais/mmlu:2884",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "d6ea7257f90a486f6e4852f111a5983ecfbe34e25e5fd261f75c071473983cb2"
+    },
+    {
+      "id": "cais/mmlu:2884--chat",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "6025c53efa651c6056eaefca44394a2efeba6d2287555e006f9ecf6b1cae40f3",
+      "source_id": "cais/mmlu:2884",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "d6ea7257f90a486f6e4852f111a5983ecfbe34e25e5fd261f75c071473983cb2"
+    },
+    {
+      "id": "cais/mmlu:2190--plain",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "c56fadb66dc6fad7e58a88594e76f9b8cb5e5713d7ad896dd6e55b3aa5b4e49c",
+      "source_id": "cais/mmlu:2190",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "8cab5631ed60a80e116f8cc9e95978e8b25c33702ee936c9b93057b3af688510"
+    },
+    {
+      "id": "cais/mmlu:2190--chat",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "c56fadb66dc6fad7e58a88594e76f9b8cb5e5713d7ad896dd6e55b3aa5b4e49c",
+      "source_id": "cais/mmlu:2190",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "8cab5631ed60a80e116f8cc9e95978e8b25c33702ee936c9b93057b3af688510"
+    },
+    {
+      "id": "cais/mmlu:914--plain",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "7ee071398710cb69e222fdf9814d5d77a81548eaf79a731e01c0c51a522eaab6",
+      "source_id": "cais/mmlu:914",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "65c2280cd0b3ddc20b24d771c955190a86ee56f190b4779e9818b6aa1eac36bf"
+    },
+    {
+      "id": "cais/mmlu:914--chat",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "7ee071398710cb69e222fdf9814d5d77a81548eaf79a731e01c0c51a522eaab6",
+      "source_id": "cais/mmlu:914",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "65c2280cd0b3ddc20b24d771c955190a86ee56f190b4779e9818b6aa1eac36bf"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:3283--plain",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "ae85a3be9490f2f2415e9f5e8156684801cfa9d8606dc0954041da4594840bf6",
+      "source_id": "TIGER-Lab/MMLU-Pro:3283",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "39a10bee2d2bb5878aaf828fa608a42c7a8c8771c2148cde229256429965cfec"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:3283--chat",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "ae85a3be9490f2f2415e9f5e8156684801cfa9d8606dc0954041da4594840bf6",
+      "source_id": "TIGER-Lab/MMLU-Pro:3283",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "39a10bee2d2bb5878aaf828fa608a42c7a8c8771c2148cde229256429965cfec"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:8870--plain",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "5014870ef999e40078de1e91356e34fbc6887ab7f304858eafe9d1e73ea86578",
+      "source_id": "TIGER-Lab/MMLU-Pro:8870",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "cd676efd1d46ae460d95f0289acbe4a5fbc207dae135e755151dc5f10438dbfa"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:8870--chat",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "5014870ef999e40078de1e91356e34fbc6887ab7f304858eafe9d1e73ea86578",
+      "source_id": "TIGER-Lab/MMLU-Pro:8870",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "cd676efd1d46ae460d95f0289acbe4a5fbc207dae135e755151dc5f10438dbfa"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:3232--plain",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "df6065a06001c6daf7b50a20845abf7955756d7ea0937761fdc267bc71c144a5",
+      "source_id": "TIGER-Lab/MMLU-Pro:3232",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "d580fdec8763a94392e18cb620f34e46c830b2315ccc14123dda574455c93789"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:3232--chat",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "df6065a06001c6daf7b50a20845abf7955756d7ea0937761fdc267bc71c144a5",
+      "source_id": "TIGER-Lab/MMLU-Pro:3232",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "d580fdec8763a94392e18cb620f34e46c830b2315ccc14123dda574455c93789"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:8417--plain",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "26195766c904b23d95c69efbaa1ad37bbd408aac372a3a05a35c651b7cc91cae",
+      "source_id": "TIGER-Lab/MMLU-Pro:8417",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "037639c00cb6621507356345945aaedda985dc9e00825748e19a7fcd6fd3d767"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:8417--chat",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "26195766c904b23d95c69efbaa1ad37bbd408aac372a3a05a35c651b7cc91cae",
+      "source_id": "TIGER-Lab/MMLU-Pro:8417",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "037639c00cb6621507356345945aaedda985dc9e00825748e19a7fcd6fd3d767"
+    },
+    {
+      "id": "cais/mmlu:3184--plain",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "011111b63d9d92b345a63375fd249bbb6c67ffdf32a82539a49d6f3ee424f323",
+      "source_id": "cais/mmlu:3184",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "e521fffd9dab6a2adf1ea3cac6c815ad92b40a4d908cbf52f8266a69f20a5c4f"
+    },
+    {
+      "id": "cais/mmlu:3184--chat",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "011111b63d9d92b345a63375fd249bbb6c67ffdf32a82539a49d6f3ee424f323",
+      "source_id": "cais/mmlu:3184",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "e521fffd9dab6a2adf1ea3cac6c815ad92b40a4d908cbf52f8266a69f20a5c4f"
+    },
+    {
+      "id": "cais/mmlu:844--plain",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "915d7bbd282485697839bab8898f1e9bf88d7ffd55d54d35ba74622c7768b630",
+      "source_id": "cais/mmlu:844",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "7ffecc543df1d8eea2821a221fc81de88eb46202aa3dcb6fa03fb255ed73f308"
+    },
+    {
+      "id": "cais/mmlu:844--chat",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "915d7bbd282485697839bab8898f1e9bf88d7ffd55d54d35ba74622c7768b630",
+      "source_id": "cais/mmlu:844",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "7ffecc543df1d8eea2821a221fc81de88eb46202aa3dcb6fa03fb255ed73f308"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:9296--plain",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "4205e58d274b15507eb740dcc81bf120f5e1b9a8afd00744a2299a2adf8b6ef5",
+      "source_id": "TIGER-Lab/MMLU-Pro:9296",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "1d0d84fb840370c1bf99dfb263c40c5772a7b34000392300153bd5d7de5d1bb0"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:9296--chat",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "4205e58d274b15507eb740dcc81bf120f5e1b9a8afd00744a2299a2adf8b6ef5",
+      "source_id": "TIGER-Lab/MMLU-Pro:9296",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "1d0d84fb840370c1bf99dfb263c40c5772a7b34000392300153bd5d7de5d1bb0"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:4587--plain",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "16237f53bfc36f501924c0507987c6a0361c20a9f9861d330e2f5b7e445fcd3b",
+      "source_id": "TIGER-Lab/MMLU-Pro:4587",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "13d397a21ef0f6c6383f8a8b9797b995308d67301a38266575014f16a926e6c3"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:4587--chat",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "16237f53bfc36f501924c0507987c6a0361c20a9f9861d330e2f5b7e445fcd3b",
+      "source_id": "TIGER-Lab/MMLU-Pro:4587",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "13d397a21ef0f6c6383f8a8b9797b995308d67301a38266575014f16a926e6c3"
+    },
+    {
+      "id": "cais/mmlu:2100--plain",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "0d423f9d0864a3e33d005c6e370b45df2d1efea1ba1b88078136ef57a3dd01f3",
+      "source_id": "cais/mmlu:2100",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "fcb00b9ac864a2f019b2ebb8ce57d33a1107540275471a9a7d194f0c24b2c803"
+    },
+    {
+      "id": "cais/mmlu:2100--chat",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "0d423f9d0864a3e33d005c6e370b45df2d1efea1ba1b88078136ef57a3dd01f3",
+      "source_id": "cais/mmlu:2100",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "fcb00b9ac864a2f019b2ebb8ce57d33a1107540275471a9a7d194f0c24b2c803"
+    },
+    {
+      "id": "cais/mmlu:1643--plain",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "2a95b66c4c5a657e610d055529d2bfc5ea1b931067cfd885641f276ba7aca12e",
+      "source_id": "cais/mmlu:1643",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "9814a6d31ccb7b04cc492d1940e2f65f44e71f801c748148e1ca3a70f445535c"
+    },
+    {
+      "id": "cais/mmlu:1643--chat",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "2a95b66c4c5a657e610d055529d2bfc5ea1b931067cfd885641f276ba7aca12e",
+      "source_id": "cais/mmlu:1643",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "9814a6d31ccb7b04cc492d1940e2f65f44e71f801c748148e1ca3a70f445535c"
+    },
+    {
+      "id": "cais/mmlu:2111--plain",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "a829f471fccf53a7bf5adf8f169413c351a04a0f70bc0a5a461d99b000f7185b",
+      "source_id": "cais/mmlu:2111",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "cb8292c978256577f1e516a48e29b35d51cbb0f8b5e1fc5fdfb80e5f3dc41d49"
+    },
+    {
+      "id": "cais/mmlu:2111--chat",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "a829f471fccf53a7bf5adf8f169413c351a04a0f70bc0a5a461d99b000f7185b",
+      "source_id": "cais/mmlu:2111",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "cb8292c978256577f1e516a48e29b35d51cbb0f8b5e1fc5fdfb80e5f3dc41d49"
+    },
+    {
+      "id": "cais/mmlu:4497--plain",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "26fe6e7266ce58676f374b7416e05cfadc7d813af051f16dbe0ddf313eb402fb",
+      "source_id": "cais/mmlu:4497",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "8365f40b2f505f573e40bb56547d24f1cbdefd1f276dc989c1d1a2f2f7652d2a"
+    },
+    {
+      "id": "cais/mmlu:4497--chat",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "26fe6e7266ce58676f374b7416e05cfadc7d813af051f16dbe0ddf313eb402fb",
+      "source_id": "cais/mmlu:4497",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "8365f40b2f505f573e40bb56547d24f1cbdefd1f276dc989c1d1a2f2f7652d2a"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10028--plain",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "329479e3668789b02016d0ea367f5a31652ebd5577072b6b2ce92c8e274fbd3c",
+      "source_id": "TIGER-Lab/MMLU-Pro:10028",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "4a0c6496dd9512b6884902ee06b804cf8e91eddd662d38bf08d26b9c1f6cb778"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10028--chat",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "329479e3668789b02016d0ea367f5a31652ebd5577072b6b2ce92c8e274fbd3c",
+      "source_id": "TIGER-Lab/MMLU-Pro:10028",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "4a0c6496dd9512b6884902ee06b804cf8e91eddd662d38bf08d26b9c1f6cb778"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:4450--plain",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "56f216852f3a42fba4c6fd8bedba072f6832df2d758e963185a5c84cf0fb8d4d",
+      "source_id": "TIGER-Lab/MMLU-Pro:4450",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "58e559ffb3e6de6e1c7cc29f91c1229b69bbbe5a72d5c1d6cbac7d8ebced070e"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:4450--chat",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "56f216852f3a42fba4c6fd8bedba072f6832df2d758e963185a5c84cf0fb8d4d",
+      "source_id": "TIGER-Lab/MMLU-Pro:4450",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "58e559ffb3e6de6e1c7cc29f91c1229b69bbbe5a72d5c1d6cbac7d8ebced070e"
+    },
+    {
+      "id": "cais/mmlu:4798--plain",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "8ba7c16e9f58d9ec778bd5eee168c9190256da1b72b6ef303b92cc2551d96828",
+      "source_id": "cais/mmlu:4798",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "d2940e6cbaf382edb9c19ab1870aab54712c251bd94dd4e0742ce72a04bdd0ea"
+    },
+    {
+      "id": "cais/mmlu:4798--chat",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "8ba7c16e9f58d9ec778bd5eee168c9190256da1b72b6ef303b92cc2551d96828",
+      "source_id": "cais/mmlu:4798",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "d2940e6cbaf382edb9c19ab1870aab54712c251bd94dd4e0742ce72a04bdd0ea"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:8099--plain",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "a2ec6482c694025628210687154a1a03e8b4e9ff01ba7d0e0a6f34322dbe3bf5",
+      "source_id": "TIGER-Lab/MMLU-Pro:8099",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "4ec805f0471dbc9c4dad51cc1eb74faa339e32ba1c687177115c0ff4cd75cff6"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:8099--chat",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "a2ec6482c694025628210687154a1a03e8b4e9ff01ba7d0e0a6f34322dbe3bf5",
+      "source_id": "TIGER-Lab/MMLU-Pro:8099",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "4ec805f0471dbc9c4dad51cc1eb74faa339e32ba1c687177115c0ff4cd75cff6"
+    },
+    {
+      "id": "cais/mmlu:94--plain",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "506fd235f48773c6ec64c9a84016f1de9d4ca790fb75c6e96d19f33152e90ce6",
+      "source_id": "cais/mmlu:94",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "5f27087badd81b211031abb252cee5d36e386a33ac81781fa4e4b65508844f5a"
+    },
+    {
+      "id": "cais/mmlu:94--chat",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "506fd235f48773c6ec64c9a84016f1de9d4ca790fb75c6e96d19f33152e90ce6",
+      "source_id": "cais/mmlu:94",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "5f27087badd81b211031abb252cee5d36e386a33ac81781fa4e4b65508844f5a"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10200--plain",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "d57a273e186022d9a9f6e8f61daa5e1284dddf03c2452ef3722ee6a0545890a3",
+      "source_id": "TIGER-Lab/MMLU-Pro:10200",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "44fd0dc458e48888472bb1f93d86b3364d672f60317f18279fae9d2abb01eff0"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10200--chat",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "d57a273e186022d9a9f6e8f61daa5e1284dddf03c2452ef3722ee6a0545890a3",
+      "source_id": "TIGER-Lab/MMLU-Pro:10200",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "44fd0dc458e48888472bb1f93d86b3364d672f60317f18279fae9d2abb01eff0"
+    },
+    {
+      "id": "cais/mmlu:3093--plain",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "766a77a69d2397e5a642c656bf960bb6bac4ce8f724ee2c6027960055c159130",
+      "source_id": "cais/mmlu:3093",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "b4d0949eb2903c803e8c1768505e910b36fc551e4be1724ac0c220949f68dce7"
+    },
+    {
+      "id": "cais/mmlu:3093--chat",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "766a77a69d2397e5a642c656bf960bb6bac4ce8f724ee2c6027960055c159130",
+      "source_id": "cais/mmlu:3093",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "b4d0949eb2903c803e8c1768505e910b36fc551e4be1724ac0c220949f68dce7"
+    },
+    {
+      "id": "cais/mmlu:1548--plain",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "afc7a5c5e55461a7bed85e730e2b8c7d030ebb4a5ceef867db7a7704eb230d67",
+      "source_id": "cais/mmlu:1548",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "933ecfd6a7f34c580f29be75f483a833c08f59f2700021e0755fe69693269a0f"
+    },
+    {
+      "id": "cais/mmlu:1548--chat",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "afc7a5c5e55461a7bed85e730e2b8c7d030ebb4a5ceef867db7a7704eb230d67",
+      "source_id": "cais/mmlu:1548",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "933ecfd6a7f34c580f29be75f483a833c08f59f2700021e0755fe69693269a0f"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:9865--plain",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "fd13c0158ae54e89bc54818435cd8eb351ed72635078550ede736e545068087e",
+      "source_id": "TIGER-Lab/MMLU-Pro:9865",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "c51ccf87f80fae102fe48bda9644d0d3c7f37f963722a1a9c3ae41b9f5684d24"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:9865--chat",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "fd13c0158ae54e89bc54818435cd8eb351ed72635078550ede736e545068087e",
+      "source_id": "TIGER-Lab/MMLU-Pro:9865",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "c51ccf87f80fae102fe48bda9644d0d3c7f37f963722a1a9c3ae41b9f5684d24"
+    },
+    {
+      "id": "cais/mmlu:3058--plain",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "e2560fa8c5b7a5ba49f6f876b9ed430fd93e932ef48f6b537a4700c99180bc56",
+      "source_id": "cais/mmlu:3058",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "5f87d14b4ccd9ebd96bcb416da6c5ac72920d3df889010c4786e9ced81460a81"
+    },
+    {
+      "id": "cais/mmlu:3058--chat",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "e2560fa8c5b7a5ba49f6f876b9ed430fd93e932ef48f6b537a4700c99180bc56",
+      "source_id": "cais/mmlu:3058",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "5f87d14b4ccd9ebd96bcb416da6c5ac72920d3df889010c4786e9ced81460a81"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:3419--plain",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "6dfa0c8d4d5d2f97647f08b51f7ed2fd8cdcb25e0ec5a8e120df24ae42bb676a",
+      "source_id": "TIGER-Lab/MMLU-Pro:3419",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "53e6e2315cc48992597be46376ae4866d674e4dd766a845e4a911231200409ba"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:3419--chat",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "6dfa0c8d4d5d2f97647f08b51f7ed2fd8cdcb25e0ec5a8e120df24ae42bb676a",
+      "source_id": "TIGER-Lab/MMLU-Pro:3419",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "53e6e2315cc48992597be46376ae4866d674e4dd766a845e4a911231200409ba"
+    },
+    {
+      "id": "cais/mmlu:1672--plain",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "2273ffe684ffb2b0ca2aa466411e5d1441dd10756992019d76a7c6d54a05619f",
+      "source_id": "cais/mmlu:1672",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "8f953e78b4695ff066e90f3a83a9021da6ccfc1cd16aebe8f99cb59b6fa7bb42"
+    },
+    {
+      "id": "cais/mmlu:1672--chat",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "2273ffe684ffb2b0ca2aa466411e5d1441dd10756992019d76a7c6d54a05619f",
+      "source_id": "cais/mmlu:1672",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "8f953e78b4695ff066e90f3a83a9021da6ccfc1cd16aebe8f99cb59b6fa7bb42"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:4396--plain",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "45c0717ada31f189d01fca4f16956e269d0b8194e53c07825599288e5e805e91",
+      "source_id": "TIGER-Lab/MMLU-Pro:4396",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "583b8ed726a87c6c567d89b3f5f55ddb54508a497d67a67ab1d49042f6681f66"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:4396--chat",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "45c0717ada31f189d01fca4f16956e269d0b8194e53c07825599288e5e805e91",
+      "source_id": "TIGER-Lab/MMLU-Pro:4396",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "583b8ed726a87c6c567d89b3f5f55ddb54508a497d67a67ab1d49042f6681f66"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:9896--plain",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "92f9753d5fc489995eeae7a9eaa2f08fe8cef108e903b9cc0e60285dae9b1ed4",
+      "source_id": "TIGER-Lab/MMLU-Pro:9896",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "b6f0c7e8cbdb31e7cce15deb98149085f1a672144f3e4b93b7324690971d6339"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:9896--chat",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "92f9753d5fc489995eeae7a9eaa2f08fe8cef108e903b9cc0e60285dae9b1ed4",
+      "source_id": "TIGER-Lab/MMLU-Pro:9896",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "b6f0c7e8cbdb31e7cce15deb98149085f1a672144f3e4b93b7324690971d6339"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:9138--plain",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "354b10312f6a55d1957bec8300e0582f4af5b804516a5ec8b44b5065de7539d9",
+      "source_id": "TIGER-Lab/MMLU-Pro:9138",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "c0fecc75b2f8dd96df1bbf01785495511150c013092fde5e884dc45a1a8a22e0"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:9138--chat",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "354b10312f6a55d1957bec8300e0582f4af5b804516a5ec8b44b5065de7539d9",
+      "source_id": "TIGER-Lab/MMLU-Pro:9138",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "c0fecc75b2f8dd96df1bbf01785495511150c013092fde5e884dc45a1a8a22e0"
+    },
+    {
+      "id": "cais/mmlu:4797--plain",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "5a2f8a13dd0cd4a153828e2daa56581f5fff7a407fa43284e30637b85aecf186",
+      "source_id": "cais/mmlu:4797",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "bbb95b36c764a79ec0aa236c93c2d89055b7c1f10d291dae5bfd4c8c5ddb1d6f"
+    },
+    {
+      "id": "cais/mmlu:4797--chat",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "5a2f8a13dd0cd4a153828e2daa56581f5fff7a407fa43284e30637b85aecf186",
+      "source_id": "cais/mmlu:4797",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "bbb95b36c764a79ec0aa236c93c2d89055b7c1f10d291dae5bfd4c8c5ddb1d6f"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:8414--plain",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "758bad4fb255a50b41801f8dabf2fede99bf9ede2d2f7210ac7cd097ed2263ec",
+      "source_id": "TIGER-Lab/MMLU-Pro:8414",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "98414f2a762bd6b5e72d448edaee58b34f4bed00538039203e42b0c6da61709d"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:8414--chat",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "758bad4fb255a50b41801f8dabf2fede99bf9ede2d2f7210ac7cd097ed2263ec",
+      "source_id": "TIGER-Lab/MMLU-Pro:8414",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "98414f2a762bd6b5e72d448edaee58b34f4bed00538039203e42b0c6da61709d"
+    },
+    {
+      "id": "cais/mmlu:2069--plain",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "db9e4d7964005eba408963b7e05a561f15e7e3d70e7e0da1fda73c62d58c8230",
+      "source_id": "cais/mmlu:2069",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "629d10930e5af26ff2199af7b5834c4787f5e2ef5a07409e388e276345bb9b82"
+    },
+    {
+      "id": "cais/mmlu:2069--chat",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "db9e4d7964005eba408963b7e05a561f15e7e3d70e7e0da1fda73c62d58c8230",
+      "source_id": "cais/mmlu:2069",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "629d10930e5af26ff2199af7b5834c4787f5e2ef5a07409e388e276345bb9b82"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:9740--plain",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "f926cba4988a133979f91cf1acb72d3fcd065ea98d312ebb4c1eeb800bb2aed4",
+      "source_id": "TIGER-Lab/MMLU-Pro:9740",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "fe742739c378ba31583de4a804676cfef81bbccb4236beeeb8e3480e8259275c"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:9740--chat",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "f926cba4988a133979f91cf1acb72d3fcd065ea98d312ebb4c1eeb800bb2aed4",
+      "source_id": "TIGER-Lab/MMLU-Pro:9740",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "fe742739c378ba31583de4a804676cfef81bbccb4236beeeb8e3480e8259275c"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:8533--plain",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "19cc07b8966e69502d92a02dafde3157c8aafc93e1eb589388575864ee253222",
+      "source_id": "TIGER-Lab/MMLU-Pro:8533",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "4e2db02e843788d90406ca1a35e00f5b5bd80307551e809a898a176eef4af0d2"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:8533--chat",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "19cc07b8966e69502d92a02dafde3157c8aafc93e1eb589388575864ee253222",
+      "source_id": "TIGER-Lab/MMLU-Pro:8533",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "4e2db02e843788d90406ca1a35e00f5b5bd80307551e809a898a176eef4af0d2"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:3847--plain",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "d77aa845e64333677af40b5da9019e64f6f4761a7e9d7ba3fc981dd0a5a8e8cf",
+      "source_id": "TIGER-Lab/MMLU-Pro:3847",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "66e2c3bf2a54c54ca0344504eed604602e1a2b098fb74b6ea87731adc86b75f1"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:3847--chat",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "d77aa845e64333677af40b5da9019e64f6f4761a7e9d7ba3fc981dd0a5a8e8cf",
+      "source_id": "TIGER-Lab/MMLU-Pro:3847",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "66e2c3bf2a54c54ca0344504eed604602e1a2b098fb74b6ea87731adc86b75f1"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:8959--plain",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "2bd93932968330c2ae10d717246b33a40dccb1f20b21625fde0d0bd859b85c6a",
+      "source_id": "TIGER-Lab/MMLU-Pro:8959",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "2ffe78b679dc27165643c98b19fc6c551a367ce2ec53173ccc4598bc61379e96"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:8959--chat",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "2bd93932968330c2ae10d717246b33a40dccb1f20b21625fde0d0bd859b85c6a",
+      "source_id": "TIGER-Lab/MMLU-Pro:8959",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "2ffe78b679dc27165643c98b19fc6c551a367ce2ec53173ccc4598bc61379e96"
+    },
+    {
+      "id": "cais/mmlu:2182--plain",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "f884b0a9d05454dd3de95b45ae6d92bb3bda13f2eb7e75cb6370f663d1df4847",
+      "source_id": "cais/mmlu:2182",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "c12f8156a259225e04facacf21ba7d7a37a32da76ee3b17010489cdeed66ab22"
+    },
+    {
+      "id": "cais/mmlu:2182--chat",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "f884b0a9d05454dd3de95b45ae6d92bb3bda13f2eb7e75cb6370f663d1df4847",
+      "source_id": "cais/mmlu:2182",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "c12f8156a259225e04facacf21ba7d7a37a32da76ee3b17010489cdeed66ab22"
+    },
+    {
+      "id": "cais/mmlu:2095--plain",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "19114be7a87725cf47cc54667e36a1ac52bbef4b4a9a491a43e37824fea8c5e1",
+      "source_id": "cais/mmlu:2095",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "95a431f91d92fa155fab3248b59085a1c7baa3609cb3668f9a79d2bb14990476"
+    },
+    {
+      "id": "cais/mmlu:2095--chat",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "19114be7a87725cf47cc54667e36a1ac52bbef4b4a9a491a43e37824fea8c5e1",
+      "source_id": "cais/mmlu:2095",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "95a431f91d92fa155fab3248b59085a1c7baa3609cb3668f9a79d2bb14990476"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:3995--plain",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "e1080d8872ce9890f255942b02626fc4b36014ecae463530f69f81bf9bd4969d",
+      "source_id": "TIGER-Lab/MMLU-Pro:3995",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "bbe74fbf270620790d94787fedc81f2caa4acb4d5594c09aacdd69c8809dd470"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:3995--chat",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "e1080d8872ce9890f255942b02626fc4b36014ecae463530f69f81bf9bd4969d",
+      "source_id": "TIGER-Lab/MMLU-Pro:3995",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "bbe74fbf270620790d94787fedc81f2caa4acb4d5594c09aacdd69c8809dd470"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:7978--plain",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "df1589a4deaab1c8931c7ba0c7adf8a03920b7beafa4190ab8dccd8255eec416",
+      "source_id": "TIGER-Lab/MMLU-Pro:7978",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "c68ca190a3f23ab2c1953679755ff7491acb84af869ac2734e5268fd26204389"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:7978--chat",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "df1589a4deaab1c8931c7ba0c7adf8a03920b7beafa4190ab8dccd8255eec416",
+      "source_id": "TIGER-Lab/MMLU-Pro:7978",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "c68ca190a3f23ab2c1953679755ff7491acb84af869ac2734e5268fd26204389"
+    },
+    {
+      "id": "cais/mmlu:1748--plain",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "fde5751bdc539ce047144e3a8d1d232867c170bd978663426d6476de22ef40c1",
+      "source_id": "cais/mmlu:1748",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "057d8d0fde64fe9d62d5881296a92f48a95e288ddc0cc0365a0cd583256b394c"
+    },
+    {
+      "id": "cais/mmlu:1748--chat",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "fde5751bdc539ce047144e3a8d1d232867c170bd978663426d6476de22ef40c1",
+      "source_id": "cais/mmlu:1748",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "057d8d0fde64fe9d62d5881296a92f48a95e288ddc0cc0365a0cd583256b394c"
+    },
+    {
+      "id": "cais/mmlu:1377--plain",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "5b33256a63b2c6e239fff62f7e05630c137913bbae97a30160c305f5fda25d7a",
+      "source_id": "cais/mmlu:1377",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "c33b912fd8adf530a9b223d676d7f623f642f5df5021b213dbbd26833b2b4df9"
+    },
+    {
+      "id": "cais/mmlu:1377--chat",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "5b33256a63b2c6e239fff62f7e05630c137913bbae97a30160c305f5fda25d7a",
+      "source_id": "cais/mmlu:1377",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "c33b912fd8adf530a9b223d676d7f623f642f5df5021b213dbbd26833b2b4df9"
+    },
+    {
+      "id": "cais/mmlu:72--plain",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "1ac2b74976238a07eb4d1432cf937025d9e26e140f932edcb02e8aefd1bf8d00",
+      "source_id": "cais/mmlu:72",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "15edc0ffbf45eb45f01972c1ccdce8e52b5a895d3645f9422a9f9f61213cbadd"
+    },
+    {
+      "id": "cais/mmlu:72--chat",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "1ac2b74976238a07eb4d1432cf937025d9e26e140f932edcb02e8aefd1bf8d00",
+      "source_id": "cais/mmlu:72",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "15edc0ffbf45eb45f01972c1ccdce8e52b5a895d3645f9422a9f9f61213cbadd"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:8934--plain",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "96ee5fe0b80ad92f3c77eb3c3f33ea7403bf76810c17eb56558b35f210a9a3d6",
+      "source_id": "TIGER-Lab/MMLU-Pro:8934",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "df19a1eca95ddd5ee3d4af8399d653b8bf0ed7de039380db8bb5d7b3add5d707"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:8934--chat",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "96ee5fe0b80ad92f3c77eb3c3f33ea7403bf76810c17eb56558b35f210a9a3d6",
+      "source_id": "TIGER-Lab/MMLU-Pro:8934",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "df19a1eca95ddd5ee3d4af8399d653b8bf0ed7de039380db8bb5d7b3add5d707"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10307--plain",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "1f824501d0dd6baf6951c68a2455b889541a949e27d60062db01b48b2fc85ecf",
+      "source_id": "TIGER-Lab/MMLU-Pro:10307",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "f1505dc413802f5c110cbd015b16ca6bc1449deefcbbcd63c1d1b86069c20a17"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10307--chat",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "1f824501d0dd6baf6951c68a2455b889541a949e27d60062db01b48b2fc85ecf",
+      "source_id": "TIGER-Lab/MMLU-Pro:10307",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "f1505dc413802f5c110cbd015b16ca6bc1449deefcbbcd63c1d1b86069c20a17"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:3746--plain",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "1df71a8334aba85b79bd92cc3d261eeb272886da93dcec972e12c81a47d5da2b",
+      "source_id": "TIGER-Lab/MMLU-Pro:3746",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "27d716f98eff25adadfe6b79673d10cba31205b172fe6d8015b1e7cb3f431531"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:3746--chat",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "1df71a8334aba85b79bd92cc3d261eeb272886da93dcec972e12c81a47d5da2b",
+      "source_id": "TIGER-Lab/MMLU-Pro:3746",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "27d716f98eff25adadfe6b79673d10cba31205b172fe6d8015b1e7cb3f431531"
+    },
+    {
+      "id": "cais/mmlu:2073--plain",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "1f26d3ec1e0db00cb2bd4d004311fd3667dacb210cabe911c07c49a4a761e3ba",
+      "source_id": "cais/mmlu:2073",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "d3c8bec2f422483b33d576eb282d35c912c8d0cc33986fe3e804c1e56b2a3b2e"
+    },
+    {
+      "id": "cais/mmlu:2073--chat",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "1f26d3ec1e0db00cb2bd4d004311fd3667dacb210cabe911c07c49a4a761e3ba",
+      "source_id": "cais/mmlu:2073",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "d3c8bec2f422483b33d576eb282d35c912c8d0cc33986fe3e804c1e56b2a3b2e"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:3935--plain",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "b3a2d138ccddf3616bdfb1794e53b3ad3f4c8a6a31c92994f91cb60471effcfe",
+      "source_id": "TIGER-Lab/MMLU-Pro:3935",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "4ce0b347972dc94016c5b9621bc116354f0d246944c89783ae533b02994a46ca"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:3935--chat",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "b3a2d138ccddf3616bdfb1794e53b3ad3f4c8a6a31c92994f91cb60471effcfe",
+      "source_id": "TIGER-Lab/MMLU-Pro:3935",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "4ce0b347972dc94016c5b9621bc116354f0d246944c89783ae533b02994a46ca"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10464--plain",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "b17228ebad87de47b2e529511029840d31d4e5f615d5544fce08ef18dccd7a8f",
+      "source_id": "TIGER-Lab/MMLU-Pro:10464",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "da40359b10c522db613171357fd9cbc67065b0b1a0b4b3c25caac7a5f4645f63"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10464--chat",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "b17228ebad87de47b2e529511029840d31d4e5f615d5544fce08ef18dccd7a8f",
+      "source_id": "TIGER-Lab/MMLU-Pro:10464",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "da40359b10c522db613171357fd9cbc67065b0b1a0b4b3c25caac7a5f4645f63"
+    },
+    {
+      "id": "cais/mmlu:1732--plain",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "2fbe640c35303c56d8002f26babc517777b86487c110a034cb76e90b3988582f",
+      "source_id": "cais/mmlu:1732",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "ce71909d1469733b8763149ccb529d31996d294f958b9d7b11ccf2112cb79984"
+    },
+    {
+      "id": "cais/mmlu:1732--chat",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "2fbe640c35303c56d8002f26babc517777b86487c110a034cb76e90b3988582f",
+      "source_id": "cais/mmlu:1732",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "ce71909d1469733b8763149ccb529d31996d294f958b9d7b11ccf2112cb79984"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:9248--plain",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "22f81df3c6273e55e45c6d1e4f9dd4bf88de4c29d6ac2c5611305f513f5c49ec",
+      "source_id": "TIGER-Lab/MMLU-Pro:9248",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "d6ac43f4c7a84b9444c4095c44b89c9df3345f6cb260b8be1238e6a5aa32a70a"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:9248--chat",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "22f81df3c6273e55e45c6d1e4f9dd4bf88de4c29d6ac2c5611305f513f5c49ec",
+      "source_id": "TIGER-Lab/MMLU-Pro:9248",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "d6ac43f4c7a84b9444c4095c44b89c9df3345f6cb260b8be1238e6a5aa32a70a"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:7968--plain",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "0638b501c0bf788b41cf293801da032a72f60fdbb2b9c75cd5fbbdb21ff8443b",
+      "source_id": "TIGER-Lab/MMLU-Pro:7968",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "69d13db2c2f0412bd7bd1872732509d18b8e90314036640e49cc2f474d28a4c9"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:7968--chat",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "0638b501c0bf788b41cf293801da032a72f60fdbb2b9c75cd5fbbdb21ff8443b",
+      "source_id": "TIGER-Lab/MMLU-Pro:7968",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "69d13db2c2f0412bd7bd1872732509d18b8e90314036640e49cc2f474d28a4c9"
+    },
+    {
+      "id": "cais/mmlu:997--plain",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "604630dbb88ee2b9261f5f110357f12fa14aab3d0669c9f9d45b1b3bf7db3072",
+      "source_id": "cais/mmlu:997",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "0805fa045c4c9ddb439baf86ee388732340440e1a6ced5caa94b901da3e4a167"
+    },
+    {
+      "id": "cais/mmlu:997--chat",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "604630dbb88ee2b9261f5f110357f12fa14aab3d0669c9f9d45b1b3bf7db3072",
+      "source_id": "cais/mmlu:997",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "0805fa045c4c9ddb439baf86ee388732340440e1a6ced5caa94b901da3e4a167"
+    },
+    {
+      "id": "cais/mmlu:1783--plain",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "53629987ecea7e61f8508dfec716c7d395a9b856b8d331c375395968c06f83ef",
+      "source_id": "cais/mmlu:1783",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "2fc83116ceb7e92f2be748434f28a2724399ab968e17b8cf841d1b541212dde7"
+    },
+    {
+      "id": "cais/mmlu:1783--chat",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "53629987ecea7e61f8508dfec716c7d395a9b856b8d331c375395968c06f83ef",
+      "source_id": "cais/mmlu:1783",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "2fc83116ceb7e92f2be748434f28a2724399ab968e17b8cf841d1b541212dde7"
+    },
+    {
+      "id": "cais/mmlu:2089--plain",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "8e27cfbe350d1254140351c2c4616607145ee624f0575918acce76fab97fb920",
+      "source_id": "cais/mmlu:2089",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "1d7739f812e17f022b2f056a32dc5611ae63a2c656768d298e49694bacd09614"
+    },
+    {
+      "id": "cais/mmlu:2089--chat",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "8e27cfbe350d1254140351c2c4616607145ee624f0575918acce76fab97fb920",
+      "source_id": "cais/mmlu:2089",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "1d7739f812e17f022b2f056a32dc5611ae63a2c656768d298e49694bacd09614"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:3866--plain",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "861cc193929e302dccd5e31c83d0a9809a359caa6b4f937fc06409a9422bed86",
+      "source_id": "TIGER-Lab/MMLU-Pro:3866",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "478507c6609eab2dc6c164e67257fa193b751d5dcb0dae42c958b5fe85735a78"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:3866--chat",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "861cc193929e302dccd5e31c83d0a9809a359caa6b4f937fc06409a9422bed86",
+      "source_id": "TIGER-Lab/MMLU-Pro:3866",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "478507c6609eab2dc6c164e67257fa193b751d5dcb0dae42c958b5fe85735a78"
+    },
+    {
+      "id": "cais/mmlu:1699--plain",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "94ea86306558f032d17347abe123281fb5d02651b123a0b7552c5a151d442009",
+      "source_id": "cais/mmlu:1699",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "6b5ca84dbcdf445b2ae5cd01ac6a96f744d439430f7b225d865570f6e75ab070"
+    },
+    {
+      "id": "cais/mmlu:1699--chat",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "94ea86306558f032d17347abe123281fb5d02651b123a0b7552c5a151d442009",
+      "source_id": "cais/mmlu:1699",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "6b5ca84dbcdf445b2ae5cd01ac6a96f744d439430f7b225d865570f6e75ab070"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10087--plain",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "e36dde8aee546bc6575ab6952d7f63bc364a8b041b7483584a87c2f7308015e6",
+      "source_id": "TIGER-Lab/MMLU-Pro:10087",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "b4b866c2238f5cb0dd59659168880a3572329015df45993f4e07e6579dfbb4ed"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10087--chat",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "e36dde8aee546bc6575ab6952d7f63bc364a8b041b7483584a87c2f7308015e6",
+      "source_id": "TIGER-Lab/MMLU-Pro:10087",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "b4b866c2238f5cb0dd59659168880a3572329015df45993f4e07e6579dfbb4ed"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:9388--plain",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "f4bd7cc34ac6041ffd626ef5c541ee75286a71d5ff07797aec93cc453eab389f",
+      "source_id": "TIGER-Lab/MMLU-Pro:9388",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "3cec1b38b9a19197038b7ab9cb8679b3f2ff92529c43fa6c018bc6e0243fd786"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:9388--chat",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "f4bd7cc34ac6041ffd626ef5c541ee75286a71d5ff07797aec93cc453eab389f",
+      "source_id": "TIGER-Lab/MMLU-Pro:9388",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "3cec1b38b9a19197038b7ab9cb8679b3f2ff92529c43fa6c018bc6e0243fd786"
+    },
+    {
+      "id": "cais/mmlu:2255--plain",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "ebf0dd31fd287c593957db55b107f3d11e9ebd03e6ef0d4a6af9ba080ba70cf4",
+      "source_id": "cais/mmlu:2255",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "94fcf3036535b78bf76e5ec50b40d1642d8350b4cac39a0675d75e79beeeee48"
+    },
+    {
+      "id": "cais/mmlu:2255--chat",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "ebf0dd31fd287c593957db55b107f3d11e9ebd03e6ef0d4a6af9ba080ba70cf4",
+      "source_id": "cais/mmlu:2255",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "94fcf3036535b78bf76e5ec50b40d1642d8350b4cac39a0675d75e79beeeee48"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:3352--plain",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "3b5ad5bcb81f0e4dc5cddeac483f27fb5ab0b7d576a6fa5dacc19d117d8df64c",
+      "source_id": "TIGER-Lab/MMLU-Pro:3352",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "5bf86e6e15c2133a957b7c7b06b637c820caade54de54307e362d16f969f9299"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:3352--chat",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "3b5ad5bcb81f0e4dc5cddeac483f27fb5ab0b7d576a6fa5dacc19d117d8df64c",
+      "source_id": "TIGER-Lab/MMLU-Pro:3352",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "5bf86e6e15c2133a957b7c7b06b637c820caade54de54307e362d16f969f9299"
+    },
+    {
+      "id": "cais/mmlu:3224--plain",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "6faab9adb8fda0542a6ea2c933b346377eb47581a450c375a1dcbadc89c15bf1",
+      "source_id": "cais/mmlu:3224",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "3072fca71759df1a24590472ea919720180f5008966976fa7e779cdead1907e3"
+    },
+    {
+      "id": "cais/mmlu:3224--chat",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "6faab9adb8fda0542a6ea2c933b346377eb47581a450c375a1dcbadc89c15bf1",
+      "source_id": "cais/mmlu:3224",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "3072fca71759df1a24590472ea919720180f5008966976fa7e779cdead1907e3"
+    },
+    {
+      "id": "cais/mmlu:1447--plain",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "06d6ed4a99686c37f401938681c16ee7dd17feacff5a7960f4a22b747f3fdc79",
+      "source_id": "cais/mmlu:1447",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "f1565db5e8751d97216ca210c21e9c17790ebe5eeb0539ed5a8245de3c9f4cf2"
+    },
+    {
+      "id": "cais/mmlu:1447--chat",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "06d6ed4a99686c37f401938681c16ee7dd17feacff5a7960f4a22b747f3fdc79",
+      "source_id": "cais/mmlu:1447",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "f1565db5e8751d97216ca210c21e9c17790ebe5eeb0539ed5a8245de3c9f4cf2"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10643--plain",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "c41079684ab83351bc73a362b9925dc59a08c68393b0c219838e5863cda2aad8",
+      "source_id": "TIGER-Lab/MMLU-Pro:10643",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "91c547d1d0a40c8ba454dbd6fd8aa696400691a8a387fe00c744f3db33b4b01b"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10643--chat",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "c41079684ab83351bc73a362b9925dc59a08c68393b0c219838e5863cda2aad8",
+      "source_id": "TIGER-Lab/MMLU-Pro:10643",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "91c547d1d0a40c8ba454dbd6fd8aa696400691a8a387fe00c744f3db33b4b01b"
+    },
+    {
+      "id": "cais/mmlu:1159--plain",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "7c2892235e77066f5fd9ac5f3bdb7f5617feb444e8711946cb83743a182631a4",
+      "source_id": "cais/mmlu:1159",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "600d69b6fcd999c0938adf97a1e9a5e2dde8b29da932ffc0749293bd583f79e1"
+    },
+    {
+      "id": "cais/mmlu:1159--chat",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "7c2892235e77066f5fd9ac5f3bdb7f5617feb444e8711946cb83743a182631a4",
+      "source_id": "cais/mmlu:1159",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "600d69b6fcd999c0938adf97a1e9a5e2dde8b29da932ffc0749293bd583f79e1"
+    },
+    {
+      "id": "cais/mmlu:1599--plain",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "668619309bed324dbeb0ce088e9f05937830ab68e25df0980003d701ed9e4e8a",
+      "source_id": "cais/mmlu:1599",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "f48c31f24424879a577865ed2702bbadd043dd68f3afe6b2233888e7d6f68ea6"
+    },
+    {
+      "id": "cais/mmlu:1599--chat",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "668619309bed324dbeb0ce088e9f05937830ab68e25df0980003d701ed9e4e8a",
+      "source_id": "cais/mmlu:1599",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "f48c31f24424879a577865ed2702bbadd043dd68f3afe6b2233888e7d6f68ea6"
+    },
+    {
+      "id": "cais/mmlu:2320--plain",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "87a4cf061b1aaa4731fd59ef16c25d40226198ec7e58381ea0f0d769bb588312",
+      "source_id": "cais/mmlu:2320",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "fa069d6546e47af51d2dce48413ac35fcc9f17fcedd59f1f9d1bed22abe8ef89"
+    },
+    {
+      "id": "cais/mmlu:2320--chat",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "87a4cf061b1aaa4731fd59ef16c25d40226198ec7e58381ea0f0d769bb588312",
+      "source_id": "cais/mmlu:2320",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "fa069d6546e47af51d2dce48413ac35fcc9f17fcedd59f1f9d1bed22abe8ef89"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:9379--plain",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "53c7c51ac1debaa8b216e74ef31c7224ad1eea39e70e7d21a64fc646d682061c",
+      "source_id": "TIGER-Lab/MMLU-Pro:9379",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "de80ccb9e6808001b21ccdc2f623adfeebc67b77ea13ae8143596825d2630b21"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:9379--chat",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "53c7c51ac1debaa8b216e74ef31c7224ad1eea39e70e7d21a64fc646d682061c",
+      "source_id": "TIGER-Lab/MMLU-Pro:9379",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "de80ccb9e6808001b21ccdc2f623adfeebc67b77ea13ae8143596825d2630b21"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:8618--plain",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "9e083df5372a915b48c817a75101078339f8a88097a0acc6a3eeaedc66c42296",
+      "source_id": "TIGER-Lab/MMLU-Pro:8618",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "58d3d5a09a3f1da47d5a40af7355b3d5397434c51e7a2a65cd8a1665e5016c55"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:8618--chat",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "9e083df5372a915b48c817a75101078339f8a88097a0acc6a3eeaedc66c42296",
+      "source_id": "TIGER-Lab/MMLU-Pro:8618",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "58d3d5a09a3f1da47d5a40af7355b3d5397434c51e7a2a65cd8a1665e5016c55"
+    },
+    {
+      "id": "cais/mmlu:1422--plain",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "2a4c07fc21ec93a41bb01b958046cfde8c5b8db8e8d51033aaf9a6ef8c3d9bb9",
+      "source_id": "cais/mmlu:1422",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "55699e270d2ead99fec2ce289ebe74238396f8b8814594914229cc94c065ea73"
+    },
+    {
+      "id": "cais/mmlu:1422--chat",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "2a4c07fc21ec93a41bb01b958046cfde8c5b8db8e8d51033aaf9a6ef8c3d9bb9",
+      "source_id": "cais/mmlu:1422",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "55699e270d2ead99fec2ce289ebe74238396f8b8814594914229cc94c065ea73"
+    },
+    {
+      "id": "cais/mmlu:3272--plain",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "124166fb160a3ba862b153190fdc1de0cba8c3fdc532dc873f64cf5532e71419",
+      "source_id": "cais/mmlu:3272",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "60ed8fbfad899950d39aa3c8813293d168e901adacda72c8e6019ac56374ab90"
+    },
+    {
+      "id": "cais/mmlu:3272--chat",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "124166fb160a3ba862b153190fdc1de0cba8c3fdc532dc873f64cf5532e71419",
+      "source_id": "cais/mmlu:3272",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "60ed8fbfad899950d39aa3c8813293d168e901adacda72c8e6019ac56374ab90"
+    },
+    {
+      "id": "cais/mmlu:2889--plain",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "b85f47fab07749d81c02f29ddb14a3675872775b3d163197add2e138536b912d",
+      "source_id": "cais/mmlu:2889",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "8e1d1ac6d73ac1b7c405d9e666899b81868ac05118bd244eac7313c5d4079bb3"
+    },
+    {
+      "id": "cais/mmlu:2889--chat",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "b85f47fab07749d81c02f29ddb14a3675872775b3d163197add2e138536b912d",
+      "source_id": "cais/mmlu:2889",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "8e1d1ac6d73ac1b7c405d9e666899b81868ac05118bd244eac7313c5d4079bb3"
+    },
+    {
+      "id": "cais/mmlu:1605--plain",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "20ae8cf5326161a2b3086acac7718cca3d65f7f99b7329b642cb12dab9fb2666",
+      "source_id": "cais/mmlu:1605",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "cce19e53d37f24aec45cb33df5874bafb4d450771a40eebf58dc9d20addd1f94"
+    },
+    {
+      "id": "cais/mmlu:1605--chat",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "20ae8cf5326161a2b3086acac7718cca3d65f7f99b7329b642cb12dab9fb2666",
+      "source_id": "cais/mmlu:1605",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "cce19e53d37f24aec45cb33df5874bafb4d450771a40eebf58dc9d20addd1f94"
+    },
+    {
+      "id": "cais/mmlu:2144--plain",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "10946682f57995b7095cb8ff0832bcc5a200735d307738b0509bed286986a8d7",
+      "source_id": "cais/mmlu:2144",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "52f9e0afa139f5051a67e6b91afc3a0827cdeb3a615721b2be86adb5ffb3ecf6"
+    },
+    {
+      "id": "cais/mmlu:2144--chat",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "10946682f57995b7095cb8ff0832bcc5a200735d307738b0509bed286986a8d7",
+      "source_id": "cais/mmlu:2144",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "52f9e0afa139f5051a67e6b91afc3a0827cdeb3a615721b2be86adb5ffb3ecf6"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:9970--plain",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "026e83b394ca4f70bce49a10b057cb14a7cb3a94a43e2825d44106a134267fd0",
+      "source_id": "TIGER-Lab/MMLU-Pro:9970",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "d815479d24652486170a6f8283747c081c3f485e71460372c0a0d52faf2f977a"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:9970--chat",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "026e83b394ca4f70bce49a10b057cb14a7cb3a94a43e2825d44106a134267fd0",
+      "source_id": "TIGER-Lab/MMLU-Pro:9970",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "d815479d24652486170a6f8283747c081c3f485e71460372c0a0d52faf2f977a"
+    },
+    {
+      "id": "cais/mmlu:2988--plain",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "4883c0be62626d43dbc4550d9eb8c9d2682552b266ea71306bd34db398d68d4f",
+      "source_id": "cais/mmlu:2988",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "ab456c730ab728fb03bc58b2ed809fea20960739d792bdb4230b79100be6f02a"
+    },
+    {
+      "id": "cais/mmlu:2988--chat",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "4883c0be62626d43dbc4550d9eb8c9d2682552b266ea71306bd34db398d68d4f",
+      "source_id": "cais/mmlu:2988",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "ab456c730ab728fb03bc58b2ed809fea20960739d792bdb4230b79100be6f02a"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:4118--plain",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "cd04908edca9bbee2e05e6084098051bdc46011769973ce4913cec150b490b02",
+      "source_id": "TIGER-Lab/MMLU-Pro:4118",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "818f5e5d987807e1e047eeeba4caf34ed70f8d9574a2d94790755162963c0e05"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:4118--chat",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "cd04908edca9bbee2e05e6084098051bdc46011769973ce4913cec150b490b02",
+      "source_id": "TIGER-Lab/MMLU-Pro:4118",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "818f5e5d987807e1e047eeeba4caf34ed70f8d9574a2d94790755162963c0e05"
+    },
+    {
+      "id": "cais/mmlu:1165--plain",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "a1833ad43306c462f6673a1fa12de73006f0bb8b6adf85102e1eaab0cfa4ddcb",
+      "source_id": "cais/mmlu:1165",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "6b5f88352aac77ce927cb54963ab3070dc704d71c16882ae1f7512efe9821338"
+    },
+    {
+      "id": "cais/mmlu:1165--chat",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "a1833ad43306c462f6673a1fa12de73006f0bb8b6adf85102e1eaab0cfa4ddcb",
+      "source_id": "cais/mmlu:1165",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "6b5f88352aac77ce927cb54963ab3070dc704d71c16882ae1f7512efe9821338"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:4280--plain",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "053919662363ff2469e267064398d82c73e65c947224a7248a0281b2de643259",
+      "source_id": "TIGER-Lab/MMLU-Pro:4280",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "77883db80a5f7893d479841be2d71dd89b1138558250c9c8af91578ad9ce475e"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:4280--chat",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "053919662363ff2469e267064398d82c73e65c947224a7248a0281b2de643259",
+      "source_id": "TIGER-Lab/MMLU-Pro:4280",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "77883db80a5f7893d479841be2d71dd89b1138558250c9c8af91578ad9ce475e"
+    },
+    {
+      "id": "cais/mmlu:1504--plain",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "e8d32cfb3b1829530c61f7af20a2b5748e9b098033c187effffe97d0d69dcdf3",
+      "source_id": "cais/mmlu:1504",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "53cdd89dd2514f6f2b85b4ffe438bc85e4010305b028f9b0cc38c139e3bddb8a"
+    },
+    {
+      "id": "cais/mmlu:1504--chat",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "e8d32cfb3b1829530c61f7af20a2b5748e9b098033c187effffe97d0d69dcdf3",
+      "source_id": "cais/mmlu:1504",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "53cdd89dd2514f6f2b85b4ffe438bc85e4010305b028f9b0cc38c139e3bddb8a"
+    },
+    {
+      "id": "cais/mmlu:876--plain",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "7a230fe6a79b22201580fc4c449ab3e6273d9dbddaaa5376e096fd33b620374d",
+      "source_id": "cais/mmlu:876",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "659d62d0a37a450aa562fec0cbe8b424f3f17af26574cd6f0dcfe68a418b75f0"
+    },
+    {
+      "id": "cais/mmlu:876--chat",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "7a230fe6a79b22201580fc4c449ab3e6273d9dbddaaa5376e096fd33b620374d",
+      "source_id": "cais/mmlu:876",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "659d62d0a37a450aa562fec0cbe8b424f3f17af26574cd6f0dcfe68a418b75f0"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10203--plain",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "66b629b6f924bdb08cd1a4aade2fe1e3f0f81bc5c209ddb4417a9d0ae5fb5f91",
+      "source_id": "TIGER-Lab/MMLU-Pro:10203",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "3180573893c3f5ae6d860df5d0858438fa0877b3855bde015e9927c016a51b25"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10203--chat",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "66b629b6f924bdb08cd1a4aade2fe1e3f0f81bc5c209ddb4417a9d0ae5fb5f91",
+      "source_id": "TIGER-Lab/MMLU-Pro:10203",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "3180573893c3f5ae6d860df5d0858438fa0877b3855bde015e9927c016a51b25"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:7996--plain",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "fbbe57ddeea70a5bc0d1beb63f886bdfc2034d05b92db89036edd86c0831c270",
+      "source_id": "TIGER-Lab/MMLU-Pro:7996",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "1757b353d7ac5c88fb80612c30c3a03a0f3ae25b824ba4ab3a15bfe065e8ff7e"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:7996--chat",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "fbbe57ddeea70a5bc0d1beb63f886bdfc2034d05b92db89036edd86c0831c270",
+      "source_id": "TIGER-Lab/MMLU-Pro:7996",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "1757b353d7ac5c88fb80612c30c3a03a0f3ae25b824ba4ab3a15bfe065e8ff7e"
+    },
+    {
+      "id": "cais/mmlu:1604--plain",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "98b46450a99a4802a225c9bb5e7cfab68d15562dc17cbde92471243f732959e0",
+      "source_id": "cais/mmlu:1604",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "f0bbb7e0f7c70b05c6be7380e0ff7f54d942de5d8a89af5ed10cf2aeb78736e1"
+    },
+    {
+      "id": "cais/mmlu:1604--chat",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "98b46450a99a4802a225c9bb5e7cfab68d15562dc17cbde92471243f732959e0",
+      "source_id": "cais/mmlu:1604",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "f0bbb7e0f7c70b05c6be7380e0ff7f54d942de5d8a89af5ed10cf2aeb78736e1"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:2834--plain",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "7cf709064c5de4c0e22cf6f3269cf8763c27a1ae0db1fe5926e07169f2c4f14a",
+      "source_id": "TIGER-Lab/MMLU-Pro:2834",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "42b89540b3471ecf84d593db822ed209a434a477f90ff29ac5cabd467d932aac"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:2834--chat",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "7cf709064c5de4c0e22cf6f3269cf8763c27a1ae0db1fe5926e07169f2c4f14a",
+      "source_id": "TIGER-Lab/MMLU-Pro:2834",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "42b89540b3471ecf84d593db822ed209a434a477f90ff29ac5cabd467d932aac"
+    },
+    {
+      "id": "cais/mmlu:1143--plain",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "95a4cbe1ea7db19e65387ea681ca8cb846cc13a44907b583d3f873f4fe0a579f",
+      "source_id": "cais/mmlu:1143",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "e4726316af878632077982c6b6a33d73f766e3d67609b67f4e8a239b6dba5fbf"
+    },
+    {
+      "id": "cais/mmlu:1143--chat",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "95a4cbe1ea7db19e65387ea681ca8cb846cc13a44907b583d3f873f4fe0a579f",
+      "source_id": "cais/mmlu:1143",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "e4726316af878632077982c6b6a33d73f766e3d67609b67f4e8a239b6dba5fbf"
+    },
+    {
+      "id": "cais/mmlu:2954--plain",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "0985bf80719494b87b94c399def4326ff51358810db9a439e83df8e57ac81569",
+      "source_id": "cais/mmlu:2954",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "82b394262c121e00420c6a57f1de068aabb65ed755480507a8a7751a14403dc6"
+    },
+    {
+      "id": "cais/mmlu:2954--chat",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "0985bf80719494b87b94c399def4326ff51358810db9a439e83df8e57ac81569",
+      "source_id": "cais/mmlu:2954",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "82b394262c121e00420c6a57f1de068aabb65ed755480507a8a7751a14403dc6"
+    },
+    {
+      "id": "cais/mmlu:4258--plain",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "2cb04908dad51682d2553e68a3d9764c7eb7016cf4145fddda1fe5ae3336d2f2",
+      "source_id": "cais/mmlu:4258",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "8b2bcee9cae768a0588cdd33e41df36b5ec2f77f8c2fb23754a1cbf1eb63066c"
+    },
+    {
+      "id": "cais/mmlu:4258--chat",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "2cb04908dad51682d2553e68a3d9764c7eb7016cf4145fddda1fe5ae3336d2f2",
+      "source_id": "cais/mmlu:4258",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "8b2bcee9cae768a0588cdd33e41df36b5ec2f77f8c2fb23754a1cbf1eb63066c"
+    },
+    {
+      "id": "cais/mmlu:1594--plain",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "c114103b912a4c1a2c168eb3ac109d1e3ea821aa27af6ddc3a73981372a09ab8",
+      "source_id": "cais/mmlu:1594",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "2a10e101764f8956187bcde39ae8018ad68711f21f61b3d03a24d057fa31517b"
+    },
+    {
+      "id": "cais/mmlu:1594--chat",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "c114103b912a4c1a2c168eb3ac109d1e3ea821aa27af6ddc3a73981372a09ab8",
+      "source_id": "cais/mmlu:1594",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "2a10e101764f8956187bcde39ae8018ad68711f21f61b3d03a24d057fa31517b"
+    },
+    {
+      "id": "cais/mmlu:2346--plain",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "46b694585f449c61619194373bef2f19cb9071a80ce56932a2479b324dee145d",
+      "source_id": "cais/mmlu:2346",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "dfa0a7c2bd1b1b339170f71db6edfc7165e21fe00ca4e733ad6e1b229c9861fd"
+    },
+    {
+      "id": "cais/mmlu:2346--chat",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "46b694585f449c61619194373bef2f19cb9071a80ce56932a2479b324dee145d",
+      "source_id": "cais/mmlu:2346",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "dfa0a7c2bd1b1b339170f71db6edfc7165e21fe00ca4e733ad6e1b229c9861fd"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:8750--plain",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "c6bc632a75789e270cba2202d817b2aeef4796530fa75e2afa235b18887e2b0b",
+      "source_id": "TIGER-Lab/MMLU-Pro:8750",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "29d219a293167b26ac7a190d2f62c6dc96b675216019189761962f69820984b0"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:8750--chat",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "c6bc632a75789e270cba2202d817b2aeef4796530fa75e2afa235b18887e2b0b",
+      "source_id": "TIGER-Lab/MMLU-Pro:8750",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "29d219a293167b26ac7a190d2f62c6dc96b675216019189761962f69820984b0"
+    },
+    {
+      "id": "cais/mmlu:2841--plain",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "76794144f6c4a1fd2f8ed7efefcc862cc66746e3634da82c18f09d17468b12fb",
+      "source_id": "cais/mmlu:2841",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "09c04b300a713e69147bf2755f51d002d0d42f544c9b6b7194129b7e3f188c8c"
+    },
+    {
+      "id": "cais/mmlu:2841--chat",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "76794144f6c4a1fd2f8ed7efefcc862cc66746e3634da82c18f09d17468b12fb",
+      "source_id": "cais/mmlu:2841",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "09c04b300a713e69147bf2755f51d002d0d42f544c9b6b7194129b7e3f188c8c"
+    },
+    {
+      "id": "cais/mmlu:3275--plain",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "d15503abfd4e36e7c2aab24eb9a41590ac0c650de35d015065f17aa33f1239f2",
+      "source_id": "cais/mmlu:3275",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "66f4ca00a12abbb4d730c411428e2d04fc547a9db79d96775a1c4675477414b4"
+    },
+    {
+      "id": "cais/mmlu:3275--chat",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "d15503abfd4e36e7c2aab24eb9a41590ac0c650de35d015065f17aa33f1239f2",
+      "source_id": "cais/mmlu:3275",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "66f4ca00a12abbb4d730c411428e2d04fc547a9db79d96775a1c4675477414b4"
+    },
+    {
+      "id": "cais/mmlu:4828--plain",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "74f5da7a9489b65ef7e0d44f4e462745876393340d239b61b974d5b09124969d",
+      "source_id": "cais/mmlu:4828",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "cca23d9eba3dd55eca336a9b1b0cbc81d3bda2771a714eee77a46e43f6c5af04"
+    },
+    {
+      "id": "cais/mmlu:4828--chat",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "74f5da7a9489b65ef7e0d44f4e462745876393340d239b61b974d5b09124969d",
+      "source_id": "cais/mmlu:4828",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "cca23d9eba3dd55eca336a9b1b0cbc81d3bda2771a714eee77a46e43f6c5af04"
+    },
+    {
+      "id": "cais/mmlu:1753--plain",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "e60811cd7d6713a087362846ea7ab0fdeaa16fbd7c2147b0b59e475abe776c77",
+      "source_id": "cais/mmlu:1753",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "183e589efabff807b3b502f273ddb17baea3f394efa8b10bc991a76337cba903"
+    },
+    {
+      "id": "cais/mmlu:1753--chat",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "e60811cd7d6713a087362846ea7ab0fdeaa16fbd7c2147b0b59e475abe776c77",
+      "source_id": "cais/mmlu:1753",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "183e589efabff807b3b502f273ddb17baea3f394efa8b10bc991a76337cba903"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10371--plain",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "2766bce275cd4f051b069f7479c771d0b65dd84b096b0750321fbcf7c4c9b082",
+      "source_id": "TIGER-Lab/MMLU-Pro:10371",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "e892c5f8cbd84702831d84fd9e85932f84cc8bc504395693935132edbf662304"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10371--chat",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "2766bce275cd4f051b069f7479c771d0b65dd84b096b0750321fbcf7c4c9b082",
+      "source_id": "TIGER-Lab/MMLU-Pro:10371",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "e892c5f8cbd84702831d84fd9e85932f84cc8bc504395693935132edbf662304"
+    },
+    {
+      "id": "cais/mmlu:1128--plain",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "25fe113879da554658df4ebe31622f747c79910a90ba2654bdbe5fbbce74633c",
+      "source_id": "cais/mmlu:1128",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "7f88cfb261c688b41f5677f3d846e2e96a72c80f2ef6c49231f9d138e99c2e03"
+    },
+    {
+      "id": "cais/mmlu:1128--chat",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "25fe113879da554658df4ebe31622f747c79910a90ba2654bdbe5fbbce74633c",
+      "source_id": "cais/mmlu:1128",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "7f88cfb261c688b41f5677f3d846e2e96a72c80f2ef6c49231f9d138e99c2e03"
+    },
+    {
+      "id": "cais/mmlu:2968--plain",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "bfb92af844d696965f51de7f2512013ec9107824051c53856eb052fadf2474f9",
+      "source_id": "cais/mmlu:2968",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "4e866b9af3fac72598ea525521f9bc81cd7f307087c6dfc85aabff2c62d6c48b"
+    },
+    {
+      "id": "cais/mmlu:2968--chat",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "bfb92af844d696965f51de7f2512013ec9107824051c53856eb052fadf2474f9",
+      "source_id": "cais/mmlu:2968",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "4e866b9af3fac72598ea525521f9bc81cd7f307087c6dfc85aabff2c62d6c48b"
+    },
+    {
+      "id": "cais/mmlu:3064--plain",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "05f8fc251016104b833c072c5abad2e874201a56195c2c88a71c001aeb66ef14",
+      "source_id": "cais/mmlu:3064",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "843d66fd37e2f9d43638b1dabcd882a182787d83d13e5d0fcaf823f9cdbeab79"
+    },
+    {
+      "id": "cais/mmlu:3064--chat",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "05f8fc251016104b833c072c5abad2e874201a56195c2c88a71c001aeb66ef14",
+      "source_id": "cais/mmlu:3064",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "843d66fd37e2f9d43638b1dabcd882a182787d83d13e5d0fcaf823f9cdbeab79"
+    },
+    {
+      "id": "cais/mmlu:4235--plain",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "22ca0e814af9cca144d4747be04b9eaea703ba307f5c1e29e74cd84ab57df0b3",
+      "source_id": "cais/mmlu:4235",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "d1cc7f2987d1df4a04cf81db11dab6e5babb12c9cbe8948a0f21947f69e98853"
+    },
+    {
+      "id": "cais/mmlu:4235--chat",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "22ca0e814af9cca144d4747be04b9eaea703ba307f5c1e29e74cd84ab57df0b3",
+      "source_id": "cais/mmlu:4235",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "d1cc7f2987d1df4a04cf81db11dab6e5babb12c9cbe8948a0f21947f69e98853"
+    },
+    {
+      "id": "cais/mmlu:3038--plain",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "dcdb797e3cffb0762a211d30e44bd505a60ecaae48bb0270639e4a016def9753",
+      "source_id": "cais/mmlu:3038",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "336d8a1ffc8d0b72780c93f81c25cdd85db918dcdcb7f9358446a6b1d059e9a2"
+    },
+    {
+      "id": "cais/mmlu:3038--chat",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "dcdb797e3cffb0762a211d30e44bd505a60ecaae48bb0270639e4a016def9753",
+      "source_id": "cais/mmlu:3038",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "336d8a1ffc8d0b72780c93f81c25cdd85db918dcdcb7f9358446a6b1d059e9a2"
+    },
+    {
+      "id": "cais/mmlu:3209--plain",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "dfb1a995813d25a6e2f5ea4b28575c60e05831200742b6a91e316d60a9a81cc0",
+      "source_id": "cais/mmlu:3209",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "16bb620d29a3f84cddd611d485f918c97e92eb877255c71b477b747ce1ceb0b2"
+    },
+    {
+      "id": "cais/mmlu:3209--chat",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "dfb1a995813d25a6e2f5ea4b28575c60e05831200742b6a91e316d60a9a81cc0",
+      "source_id": "cais/mmlu:3209",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "16bb620d29a3f84cddd611d485f918c97e92eb877255c71b477b747ce1ceb0b2"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:8622--plain",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "1359430b5ddedacb735ecbda7aca9427f7f3f261e1d99b157dfe26bf3eb04e94",
+      "source_id": "TIGER-Lab/MMLU-Pro:8622",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "f079e5de0bc902b1e83fd83dfc91f3cd2e62860f446e67bf6ce4c4d61208140d"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:8622--chat",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "1359430b5ddedacb735ecbda7aca9427f7f3f261e1d99b157dfe26bf3eb04e94",
+      "source_id": "TIGER-Lab/MMLU-Pro:8622",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "f079e5de0bc902b1e83fd83dfc91f3cd2e62860f446e67bf6ce4c4d61208140d"
+    },
+    {
+      "id": "cais/mmlu:2239--plain",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "6cd6a2c44bf90414c40ba8cb4a0118f28e79c49ecff930c4b76b9cbd9aca3f9e",
+      "source_id": "cais/mmlu:2239",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "83e2a01205a82bef6ab56efba9e2f08e0e0c858f1880a02bd1368c84417e1b53"
+    },
+    {
+      "id": "cais/mmlu:2239--chat",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "6cd6a2c44bf90414c40ba8cb4a0118f28e79c49ecff930c4b76b9cbd9aca3f9e",
+      "source_id": "cais/mmlu:2239",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "83e2a01205a82bef6ab56efba9e2f08e0e0c858f1880a02bd1368c84417e1b53"
+    },
+    {
+      "id": "cais/mmlu:1186--plain",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "0f526f85e5a16b0b5b33acfefaf416901e4d2f8a0eaefec9c8b91ba54f16466d",
+      "source_id": "cais/mmlu:1186",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "0be1aad1337b91fe57620f3044ca526ed773987345d19b2d8cb3eb3e652aa29f"
+    },
+    {
+      "id": "cais/mmlu:1186--chat",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "0f526f85e5a16b0b5b33acfefaf416901e4d2f8a0eaefec9c8b91ba54f16466d",
+      "source_id": "cais/mmlu:1186",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "0be1aad1337b91fe57620f3044ca526ed773987345d19b2d8cb3eb3e652aa29f"
+    },
+    {
+      "id": "cais/mmlu:4234--plain",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "3d13f6acb5573547aebe77a947c3186833427713407439080b8af99af1b183b5",
+      "source_id": "cais/mmlu:4234",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "6e0a8ea34d190fbb93e75854ba2b0d5d441709fcc8256a82ee8c1f300abe8484"
+    },
+    {
+      "id": "cais/mmlu:4234--chat",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "3d13f6acb5573547aebe77a947c3186833427713407439080b8af99af1b183b5",
+      "source_id": "cais/mmlu:4234",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "6e0a8ea34d190fbb93e75854ba2b0d5d441709fcc8256a82ee8c1f300abe8484"
+    },
+    {
+      "id": "cais/mmlu:4461--plain",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "b7d032b1d827938fa044786ad76909e39c840ec396053ee13d0c989e3dd773b4",
+      "source_id": "cais/mmlu:4461",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "f2be57674c1c17c5952e522808a4bd439fd8a08aa82ca3eedbe66b18d16dd2f3"
+    },
+    {
+      "id": "cais/mmlu:4461--chat",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "b7d032b1d827938fa044786ad76909e39c840ec396053ee13d0c989e3dd773b4",
+      "source_id": "cais/mmlu:4461",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "f2be57674c1c17c5952e522808a4bd439fd8a08aa82ca3eedbe66b18d16dd2f3"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:8529--plain",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "06c45a77a1727d61ee90433083f0180e8afa79257e5931a9303d9d0f095159c9",
+      "source_id": "TIGER-Lab/MMLU-Pro:8529",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "bb60c5adc1b46baf515c743143a9fca04fdc1220c8a1716e733653f0d9d9ffa8"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:8529--chat",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "06c45a77a1727d61ee90433083f0180e8afa79257e5931a9303d9d0f095159c9",
+      "source_id": "TIGER-Lab/MMLU-Pro:8529",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "bb60c5adc1b46baf515c743143a9fca04fdc1220c8a1716e733653f0d9d9ffa8"
+    },
+    {
+      "id": "cais/mmlu:41--plain",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "4691858620d97bb68ac21c701dc0d1fa0b38e2ac8a651aa1bb9614387fe04ca2",
+      "source_id": "cais/mmlu:41",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "a8fb33e0bf335b01f1af1a7ce91996de1917f8766a375b93153c5233b0abe8b1"
+    },
+    {
+      "id": "cais/mmlu:41--chat",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "4691858620d97bb68ac21c701dc0d1fa0b38e2ac8a651aa1bb9614387fe04ca2",
+      "source_id": "cais/mmlu:41",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "a8fb33e0bf335b01f1af1a7ce91996de1917f8766a375b93153c5233b0abe8b1"
+    },
+    {
+      "id": "cais/mmlu:1038--plain",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "3b2fbcc3b27db80da03245dc441cf05fd570e2efd74512c2a3a25b79316352fe",
+      "source_id": "cais/mmlu:1038",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "ca443aa7f8a36fa90fed1125d3f85d785a04223a0c1fdc5881c580263fc20683"
+    },
+    {
+      "id": "cais/mmlu:1038--chat",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "3b2fbcc3b27db80da03245dc441cf05fd570e2efd74512c2a3a25b79316352fe",
+      "source_id": "cais/mmlu:1038",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "ca443aa7f8a36fa90fed1125d3f85d785a04223a0c1fdc5881c580263fc20683"
+    },
+    {
+      "id": "cais/mmlu:2193--plain",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "cd7c63994ac635bbb25392e8408b950fa7206567576768f118c50a9384f72111",
+      "source_id": "cais/mmlu:2193",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "0c5dab0b16403e0bdf06a6718648defee42d56df2b7adfffdcecaf0c00bb20d8"
+    },
+    {
+      "id": "cais/mmlu:2193--chat",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "cd7c63994ac635bbb25392e8408b950fa7206567576768f118c50a9384f72111",
+      "source_id": "cais/mmlu:2193",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "0c5dab0b16403e0bdf06a6718648defee42d56df2b7adfffdcecaf0c00bb20d8"
+    },
+    {
+      "id": "cais/mmlu:1044--plain",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "4c36c84824280cd44cadd05acd68f739dc0a3993ec19d946245eba1943746b80",
+      "source_id": "cais/mmlu:1044",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "5a33261ce45f1b4f1abfd5c5d3fd43105bbd5f214a70b4b7f40845ac29df922b"
+    },
+    {
+      "id": "cais/mmlu:1044--chat",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "4c36c84824280cd44cadd05acd68f739dc0a3993ec19d946245eba1943746b80",
+      "source_id": "cais/mmlu:1044",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "5a33261ce45f1b4f1abfd5c5d3fd43105bbd5f214a70b4b7f40845ac29df922b"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:8624--plain",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "723fdd911fbdc1f7f86e6e65cdc24c0fd95bb864ea2ca48cd6174cdab94596a1",
+      "source_id": "TIGER-Lab/MMLU-Pro:8624",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "e7c0c5af1403642e8feeed69b0267b524635fdb5d2828fbe1fe38ed77086f53d"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:8624--chat",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "723fdd911fbdc1f7f86e6e65cdc24c0fd95bb864ea2ca48cd6174cdab94596a1",
+      "source_id": "TIGER-Lab/MMLU-Pro:8624",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "e7c0c5af1403642e8feeed69b0267b524635fdb5d2828fbe1fe38ed77086f53d"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:8758--plain",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "56e2219777072a9ba73788ebf46c52403f4f0759a8276cccc1d6f1c54b6764a9",
+      "source_id": "TIGER-Lab/MMLU-Pro:8758",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "b1e768b95607720ad5437fb302ef568bf313c665660dab5a00817eed6bc90bd0"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:8758--chat",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "56e2219777072a9ba73788ebf46c52403f4f0759a8276cccc1d6f1c54b6764a9",
+      "source_id": "TIGER-Lab/MMLU-Pro:8758",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "b1e768b95607720ad5437fb302ef568bf313c665660dab5a00817eed6bc90bd0"
+    },
+    {
+      "id": "cais/mmlu:7--plain",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "7c2b478371c2232c2c019bb77f5a6f4ef53a2f3940d7899807afdd550328a101",
+      "source_id": "cais/mmlu:7",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "912cf324a67a0501c0633a5dd9608ab6f387e21994407800fbeee7e16542fbaf"
+    },
+    {
+      "id": "cais/mmlu:7--chat",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "7c2b478371c2232c2c019bb77f5a6f4ef53a2f3940d7899807afdd550328a101",
+      "source_id": "cais/mmlu:7",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "912cf324a67a0501c0633a5dd9608ab6f387e21994407800fbeee7e16542fbaf"
+    },
+    {
+      "id": "cais/mmlu:3233--plain",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "a35f7726ab41483bf45e13ecb610b946b9c4d8febeae04353b9fdc4ceb9b521a",
+      "source_id": "cais/mmlu:3233",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "07dcd2ea2ae27d8c03b09d1ad8b1ce69b1c3c79e2bc2c14e5a963ef4c7520881"
+    },
+    {
+      "id": "cais/mmlu:3233--chat",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "a35f7726ab41483bf45e13ecb610b946b9c4d8febeae04353b9fdc4ceb9b521a",
+      "source_id": "cais/mmlu:3233",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "07dcd2ea2ae27d8c03b09d1ad8b1ce69b1c3c79e2bc2c14e5a963ef4c7520881"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10576--plain",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "c06c2a8d507963b82ec14fbbae8068f2cf1c7e7eb8784459bc0740305715485c",
+      "source_id": "TIGER-Lab/MMLU-Pro:10576",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "e7e122e413e0feb2c381e8f5564466a4b3430516a637fa9c36e5b3345052b9e3"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10576--chat",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "c06c2a8d507963b82ec14fbbae8068f2cf1c7e7eb8784459bc0740305715485c",
+      "source_id": "TIGER-Lab/MMLU-Pro:10576",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "e7e122e413e0feb2c381e8f5564466a4b3430516a637fa9c36e5b3345052b9e3"
+    },
+    {
+      "id": "cais/mmlu:4264--plain",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "854e7e546f512b01197639283b8af2318de9ce12ba174dcd61a70faa8cc041fb",
+      "source_id": "cais/mmlu:4264",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "b7448b145e36a29d63554eb0fdb77778bd103967a00a22be2ebe6548ce8c9319"
+    },
+    {
+      "id": "cais/mmlu:4264--chat",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "854e7e546f512b01197639283b8af2318de9ce12ba174dcd61a70faa8cc041fb",
+      "source_id": "cais/mmlu:4264",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "b7448b145e36a29d63554eb0fdb77778bd103967a00a22be2ebe6548ce8c9319"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:8768--plain",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "2adab32328dbc7648082aba05a373c6281a8f496f704e158129eef8fee3f6d4b",
+      "source_id": "TIGER-Lab/MMLU-Pro:8768",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "58d32e70d531bb1a5fb3a43d33efc188bdcb51521b24c29e593e804739104d43"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:8768--chat",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "2adab32328dbc7648082aba05a373c6281a8f496f704e158129eef8fee3f6d4b",
+      "source_id": "TIGER-Lab/MMLU-Pro:8768",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "58d32e70d531bb1a5fb3a43d33efc188bdcb51521b24c29e593e804739104d43"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:8076--plain",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "fae7f4c24b233b15031dfe458ac0f87234a2d6de5938929c1f59585191e45492",
+      "source_id": "TIGER-Lab/MMLU-Pro:8076",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "23338d4dd91a136298d9d9c33640285c754e8ad95c768a400d70cd68e162a916"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:8076--chat",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "fae7f4c24b233b15031dfe458ac0f87234a2d6de5938929c1f59585191e45492",
+      "source_id": "TIGER-Lab/MMLU-Pro:8076",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "23338d4dd91a136298d9d9c33640285c754e8ad95c768a400d70cd68e162a916"
+    },
+    {
+      "id": "cais/mmlu:1030--plain",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "ecb1e435bc1928bd7c0b55c0f3f27cc77d531ff4a7db0fb7131cb4af881889a8",
+      "source_id": "cais/mmlu:1030",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "e15d3c6fef2310ee2b23fedca4da2db585cc92117686e6cb38929cd21dbd5c1f"
+    },
+    {
+      "id": "cais/mmlu:1030--chat",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "ecb1e435bc1928bd7c0b55c0f3f27cc77d531ff4a7db0fb7131cb4af881889a8",
+      "source_id": "cais/mmlu:1030",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "e15d3c6fef2310ee2b23fedca4da2db585cc92117686e6cb38929cd21dbd5c1f"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:8636--plain",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "612352f033432451630aac93f2e83315342172080313baebeb80eb8dee999afa",
+      "source_id": "TIGER-Lab/MMLU-Pro:8636",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "e7bcde5b2c741d8374e06ef8f00bc9df657c75a3654e68c5da647877e29d254e"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:8636--chat",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "612352f033432451630aac93f2e83315342172080313baebeb80eb8dee999afa",
+      "source_id": "TIGER-Lab/MMLU-Pro:8636",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "e7bcde5b2c741d8374e06ef8f00bc9df657c75a3654e68c5da647877e29d254e"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:8943--plain",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "ffdb4052d2b5dcee30a304cfa36bf4c49517b66d13bacd60e67fc9bde599b470",
+      "source_id": "TIGER-Lab/MMLU-Pro:8943",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "e8a735f2bba03d8cc7cc3f934280d271248da1e2a5f10bd379d212db086d62b6"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:8943--chat",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "ffdb4052d2b5dcee30a304cfa36bf4c49517b66d13bacd60e67fc9bde599b470",
+      "source_id": "TIGER-Lab/MMLU-Pro:8943",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "e8a735f2bba03d8cc7cc3f934280d271248da1e2a5f10bd379d212db086d62b6"
+    },
+    {
+      "id": "cais/mmlu:1570--plain",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "b274da8153bedf512e761c626369773c858d1b3fc328dc5e390df651901a96fa",
+      "source_id": "cais/mmlu:1570",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "9694972c8a1c617a21afa685f98bab41cbe4fdc08eccef521e8d997325b21b91"
+    },
+    {
+      "id": "cais/mmlu:1570--chat",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "b274da8153bedf512e761c626369773c858d1b3fc328dc5e390df651901a96fa",
+      "source_id": "cais/mmlu:1570",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "9694972c8a1c617a21afa685f98bab41cbe4fdc08eccef521e8d997325b21b91"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:8952--plain",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "df55a595d48665b4e0bb4fd286956239d26a9b2154d7b59c76c83cc0f27360aa",
+      "source_id": "TIGER-Lab/MMLU-Pro:8952",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "751ed5ca139b9d68b4cfdb157fe6f49f97ee705608266c02b67d03ffda58b8c7"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:8952--chat",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "df55a595d48665b4e0bb4fd286956239d26a9b2154d7b59c76c83cc0f27360aa",
+      "source_id": "TIGER-Lab/MMLU-Pro:8952",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "751ed5ca139b9d68b4cfdb157fe6f49f97ee705608266c02b67d03ffda58b8c7"
+    },
+    {
+      "id": "cais/mmlu:3255--plain",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "f7e0ca5d96587c0d91a678cc8136dbcd158782f99cd87692748c52edda9a52be",
+      "source_id": "cais/mmlu:3255",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "1fd62c0ef43b737c52043bed81724ffa7771ef130ad287287010b3a623dcf6af"
+    },
+    {
+      "id": "cais/mmlu:3255--chat",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "f7e0ca5d96587c0d91a678cc8136dbcd158782f99cd87692748c52edda9a52be",
+      "source_id": "cais/mmlu:3255",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "1fd62c0ef43b737c52043bed81724ffa7771ef130ad287287010b3a623dcf6af"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:8321--plain",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "f57d1ab793ed30f83d0d3d3ffe1605f407e485c5e05ab712b62bdd421eaf540b",
+      "source_id": "TIGER-Lab/MMLU-Pro:8321",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "0bf764c2776d8027eb6c2036020c48b922a3db189531f7fc595d46f4bd7e940f"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:8321--chat",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "f57d1ab793ed30f83d0d3d3ffe1605f407e485c5e05ab712b62bdd421eaf540b",
+      "source_id": "TIGER-Lab/MMLU-Pro:8321",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "0bf764c2776d8027eb6c2036020c48b922a3db189531f7fc595d46f4bd7e940f"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:7862--plain",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "47554a96391e15eeb11b8980d036d672452d76743499646c27890d8f9df7fe04",
+      "source_id": "TIGER-Lab/MMLU-Pro:7862",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "86d8fa41a38f9fa7f0ffe741aa8f1d9ccd8d98e3f229083e451e12f53dd7a51c"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:7862--chat",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "47554a96391e15eeb11b8980d036d672452d76743499646c27890d8f9df7fe04",
+      "source_id": "TIGER-Lab/MMLU-Pro:7862",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "86d8fa41a38f9fa7f0ffe741aa8f1d9ccd8d98e3f229083e451e12f53dd7a51c"
+    },
+    {
+      "id": "cais/mmlu:1011--plain",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "839b58d52fbd39bf4f96a1016433bf16975cbd5f2723982f1bb28fbf0e8cbcaa",
+      "source_id": "cais/mmlu:1011",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "8983130c9012ed29a2b48ca27f585a55d98b66a543c11e75ed5203aeab0bf10c"
+    },
+    {
+      "id": "cais/mmlu:1011--chat",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "839b58d52fbd39bf4f96a1016433bf16975cbd5f2723982f1bb28fbf0e8cbcaa",
+      "source_id": "cais/mmlu:1011",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "8983130c9012ed29a2b48ca27f585a55d98b66a543c11e75ed5203aeab0bf10c"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:8755--plain",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "a8b26b8739d7831f7f9503322e43a34a925791a612aae8cda8d1abdc91396f77",
+      "source_id": "TIGER-Lab/MMLU-Pro:8755",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "4954334781d934c1d9415ba92503e79eded4dcdacbbf46d501e6134e3ac6364a"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:8755--chat",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "a8b26b8739d7831f7f9503322e43a34a925791a612aae8cda8d1abdc91396f77",
+      "source_id": "TIGER-Lab/MMLU-Pro:8755",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "4954334781d934c1d9415ba92503e79eded4dcdacbbf46d501e6134e3ac6364a"
+    },
+    {
+      "id": "cais/mmlu:1522--plain",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "bc6747701bfc0fac4458e1b09d5368313a6750708df7f0ea4613d72eb5af9438",
+      "source_id": "cais/mmlu:1522",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "a02ceb3062dd510a177c45a707fff57990aa4373bae22694f4de5cab1c74397e"
+    },
+    {
+      "id": "cais/mmlu:1522--chat",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "bc6747701bfc0fac4458e1b09d5368313a6750708df7f0ea4613d72eb5af9438",
+      "source_id": "cais/mmlu:1522",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "a02ceb3062dd510a177c45a707fff57990aa4373bae22694f4de5cab1c74397e"
+    },
+    {
+      "id": "cais/mmlu:3227--plain",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "70151736be5d1264109f39c509547e793b817703f3eaf67a8c4bdb107c3d2a2e",
+      "source_id": "cais/mmlu:3227",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "a5c5b495adc03308fb21531afabd5c80094a350a422961016b5f86307333380d"
+    },
+    {
+      "id": "cais/mmlu:3227--chat",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "70151736be5d1264109f39c509547e793b817703f3eaf67a8c4bdb107c3d2a2e",
+      "source_id": "cais/mmlu:3227",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "a5c5b495adc03308fb21531afabd5c80094a350a422961016b5f86307333380d"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:9033--plain",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "a839a7c48e8e6e62a1a351ca7a0beda52867cfd0a6ea1139dbc951056b210bde",
+      "source_id": "TIGER-Lab/MMLU-Pro:9033",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "1e2c644ba8ee87ec5fb8347df57d10ca416559de17a66647e8577a46059a9097"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:9033--chat",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "a839a7c48e8e6e62a1a351ca7a0beda52867cfd0a6ea1139dbc951056b210bde",
+      "source_id": "TIGER-Lab/MMLU-Pro:9033",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "1e2c644ba8ee87ec5fb8347df57d10ca416559de17a66647e8577a46059a9097"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:9023--plain",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "c64fc60d4e0667fb6bcc4946df7ac6db73086955c198a7bd2bf38a5235092d76",
+      "source_id": "TIGER-Lab/MMLU-Pro:9023",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "0aa3f86021620a2c378952aa94250316c994ae76ff3f67f079deeb51a1603062"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:9023--chat",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "c64fc60d4e0667fb6bcc4946df7ac6db73086955c198a7bd2bf38a5235092d76",
+      "source_id": "TIGER-Lab/MMLU-Pro:9023",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "0aa3f86021620a2c378952aa94250316c994ae76ff3f67f079deeb51a1603062"
+    },
+    {
+      "id": "cais/mmlu:1002--plain",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "2f88311506bff7da2badc47abd2bdc4b6f314dc12b3d057e21f54f458331178d",
+      "source_id": "cais/mmlu:1002",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "675eaa8cffb07c15364bee05c745fa6806bb25c0bc9d08322550667a7ad1527c"
+    },
+    {
+      "id": "cais/mmlu:1002--chat",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "2f88311506bff7da2badc47abd2bdc4b6f314dc12b3d057e21f54f458331178d",
+      "source_id": "cais/mmlu:1002",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "675eaa8cffb07c15364bee05c745fa6806bb25c0bc9d08322550667a7ad1527c"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:8062--plain",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "ac767e26ed2f4946ba1b02a49b6d96e9a9f6dd1a67d20804a330431dd6156f24",
+      "source_id": "TIGER-Lab/MMLU-Pro:8062",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "401659e12ddf455570fd66fc5c02ec2faf6d7522fccd1e42da2d4a4e59393cca"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:8062--chat",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "ac767e26ed2f4946ba1b02a49b6d96e9a9f6dd1a67d20804a330431dd6156f24",
+      "source_id": "TIGER-Lab/MMLU-Pro:8062",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "401659e12ddf455570fd66fc5c02ec2faf6d7522fccd1e42da2d4a4e59393cca"
+    },
+    {
+      "id": "cais/mmlu:1564--plain",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "f18b0386068d510bc8fe91c5e49cb6fb8e409139840332024a7dccd1a8567748",
+      "source_id": "cais/mmlu:1564",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "b3879904990330418f3324e6d8e4fb47e270cef39f5edbd567767d672e0fcf9e"
+    },
+    {
+      "id": "cais/mmlu:1564--chat",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "f18b0386068d510bc8fe91c5e49cb6fb8e409139840332024a7dccd1a8567748",
+      "source_id": "cais/mmlu:1564",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "b3879904990330418f3324e6d8e4fb47e270cef39f5edbd567767d672e0fcf9e"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:7988--plain",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "0737644c5067fa32e0c4bdf8d0b09b1bb999fdde4fd3bf494a574a31b1d09d08",
+      "source_id": "TIGER-Lab/MMLU-Pro:7988",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "dff7ea32b27440fa73162e0c95caaeb83d325bee0766a42773267b792678c126"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:7988--chat",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "0737644c5067fa32e0c4bdf8d0b09b1bb999fdde4fd3bf494a574a31b1d09d08",
+      "source_id": "TIGER-Lab/MMLU-Pro:7988",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "dff7ea32b27440fa73162e0c95caaeb83d325bee0766a42773267b792678c126"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10574--plain",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "6d5f18ebd6db25bfa5d48164c4a19d94f0fe15fa4bb8782872e946885eed94d6",
+      "source_id": "TIGER-Lab/MMLU-Pro:10574",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "d8292934d1f39b658dd1a1382fe916f5814f029ebd3c88a22396c2be2bd79241"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10574--chat",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "6d5f18ebd6db25bfa5d48164c4a19d94f0fe15fa4bb8782872e946885eed94d6",
+      "source_id": "TIGER-Lab/MMLU-Pro:10574",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "d8292934d1f39b658dd1a1382fe916f5814f029ebd3c88a22396c2be2bd79241"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:8294--plain",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "681700ef1d3d6503ed79148cbcbac5f8731653f6e40f53c71ac11230661a130f",
+      "source_id": "TIGER-Lab/MMLU-Pro:8294",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "3576d8b1c56206449734b03928e8d76621454b8c1ab4a5892c59e187987c2ea4"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:8294--chat",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "681700ef1d3d6503ed79148cbcbac5f8731653f6e40f53c71ac11230661a130f",
+      "source_id": "TIGER-Lab/MMLU-Pro:8294",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "3576d8b1c56206449734b03928e8d76621454b8c1ab4a5892c59e187987c2ea4"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10440--plain",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "6b7419f478a314e959ddad1097e01d7e93c96d59ced8f821df9fc32b5c728b27",
+      "source_id": "TIGER-Lab/MMLU-Pro:10440",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "3aa48d8efc0e375deb94b1f9a5db6c0bd53f6800d36cecf3863c254af6d7e2d3"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10440--chat",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "6b7419f478a314e959ddad1097e01d7e93c96d59ced8f821df9fc32b5c728b27",
+      "source_id": "TIGER-Lab/MMLU-Pro:10440",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "3aa48d8efc0e375deb94b1f9a5db6c0bd53f6800d36cecf3863c254af6d7e2d3"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:8738--plain",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "3f8c9f81cd74c736771d86f0355db1c9e5c10ea801a42946cf05349291d8fe9d",
+      "source_id": "TIGER-Lab/MMLU-Pro:8738",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "9b4bbf1d1a56c79ea0686b6b039143be53ccccce71917724a39053697be98369"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:8738--chat",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "3f8c9f81cd74c736771d86f0355db1c9e5c10ea801a42946cf05349291d8fe9d",
+      "source_id": "TIGER-Lab/MMLU-Pro:8738",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "9b4bbf1d1a56c79ea0686b6b039143be53ccccce71917724a39053697be98369"
+    },
+    {
+      "id": "cais/mmlu:996--plain",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "f722137b46e18ebde26490af426044d1e616c842e8369cb3d49634b069cdedcd",
+      "source_id": "cais/mmlu:996",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "76aa31102cc2c62ae069e5c42d6f38f3beeebd4a61db6098cc3330ae110a122f"
+    },
+    {
+      "id": "cais/mmlu:996--chat",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "f722137b46e18ebde26490af426044d1e616c842e8369cb3d49634b069cdedcd",
+      "source_id": "cais/mmlu:996",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "76aa31102cc2c62ae069e5c42d6f38f3beeebd4a61db6098cc3330ae110a122f"
+    },
+    {
+      "id": "cais/mmlu:1009--plain",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "b12ae7c008d1be1f3275efccaa397c388b337476413a7b161a03c48c601ab216",
+      "source_id": "cais/mmlu:1009",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "f5e0a714614e7d7af3b79c9a05ab2bd34c9192cf2ddd19424596140ea5997d15"
+    },
+    {
+      "id": "cais/mmlu:1009--chat",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "b12ae7c008d1be1f3275efccaa397c388b337476413a7b161a03c48c601ab216",
+      "source_id": "cais/mmlu:1009",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "f5e0a714614e7d7af3b79c9a05ab2bd34c9192cf2ddd19424596140ea5997d15"
+    },
+    {
+      "id": "cais/mmlu:3207--plain",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "d4ef4d824d426f067fe1827062d248de6806145078f1e37ca50e62be49d2b49b",
+      "source_id": "cais/mmlu:3207",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "7646f2d75bcabf11d7c8110a170656e3b4b4d711d341085f77adeba93f10b199"
+    },
+    {
+      "id": "cais/mmlu:3207--chat",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "d4ef4d824d426f067fe1827062d248de6806145078f1e37ca50e62be49d2b49b",
+      "source_id": "cais/mmlu:3207",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "7646f2d75bcabf11d7c8110a170656e3b4b4d711d341085f77adeba93f10b199"
+    },
+    {
+      "id": "cais/mmlu:1486--plain",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "6259328380c81c1677bbd470275de640dc17f48a4e1c9fd788ccec071f03753a",
+      "source_id": "cais/mmlu:1486",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "f71b4b7fef908851ed9ad8a4133d62ba6bb05f6dbb2fffc903a56baa6a39a740"
+    },
+    {
+      "id": "cais/mmlu:1486--chat",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "6259328380c81c1677bbd470275de640dc17f48a4e1c9fd788ccec071f03753a",
+      "source_id": "cais/mmlu:1486",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "f71b4b7fef908851ed9ad8a4133d62ba6bb05f6dbb2fffc903a56baa6a39a740"
+    },
+    {
+      "id": "cais/mmlu:1040--plain",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "d3d004e215778d54819fc75befa2745a79f5db08efc84a088f692a61c0979569",
+      "source_id": "cais/mmlu:1040",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "9d66f1adecea46300b644983e468234096aa4d39e8cad79d55708dc96714d364"
+    },
+    {
+      "id": "cais/mmlu:1040--chat",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "d3d004e215778d54819fc75befa2745a79f5db08efc84a088f692a61c0979569",
+      "source_id": "cais/mmlu:1040",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "9d66f1adecea46300b644983e468234096aa4d39e8cad79d55708dc96714d364"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10506--plain",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "5c133fe742d7c3b33df93315275954f555ec46ec369f1b1acf2f94575a8c4155",
+      "source_id": "TIGER-Lab/MMLU-Pro:10506",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "51c43f828e99b14a2922256abd9a7ab437ff520c7be737b94c2c10e515d6643e"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10506--chat",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "5c133fe742d7c3b33df93315275954f555ec46ec369f1b1acf2f94575a8c4155",
+      "source_id": "TIGER-Lab/MMLU-Pro:10506",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "51c43f828e99b14a2922256abd9a7ab437ff520c7be737b94c2c10e515d6643e"
+    },
+    {
+      "id": "cais/mmlu:1095--plain",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "15999f3f964222c6e060a0bd61754c2c3b971c937f207d0411ee3ad52ea8b59d",
+      "source_id": "cais/mmlu:1095",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "a7d03fd09ec9d1b43599880bddb2f68a8e87d0221d59097bea9b9e26fc6d5993"
+    },
+    {
+      "id": "cais/mmlu:1095--chat",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "15999f3f964222c6e060a0bd61754c2c3b971c937f207d0411ee3ad52ea8b59d",
+      "source_id": "cais/mmlu:1095",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "a7d03fd09ec9d1b43599880bddb2f68a8e87d0221d59097bea9b9e26fc6d5993"
+    },
+    {
+      "id": "cais/mmlu:3253--plain",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "0cc90949719e64076c0ff73fbebdb95eedbb3d582ca483f129e49829497c95fd",
+      "source_id": "cais/mmlu:3253",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "117f7f3fb4a611320dd9e1b8d27258e3a1859174b3c6325c9919c509f37e4cdd"
+    },
+    {
+      "id": "cais/mmlu:3253--chat",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "0cc90949719e64076c0ff73fbebdb95eedbb3d582ca483f129e49829497c95fd",
+      "source_id": "cais/mmlu:3253",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "117f7f3fb4a611320dd9e1b8d27258e3a1859174b3c6325c9919c509f37e4cdd"
+    },
+    {
+      "id": "cais/mmlu:3246--plain",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "0a541eed9fc346ca306444cc1d7773749fd2b59cba9d936c0b9cae087fe60706",
+      "source_id": "cais/mmlu:3246",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "87a3453f651966615c7cbcc3d47111d237ed3cacc0efab625832996ac85a5c18"
+    },
+    {
+      "id": "cais/mmlu:3246--chat",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "0a541eed9fc346ca306444cc1d7773749fd2b59cba9d936c0b9cae087fe60706",
+      "source_id": "cais/mmlu:3246",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "87a3453f651966615c7cbcc3d47111d237ed3cacc0efab625832996ac85a5c18"
+    },
+    {
+      "id": "cais/mmlu:1558--plain",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "baac8723047b432f064993d97d2836a67ea040fe037625f996e159f05062ae05",
+      "source_id": "cais/mmlu:1558",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "97ff5e72adf9cca34504a790e9ced688711bf9f2249f2fdddc1b8b5418ef022d"
+    },
+    {
+      "id": "cais/mmlu:1558--chat",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "baac8723047b432f064993d97d2836a67ea040fe037625f996e159f05062ae05",
+      "source_id": "cais/mmlu:1558",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "97ff5e72adf9cca34504a790e9ced688711bf9f2249f2fdddc1b8b5418ef022d"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10641--plain",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "7aac04d401542ce016d0a958e900c94bc8631324a1c1f18168081e26d4fb466c",
+      "source_id": "TIGER-Lab/MMLU-Pro:10641",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "2c20f19be16ced791d224486d909017a3f9a82d85f725f9fb2009cf1efc63c84"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10641--chat",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "7aac04d401542ce016d0a958e900c94bc8631324a1c1f18168081e26d4fb466c",
+      "source_id": "TIGER-Lab/MMLU-Pro:10641",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "2c20f19be16ced791d224486d909017a3f9a82d85f725f9fb2009cf1efc63c84"
+    },
+    {
+      "id": "cais/mmlu:1069--plain",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "ab880cc1ef0c55cea6dad8b6e935e6d954b131de26e5e0dce40a809244bdbe88",
+      "source_id": "cais/mmlu:1069",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "ec7a4d8dc4273c3fe6152a81a7c20525662b009c588ec18d664afcd4e996fec5"
+    },
+    {
+      "id": "cais/mmlu:1069--chat",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "ab880cc1ef0c55cea6dad8b6e935e6d954b131de26e5e0dce40a809244bdbe88",
+      "source_id": "cais/mmlu:1069",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "ec7a4d8dc4273c3fe6152a81a7c20525662b009c588ec18d664afcd4e996fec5"
+    },
+    {
+      "id": "cais/mmlu:1052--plain",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "4e99cfef4c81e6560308bc61341fc7467d1535ffe8d6ba059e90fde0ea6b8e97",
+      "source_id": "cais/mmlu:1052",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "c2e6f29c67fcb5f2b0eb4ade5fae83dbd5b106e0fd56cd4f1dd2ab1563303e66"
+    },
+    {
+      "id": "cais/mmlu:1052--chat",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "4e99cfef4c81e6560308bc61341fc7467d1535ffe8d6ba059e90fde0ea6b8e97",
+      "source_id": "cais/mmlu:1052",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "c2e6f29c67fcb5f2b0eb4ade5fae83dbd5b106e0fd56cd4f1dd2ab1563303e66"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10765--plain",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "eca8e59463c5e87b6ef710b6f15791d55e2cd3d0d72d2d1ba5f78d4ca6510e5c",
+      "source_id": "TIGER-Lab/MMLU-Pro:10765",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "9340db3209894bbfefd3f8a98ad0ce4ea94235eacdcdb62f4e8d8a6cbbc2aa36"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10765--chat",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "eca8e59463c5e87b6ef710b6f15791d55e2cd3d0d72d2d1ba5f78d4ca6510e5c",
+      "source_id": "TIGER-Lab/MMLU-Pro:10765",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "9340db3209894bbfefd3f8a98ad0ce4ea94235eacdcdb62f4e8d8a6cbbc2aa36"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10498--plain",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "ab83526b66e0f355a2257dd06f9f059aaa4de13e156b4c027f9430731d4e4f94",
+      "source_id": "TIGER-Lab/MMLU-Pro:10498",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "8b7a217e602655239f595bdf7a095ca7e8445e577626d292505ce19042f43d70"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10498--chat",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "ab83526b66e0f355a2257dd06f9f059aaa4de13e156b4c027f9430731d4e4f94",
+      "source_id": "TIGER-Lab/MMLU-Pro:10498",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "8b7a217e602655239f595bdf7a095ca7e8445e577626d292505ce19042f43d70"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10608--plain",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "4f404b43ec1818957d665eff05376abc0fecaf021912df2e1ec4c85233e644c9",
+      "source_id": "TIGER-Lab/MMLU-Pro:10608",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "7c3f20db72e94e25d6c2d1d3e4f7fd22acdaf1ae93f685948d7156f45f6d46a3"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10608--chat",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "4f404b43ec1818957d665eff05376abc0fecaf021912df2e1ec4c85233e644c9",
+      "source_id": "TIGER-Lab/MMLU-Pro:10608",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "7c3f20db72e94e25d6c2d1d3e4f7fd22acdaf1ae93f685948d7156f45f6d46a3"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10740--plain",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "07f22384aeebceb7ba2c941243adc09fb3dde5dc331cffcdf09f435d5b9110a2",
+      "source_id": "TIGER-Lab/MMLU-Pro:10740",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "21a7943674d6943ff75ac8fc6b4153c42ff0ebeb383eb2207acad0b8ade828a8"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10740--chat",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "07f22384aeebceb7ba2c941243adc09fb3dde5dc331cffcdf09f435d5b9110a2",
+      "source_id": "TIGER-Lab/MMLU-Pro:10740",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "21a7943674d6943ff75ac8fc6b4153c42ff0ebeb383eb2207acad0b8ade828a8"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10375--plain",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "6b07fbcff3824052c6685c437819267b22fe0e5c01e1f5d0c4a98b377b8fa8a9",
+      "source_id": "TIGER-Lab/MMLU-Pro:10375",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "ec07eae53368c3abbacc01770a5b8e20ef3822dc48cc8ba96ba8242f09e10a01"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10375--chat",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "6b07fbcff3824052c6685c437819267b22fe0e5c01e1f5d0c4a98b377b8fa8a9",
+      "source_id": "TIGER-Lab/MMLU-Pro:10375",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "ec07eae53368c3abbacc01770a5b8e20ef3822dc48cc8ba96ba8242f09e10a01"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10612--plain",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "9076dbba08796d1b243ecb7022d68b1862be20453c5b0657e79154f9b0dc4294",
+      "source_id": "TIGER-Lab/MMLU-Pro:10612",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "a869ae8cddc7516216f54ec5ec1dd0094b321e6fd677e3bd4ca3ca9e599de871"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10612--chat",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "9076dbba08796d1b243ecb7022d68b1862be20453c5b0657e79154f9b0dc4294",
+      "source_id": "TIGER-Lab/MMLU-Pro:10612",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "a869ae8cddc7516216f54ec5ec1dd0094b321e6fd677e3bd4ca3ca9e599de871"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10741--plain",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "af46469ed4f469463940a7dfbcdbd5254c64022b815d6c6ad5fe1432416fceb5",
+      "source_id": "TIGER-Lab/MMLU-Pro:10741",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "4eb7aa273fbee5d5d7306f4cb15961069d7d104d77b92eb7669c47cdfaba9cd1"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10741--chat",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "af46469ed4f469463940a7dfbcdbd5254c64022b815d6c6ad5fe1432416fceb5",
+      "source_id": "TIGER-Lab/MMLU-Pro:10741",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "4eb7aa273fbee5d5d7306f4cb15961069d7d104d77b92eb7669c47cdfaba9cd1"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10747--plain",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "b625d409a481fb8a76892cd031dc94114f361afeb962a80f6bd09128e469b54d",
+      "source_id": "TIGER-Lab/MMLU-Pro:10747",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "8515560fd6a96e8095c8501b2b3b76fb353456d1200dc8d69340945d4ba0c1e6"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10747--chat",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "b625d409a481fb8a76892cd031dc94114f361afeb962a80f6bd09128e469b54d",
+      "source_id": "TIGER-Lab/MMLU-Pro:10747",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "8515560fd6a96e8095c8501b2b3b76fb353456d1200dc8d69340945d4ba0c1e6"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10466--plain",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "68b0f715f03c0ab6b5dbf0bc25687b5f32b9723cecbfe7c53410e1dd18565f72",
+      "source_id": "TIGER-Lab/MMLU-Pro:10466",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "b167dd95a59c7c02476cb0319268629d94742a91560be255bacd97f56c37efef"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10466--chat",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "68b0f715f03c0ab6b5dbf0bc25687b5f32b9723cecbfe7c53410e1dd18565f72",
+      "source_id": "TIGER-Lab/MMLU-Pro:10466",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "b167dd95a59c7c02476cb0319268629d94742a91560be255bacd97f56c37efef"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10502--plain",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "ff2166f3b8950e489d4bed84961ad2bba834c69f81ac651a97a8111dc57ee1de",
+      "source_id": "TIGER-Lab/MMLU-Pro:10502",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "209ac210a2a70c033553f2c3254d884ab72bce84955976134426aca8aede848e"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10502--chat",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "ff2166f3b8950e489d4bed84961ad2bba834c69f81ac651a97a8111dc57ee1de",
+      "source_id": "TIGER-Lab/MMLU-Pro:10502",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "209ac210a2a70c033553f2c3254d884ab72bce84955976134426aca8aede848e"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10739--plain",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "d1809bf0875f1b60f59e8350d83ccc18a005d3a18c8904caca5235b78f794164",
+      "source_id": "TIGER-Lab/MMLU-Pro:10739",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "e75e99a1c7cba1d5351be4519839e62386062aadfd77b3cd14a3f9c5c5e984ce"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10739--chat",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "d1809bf0875f1b60f59e8350d83ccc18a005d3a18c8904caca5235b78f794164",
+      "source_id": "TIGER-Lab/MMLU-Pro:10739",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "e75e99a1c7cba1d5351be4519839e62386062aadfd77b3cd14a3f9c5c5e984ce"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10401--plain",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "08d9acf9ce4b0da2b5c4b055699b9bdc0e77a44ec4345ad1495182b24b530ab3",
+      "source_id": "TIGER-Lab/MMLU-Pro:10401",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "fcb673cd5cabb09798e60b89e65aea635191782dabf2e68408ccab45b4dcd56b"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10401--chat",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "08d9acf9ce4b0da2b5c4b055699b9bdc0e77a44ec4345ad1495182b24b530ab3",
+      "source_id": "TIGER-Lab/MMLU-Pro:10401",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "fcb673cd5cabb09798e60b89e65aea635191782dabf2e68408ccab45b4dcd56b"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10500--plain",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "52e578281ec90563adf8e0dfd97129581f8c783da7df002e64b424e5fa89312d",
+      "source_id": "TIGER-Lab/MMLU-Pro:10500",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "1926fcbe8d10b70d558173a2a803cf4fac939a5601ab33f6d184e3cc7a207553"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10500--chat",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "52e578281ec90563adf8e0dfd97129581f8c783da7df002e64b424e5fa89312d",
+      "source_id": "TIGER-Lab/MMLU-Pro:10500",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "1926fcbe8d10b70d558173a2a803cf4fac939a5601ab33f6d184e3cc7a207553"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10436--plain",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "3e03e10cdfa88efd53d4812a4ffa3b6ae2e479e6a6d35fc5ec011dd414520a40",
+      "source_id": "TIGER-Lab/MMLU-Pro:10436",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "0180cf8f7e3ae630b4dbf32062632507052c7457788b568c6227344246be750d"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10436--chat",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "3e03e10cdfa88efd53d4812a4ffa3b6ae2e479e6a6d35fc5ec011dd414520a40",
+      "source_id": "TIGER-Lab/MMLU-Pro:10436",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "0180cf8f7e3ae630b4dbf32062632507052c7457788b568c6227344246be750d"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10575--plain",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "2e5897c8b32f5a29b3213f6ec971968ae4881e3cefeeb371b38c1e8601ef0e3b",
+      "source_id": "TIGER-Lab/MMLU-Pro:10575",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "e99a2e166bac74879b9d088cd61ec2419f55b81ba1dfc5cea3a736a7e1f3b063"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10575--chat",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "2e5897c8b32f5a29b3213f6ec971968ae4881e3cefeeb371b38c1e8601ef0e3b",
+      "source_id": "TIGER-Lab/MMLU-Pro:10575",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "e99a2e166bac74879b9d088cd61ec2419f55b81ba1dfc5cea3a736a7e1f3b063"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10400--plain",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "8d2ec8c5b715ce12a07f7d3c55d6309da27cf2d25c652fa1db259931fce93a47",
+      "source_id": "TIGER-Lab/MMLU-Pro:10400",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "4270d91380943f04e73bbd0eaaccf7695e66e87fc60339d4b8d900464b336d23"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10400--chat",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "8d2ec8c5b715ce12a07f7d3c55d6309da27cf2d25c652fa1db259931fce93a47",
+      "source_id": "TIGER-Lab/MMLU-Pro:10400",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "4270d91380943f04e73bbd0eaaccf7695e66e87fc60339d4b8d900464b336d23"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10699--plain",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "8117a20e18be99bab4b3ae7e1adf4bfc007d1e8a587762a77e43ffce38f8490a",
+      "source_id": "TIGER-Lab/MMLU-Pro:10699",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "2c632bd6f06b49c7637a38e4b2df46f1da23a88aa0363a63be6aae28831b572f"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10699--chat",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "8117a20e18be99bab4b3ae7e1adf4bfc007d1e8a587762a77e43ffce38f8490a",
+      "source_id": "TIGER-Lab/MMLU-Pro:10699",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "2c632bd6f06b49c7637a38e4b2df46f1da23a88aa0363a63be6aae28831b572f"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10700--plain",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "24a7c2f912deaea1700a8d3e025d3d0caf238bfa0536e5708e7436ec9570382e",
+      "source_id": "TIGER-Lab/MMLU-Pro:10700",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "7c2a1bd0415ca18bcef2a97993c6247bc2fb715b72d5bab1853a71f25ea0a7d7"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10700--chat",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "24a7c2f912deaea1700a8d3e025d3d0caf238bfa0536e5708e7436ec9570382e",
+      "source_id": "TIGER-Lab/MMLU-Pro:10700",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "7c2a1bd0415ca18bcef2a97993c6247bc2fb715b72d5bab1853a71f25ea0a7d7"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10433--plain",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "5bb4e15bff8e0e0b017e8c24ccd688b170d978740a2f2eac438384119408b889",
+      "source_id": "TIGER-Lab/MMLU-Pro:10433",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "2122280902782bc9a18c5e7805ff90059d53ae468193d4b33842912a43023ec3"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10433--chat",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "5bb4e15bff8e0e0b017e8c24ccd688b170d978740a2f2eac438384119408b889",
+      "source_id": "TIGER-Lab/MMLU-Pro:10433",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "2122280902782bc9a18c5e7805ff90059d53ae468193d4b33842912a43023ec3"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10702--plain",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "be67e581d22f57fee9b8dd983a774b2f27352f3cb351c37d8f672015be73ef14",
+      "source_id": "TIGER-Lab/MMLU-Pro:10702",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "5bd1a1ea68c3aa4bb679d5c9a8eb8c964bafb34267d4186287977ea6066d29b8"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10702--chat",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "be67e581d22f57fee9b8dd983a774b2f27352f3cb351c37d8f672015be73ef14",
+      "source_id": "TIGER-Lab/MMLU-Pro:10702",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "5bd1a1ea68c3aa4bb679d5c9a8eb8c964bafb34267d4186287977ea6066d29b8"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10501--plain",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "8c4835cedc2b9dc51694f8876052c59853d6916d6b548350d6f37ef65cf12400",
+      "source_id": "TIGER-Lab/MMLU-Pro:10501",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "950c53d13edf581b7e2bc8d74b98aabfa775e8cdecc79bd7c9ef4e0664529e4d"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10501--chat",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "8c4835cedc2b9dc51694f8876052c59853d6916d6b548350d6f37ef65cf12400",
+      "source_id": "TIGER-Lab/MMLU-Pro:10501",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "950c53d13edf581b7e2bc8d74b98aabfa775e8cdecc79bd7c9ef4e0664529e4d"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10462--plain",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "00f0423bf5577e898970f5d40c0d65d7fe83b271a3e85499f00536377f349d2e",
+      "source_id": "TIGER-Lab/MMLU-Pro:10462",
+      "format_variant": "plain",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "4fc47c4297b492821513e4a205732846b2a53a68189a3c0fd4e54567eab111b5"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10462--chat",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "00f0423bf5577e898970f5d40c0d65d7fe83b271a3e85499f00536377f349d2e",
+      "source_id": "TIGER-Lab/MMLU-Pro:10462",
+      "format_variant": "chat",
+      "alignment_coverage": 1.0,
+      "aligned_tokens_sha256": "4fc47c4297b492821513e4a205732846b2a53a68189a3c0fd4e54567eab111b5"
+    }
+  ]
+}

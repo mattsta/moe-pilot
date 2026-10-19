@@ -1,0 +1,6 @@
+model,layer,mean_selected_gate_mass,ci_low,ci_high,documents,interpretation
+olmoe-0125-base,7,0.3995563023358351,0.39650254348386565,0.4025500653346991,180,raw total selected probability mass before distribution normalization
+olmoe-0125-dpo,7,0.4095280882993815,0.407002415320453,0.41193433978963856,180,raw total selected probability mass before distribution normalization
+olmoe-0125-instruct,7,0.40888967713762775,0.40635127352041,0.41130996472023945,180,raw total selected probability mass before distribution normalization
+olmoe-0125-sft,7,0.4112018980311136,0.40860477727334116,0.4136527996043526,180,raw total selected probability mass before distribution normalization
+olmoe-0924,7,0.37461140235815665,0.372243008422616,0.37689933950750254,180,raw total selected probability mass before distribution normalization

@@ -1,0 +1,12 @@
+{
+  "kind": "post-hoc-on-off-interaction",
+  "input_evidence_sha256": "7bc20b69ec4eae1875c491cb445ca381235a79cba67cbe5db1a4b7d4b8b6900e",
+  "implementation_sha256": "a3347a5bfc689656d7f67447ad492332182e50e42b96b1085781881a3e69fcc0",
+  "bootstrap_samples": 10000,
+  "permutations": 9999,
+  "seed": 20261019,
+  "family": "all five domains, layer 7, one expert, on-domain mass controls",
+  "multiplicity": "Holm across five interactions",
+  "status": "complete",
+  "limits": "Exploratory reanalysis; no new model execution; domain/source confounded; matching imperfect"
+}

@@ -1,0 +1,398 @@
+{
+  "schema": 1,
+  "model": "olmoe-0924",
+  "plan": {
+    "schema": 1,
+    "layer": 7,
+    "primary_modes": [
+      "remove",
+      "reroute"
+    ],
+    "secondary_modes": [
+      "rescale",
+      "substitute"
+    ],
+    "primary_metric": "document-mean next-token loss, nats/token",
+    "primary_contrast": "specialist-minus-control effect on-domain minus equally weighted off-domains",
+    "primary_family": "three domains by two primary modes; Holm adjustment",
+    "bootstrap": "paired documents stratified by source and domain; 10000 replicates",
+    "permutation": "domain labels permuted within source; 9999 replicates; plus-one two-sided p",
+    "selection": "rank by discovery on/off mass ratio; first of top eight admitting a calibration-matched control; otherwise top expert with failed balance explicitly retained",
+    "control_pool": "discovery specificity at or below its median, excluding discovery top eight",
+    "matching": "calibration on/off mass, on/off usage, and raw output norm; relative gaps <=10%, norm <=20%",
+    "weighting": "equal documents; frozen balanced source/domain cells",
+    "format": "identical plain question/choices/answer-label text across stages; no model-specific chat template",
+    "interpretation": "post-training comparisons are observational; failed matching blocks causal-specialization claims"
+  },
+  "domains": [
+    {
+      "domain": "computing",
+      "expert": 6,
+      "control": 27,
+      "gaps": [
+        0.4213391913362208,
+        0.40283510732853683,
+        0.27720159719142967,
+        0.6482055867140247,
+        0.3787083999883969
+      ],
+      "balance_passed": false,
+      "discovery_specificity": 2.7301028331854664,
+      "candidate_audit": [
+        {
+          "expert": 6,
+          "control": 27,
+          "gaps": [
+            0.4213391913362208,
+            0.40283510732853683,
+            0.27720159719142967,
+            0.6482055867140247,
+            0.3787083999883969
+          ],
+          "balance_passed": false,
+          "discovery_specificity": 2.7301028331854664
+        },
+        {
+          "expert": 59,
+          "control": 61,
+          "gaps": [
+            0.0970953515488799,
+            0.10615517964133842,
+            0.16419280061915606,
+            0.10338556826962099,
+            0.08198733252582839
+          ],
+          "balance_passed": false,
+          "discovery_specificity": 2.1305097397003583
+        },
+        {
+          "expert": 22,
+          "control": 49,
+          "gaps": [
+            0.3809139306461471,
+            0.02752889455020376,
+            0.24632190624678177,
+            0.1770000573849111,
+            0.27233301698050455
+          ],
+          "balance_passed": false,
+          "discovery_specificity": 2.0454434306912455
+        },
+        {
+          "expert": 31,
+          "control": 27,
+          "gaps": [
+            0.1282998808361657,
+            0.07154514044169384,
+            0.10046807114039244,
+            0.28312486334084225,
+            0.28610530942575274
+          ],
+          "balance_passed": false,
+          "discovery_specificity": 1.7928574736597482
+        },
+        {
+          "expert": 17,
+          "control": 21,
+          "gaps": [
+            0.3578092947343869,
+            0.38188329791290654,
+            0.4481333155681978,
+            0.013258391723690905,
+            0.09744821748739065
+          ],
+          "balance_passed": false,
+          "discovery_specificity": 1.7385492100570645
+        },
+        {
+          "expert": 14,
+          "control": 37,
+          "gaps": [
+            0.4559834446282066,
+            0.3150881918576715,
+            0.2610708995436155,
+            0.2003224786917752,
+            0.2262682332215042
+          ],
+          "balance_passed": false,
+          "discovery_specificity": 1.5215313564008008
+        },
+        {
+          "expert": 15,
+          "control": 61,
+          "gaps": [
+            0.12986940409326797,
+            0.19820318425431682,
+            0.32946400642727225,
+            0.07884288960995442,
+            0.04149065267872786
+          ],
+          "balance_passed": false,
+          "discovery_specificity": 1.4653625342852066
+        },
+        {
+          "expert": 5,
+          "control": 24,
+          "gaps": [
+            0.047469024518377326,
+            0.20059056884125992,
+            0.16744144958037602,
+            0.08506223399591772,
+            0.4387426531585375
+          ],
+          "balance_passed": false,
+          "discovery_specificity": 1.4216537224921282
+        }
+      ]
+    },
+    {
+      "domain": "mathematics",
+      "expert": 37,
+      "control": 27,
+      "gaps": [
+        0.4385576584733083,
+        0.1430600611707308,
+        0.09980004635304414,
+        0.45590734354867385,
+        0.02432247670606435
+      ],
+      "balance_passed": false,
+      "discovery_specificity": 2.1086535027322104,
+      "candidate_audit": [
+        {
+          "expert": 37,
+          "control": 27,
+          "gaps": [
+            0.4385576584733083,
+            0.1430600611707308,
+            0.09980004635304414,
+            0.45590734354867385,
+            0.02432247670606435
+          ],
+          "balance_passed": false,
+          "discovery_specificity": 2.1086535027322104
+        },
+        {
+          "expert": 2,
+          "control": 46,
+          "gaps": [
+            0.781083215263703,
+            0.1735463963036627,
+            0.7535478225495881,
+            0.3314125971385486,
+            0.34932754353621925
+          ],
+          "balance_passed": false,
+          "discovery_specificity": 1.7550804886879388
+        },
+        {
+          "expert": 17,
+          "control": 46,
+          "gaps": [
+            0.8438026647698068,
+            0.5266194581336542,
+            0.8105797399817632,
+            0.5517994096473887,
+            0.3627077826373505
+          ],
+          "balance_passed": false,
+          "discovery_specificity": 1.4702574046155121
+        },
+        {
+          "expert": 4,
+          "control": 46,
+          "gaps": [
+            0.9019899751213649,
+            0.7209826843582754,
+            0.846814643716138,
+            0.68952665390343,
+            0.06845989035515754
+          ],
+          "balance_passed": false,
+          "discovery_specificity": 1.4546759223296115
+        },
+        {
+          "expert": 58,
+          "control": 46,
+          "gaps": [
+            0.808210300905282,
+            0.4207461901490866,
+            0.6729300087480604,
+            0.2661809221588733,
+            0.3809566686338818
+          ],
+          "balance_passed": false,
+          "discovery_specificity": 1.3436951499332697
+        },
+        {
+          "expert": 35,
+          "control": 46,
+          "gaps": [
+            0.9029795988887513,
+            0.7392644109991154,
+            0.8434803794873711,
+            0.6649675208417053,
+            0.08046908579440189
+          ],
+          "balance_passed": false,
+          "discovery_specificity": 1.2501510147937582
+        },
+        {
+          "expert": 29,
+          "control": 46,
+          "gaps": [
+            0.7891383435599304,
+            0.5232032514176667,
+            0.7458858356634778,
+            0.5387402482129026,
+            0.13111374215110733
+          ],
+          "balance_passed": false,
+          "discovery_specificity": 1.18535276086772
+        },
+        {
+          "expert": 32,
+          "control": 46,
+          "gaps": [
+            0.5605859442777925,
+            0.2229761935122158,
+            0.5061393022630166,
+            0.18085780576243826,
+            0.29483814281195303
+          ],
+          "balance_passed": false,
+          "discovery_specificity": 1.1394103946963179
+        }
+      ]
+    },
+    {
+      "domain": "science",
+      "expert": 63,
+      "control": 16,
+      "gaps": [
+        0.8712175365905268,
+        0.23997809695455352,
+        0.8517741465501442,
+        0.38502538761509364,
+        0.31066309521226076
+      ],
+      "balance_passed": false,
+      "discovery_specificity": 4.406674223965727,
+      "candidate_audit": [
+        {
+          "expert": 63,
+          "control": 16,
+          "gaps": [
+            0.8712175365905268,
+            0.23997809695455352,
+            0.8517741465501442,
+            0.38502538761509364,
+            0.31066309521226076
+          ],
+          "balance_passed": false,
+          "discovery_specificity": 4.406674223965727
+        },
+        {
+          "expert": 9,
+          "control": 11,
+          "gaps": [
+            0.9240022486041862,
+            0.20044951820086926,
+            0.9163437287484737,
+            0.2818624480371136,
+            0.08592737363310729
+          ],
+          "balance_passed": false,
+          "discovery_specificity": 3.4951686121380776
+        },
+        {
+          "expert": 25,
+          "control": 6,
+          "gaps": [
+            0.6798569936652811,
+            0.22704285844811675,
+            0.6205714418858423,
+            0.11428260674711514,
+            0.29611926798143645
+          ],
+          "balance_passed": false,
+          "discovery_specificity": 3.141119163067081
+        },
+        {
+          "expert": 49,
+          "control": 6,
+          "gaps": [
+            0.47044783322004385,
+            0.6767903703959239,
+            0.33704921142688754,
+            0.6050556816973554,
+            0.6693966694880088
+          ],
+          "balance_passed": false,
+          "discovery_specificity": 1.9153412652618098
+        },
+        {
+          "expert": 27,
+          "control": 31,
+          "gaps": [
+            0.06693121890173404,
+            0.03497673065661361,
+            0.26917685728591256,
+            0.13185349917652764,
+            0.40076682626062604
+          ],
+          "balance_passed": false,
+          "discovery_specificity": 1.824687153189085
+        },
+        {
+          "expert": 32,
+          "control": 39,
+          "gaps": [
+            0.3629631078764363,
+            0.09513571059163561,
+            0.28993590272217157,
+            0.03927517903320724,
+            0.17416958363045237
+          ],
+          "balance_passed": false,
+          "discovery_specificity": 1.5255381179025427
+        },
+        {
+          "expert": 52,
+          "control": 16,
+          "gaps": [
+            0.5361852650825043,
+            0.3215582388933235,
+            0.4779861053075,
+            0.2674328993097591,
+            0.30062677544619726
+          ],
+          "balance_passed": false,
+          "discovery_specificity": 1.499864991502574
+        },
+        {
+          "expert": 19,
+          "control": 16,
+          "gaps": [
+            0.5293625874758946,
+            0.3549707286006721,
+            0.5228301765560054,
+            0.37275437432791897,
+            0.06005907527837983
+          ],
+          "balance_passed": false,
+          "discovery_specificity": 1.4627233455798883
+        }
+      ]
+    }
+  ],
+  "discovery_identity": "ee2749a8fd0de714b5c3d6232fa995e11f2bd7e2ea141cf24d3c055b65e38833",
+  "calibration_identity": "793235183c98540592bc8027b4e4f6f20284a1f0b605ad83192718e04e3967ed",
+  "matching_features": [
+    "on_mass",
+    "off_mass",
+    "on_usage",
+    "off_usage",
+    "raw_output_norm"
+  ]
+}

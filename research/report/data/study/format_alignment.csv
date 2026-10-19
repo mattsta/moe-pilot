@@ -1,0 +1,3 @@
+model,pairs,minimum_question_coverage,mean_question_coverage,matching_token_spans,producer_identity_sha256
+olmoe-0125-instruct,180,1.0,1.0,180,e768a1ec3dfb6b20fdb9b055ec63dfbe8bc38551057ae16eb29d1c6a9abac316
+olmoe-0125-sft,180,1.0,1.0,180,ab226ee19c8a3d883a7ec5c96adc0c7a1e8945f25774cae6cf485273bb671cc5

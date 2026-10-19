@@ -1,0 +1,10 @@
+model,reference,metric,difference,ci_low,ci_high,same_token_ids,interpretation
+olmoe-0125-dpo,olmoe-0125-base,accuracy,-0.011111111111111118,-0.07777777777777778,0.05555555555555556,True,observational paired stage contrast
+olmoe-0125-dpo,olmoe-0125-base,choice_nll,0.6867090195986546,0.4469105500025519,0.9226316863558411,True,observational paired stage contrast
+olmoe-0125-dpo,olmoe-0125-base,loss,0.6365185627023089,0.6075710776742911,0.6655641145156567,True,observational paired stage contrast
+olmoe-0125-instruct,olmoe-0125-base,accuracy,-0.016666666666666666,-0.08333333333333333,0.05,True,observational paired stage contrast
+olmoe-0125-instruct,olmoe-0125-base,choice_nll,0.8243867254143374,0.5752411268355274,1.0752383759179307,True,observational paired stage contrast
+olmoe-0125-instruct,olmoe-0125-base,loss,0.7397657693553347,0.7066414918998551,0.7735289636050322,True,observational paired stage contrast
+olmoe-0125-sft,olmoe-0125-base,accuracy,-0.016666666666666666,-0.08888888888888888,0.05555555555555555,True,observational paired stage contrast
+olmoe-0125-sft,olmoe-0125-base,choice_nll,0.6646851347035004,0.443580831757281,0.8870041921783962,True,observational paired stage contrast
+olmoe-0125-sft,olmoe-0125-base,loss,0.3038457582623894,0.2850624895860413,0.32235487948001906,True,observational paired stage contrast

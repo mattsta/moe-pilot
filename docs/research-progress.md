@@ -46,7 +46,7 @@ as supported or completed by the studies above.
 - All four intervention modes and strengths 0, 0.5, and 1 were checked against
   independent Transformers expert execution. Real-MPS integration checks
   include removal, rescaling, substitution, restoration, and diagnostics.
-  The final suite passes **207 tests**, including real-MPS checks; two
+  The final suite passes **208 tests**, including real-MPS checks; two
   CUDA/ROCm hardware tests are skipped because those backends are absent.
   This establishes software semantics, not a causal study finding.
 - The [causal data design](studies/data-design.md) records source-origin

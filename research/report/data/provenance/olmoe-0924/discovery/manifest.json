@@ -1,0 +1,1228 @@
+{
+  "schema": 1,
+  "identity": {
+    "model": "96655392614d3098627e50d14922335c52c6d78907a7a89ac7bb4ae64fdd9a2d",
+    "target": {
+      "name": "olmoe-0924",
+      "repository": "allenai/OLMoE-1B-7B-0924",
+      "revision": "6d84c48581ece794365f2b8e9cfb043c68ade9c5",
+      "stage": "base",
+      "lineage": "olmoe-0924"
+    },
+    "rows": "055354f856c4f0d1ef6fc944940e5acd033609527621c479c49f5617bc1d28e1",
+    "frequency": "ac3c14af5f31e0f1c26fe290f9834520111a9bd89aeea13579049e4f616b568a",
+    "implementation": {
+      "study.py": "8e29136106e4797b7a284398bc97ca84eb8888f8956bd1dc914117c71ae38886",
+      "engine.py": "bce5432c62b4e352a6239a85f9351aad3d4243616c0df0178e450d1efc345ecb",
+      "model.py": "e4d9291f8b2aba8112dc6ea851dff5e0e463181e225042b43ccefbb366277388",
+      "devices.py": "b9c4a3315fe0b1ef499edfb3c3b2deb2eaf527b681257d0ad07dc4bfd6528c07",
+      "resources.py": "c9efc07ea927dcb33c6a2b095a5b5f177523d3236407e6c75f634878ffec92dc",
+      "observations.py": "c1c2570241c74d0c57483e6a12a9f48d83d6ebc0a6312cb645ed6035cc978afc",
+      "perturbations.py": "bc06c394b2b234e16e4ec6afbe731bba7c6b10f55661f39fb19d2e765073bfc3",
+      "study_data.py": "95edfed59ac8173f6510195aff07cb9aa7fee1679281ddcc676c99570d9d2c09"
+    },
+    "device": {
+      "backend": "mps",
+      "device": "mps:0",
+      "name": "Apple Metal",
+      "machine": "arm64",
+      "platform": "macOS-26.5.1-arm64-arm-64bit",
+      "torch_cuda": null,
+      "torch_hip": null,
+      "dtype": "float32"
+    },
+    "max_tokens": 1024,
+    "batch_documents": 16,
+    "condition_group": 4,
+    "seed": 20261019,
+    "resources": {
+      "max_memory_gib": 5,
+      "reserve_memory_gib": 16
+    },
+    "conditions": {},
+    "selection": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+    "plan": "20930caa1f259f8c72c5f3f053cf5b7319d0d67fdc37e0d355e672742c66adc6"
+  },
+  "status": "complete",
+  "chunks": [
+    {
+      "file": "chunk-00000.npz",
+      "start": 0,
+      "documents": 16,
+      "sha256": "ed7a808192a81d98c995ae1cebdb16fc0fe69d794b4fd211ecdfdb52ec86c2c8",
+      "seconds": 10.583241751417518,
+      "peak_process_bytes": 1308704768
+    },
+    {
+      "file": "chunk-00016.npz",
+      "start": 16,
+      "documents": 16,
+      "sha256": "ec114f525c852670b85cb3bcb3da9bc16eeaf307feedc63c9c245397bf6a8f8f",
+      "seconds": 17.286424374207854,
+      "peak_process_bytes": 1313128448
+    },
+    {
+      "file": "chunk-00032.npz",
+      "start": 32,
+      "documents": 16,
+      "sha256": "d4918cfbaffc867ec50e550d2f30b86cf2c76113ca26a592767dbccc93843865",
+      "seconds": 15.521368293091655,
+      "peak_process_bytes": 1343078400
+    },
+    {
+      "file": "chunk-00048.npz",
+      "start": 48,
+      "documents": 16,
+      "sha256": "0e1a31df5aa51869c389116d13fd08043fdc5e43cf0e0192bfdbff3d8b941abb",
+      "seconds": 13.452226042747498,
+      "peak_process_bytes": 1352728576
+    },
+    {
+      "file": "chunk-00064.npz",
+      "start": 64,
+      "documents": 16,
+      "sha256": "bb81631170f1efa0318c9e91e4ed74a9d7113b13c995973d3687655a7c88ab8d",
+      "seconds": 13.932758081704378,
+      "peak_process_bytes": 1352728576
+    },
+    {
+      "file": "chunk-00080.npz",
+      "start": 80,
+      "documents": 16,
+      "sha256": "8dd40dfec858d6da123e43f2ebaacf90a8eabc2f247852bd504543f6b4f12698",
+      "seconds": 11.971769709140062,
+      "peak_process_bytes": 1352777728
+    },
+    {
+      "file": "chunk-00096.npz",
+      "start": 96,
+      "documents": 16,
+      "sha256": "d472135e1023931b9ef072188fcfe0098660f63613f5082d258316735828b0b0",
+      "seconds": 11.659882791340351,
+      "peak_process_bytes": 1353203712
+    },
+    {
+      "file": "chunk-00112.npz",
+      "start": 112,
+      "documents": 16,
+      "sha256": "c91d7eef9e9ff739084208506e5da9229ae4a431059c40ba4b1253120820b782",
+      "seconds": 12.414844043552876,
+      "peak_process_bytes": 1353203712
+    },
+    {
+      "file": "chunk-00128.npz",
+      "start": 128,
+      "documents": 16,
+      "sha256": "b3f40d3613ddb513df291ac2a49dc4e4c0b9edbca5f2eca7f66f535ffd58cf0a",
+      "seconds": 14.917019668966532,
+      "peak_process_bytes": 1354334208
+    },
+    {
+      "file": "chunk-00144.npz",
+      "start": 144,
+      "documents": 16,
+      "sha256": "15c92fd9aea33f5fec7c19b33e67ee259d60b00de97903d9d9c968f4ae4f78c8",
+      "seconds": 12.325448706746101,
+      "peak_process_bytes": 1356054528
+    },
+    {
+      "file": "chunk-00160.npz",
+      "start": 160,
+      "documents": 16,
+      "sha256": "7c6ef51327b17b599f50e45d796d5fc678c429c62bf76dc1d54e529247b24ac0",
+      "seconds": 11.98861370794475,
+      "peak_process_bytes": 1390493696
+    },
+    {
+      "file": "chunk-00176.npz",
+      "start": 176,
+      "documents": 4,
+      "sha256": "6e971ff926c9650617f6370ce81ab940f803ee81bc73d420a43d0077152130fd",
+      "seconds": 8.601552044972777,
+      "peak_process_bytes": 1390493696
+    }
+  ],
+  "documents": 180,
+  "records": [
+    {
+      "id": "cais/mmlu:4472",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "8c3bb82bb8a3db8c944512b8da93665ef132473d0ef7e85f373256c796508c44"
+    },
+    {
+      "id": "cais/mmlu:1639",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "a9dc7d26e896492e9166da37e6977cddda9efacc9fd0594d2b7aa45362b94b8b"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:4665",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "f0079ff968c8918071720b2f7640d638c42550ca96be7d0ebf23dbd19d1457a0"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10705",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "737d51217fb50841391ff9d7b3c106a31f2a7ac424bfdad88da89b0edb63a12f"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10139",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "469efc01d5f66a91fd89e8c5ee3ee332fc7e86e0c3bad6614d1ba6dc4763dbf4"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:8312",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "93f37c903915f936a29e69cde4e5462a1b2253dde677e59edbd8ed6335e5845f"
+    },
+    {
+      "id": "cais/mmlu:3120",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "6426ae2a2c1dc9c16a093946b4b77eb4bfbd356c553599d1ed8bca4a3136f010"
+    },
+    {
+      "id": "cais/mmlu:2113",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "a4b9ef11e9e54d1d41d5390f5c874c08b62b88457c2322120225a2972a2d7822"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:4299",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "c05ed476760dacf0d68a206d49141bdb2f0b6dd7addcd516c6862efdc17e1f7e"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:8419",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "95eafa887fac8293418d3562b0fd15114e3992580153836ffd52c56600a19aa7"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:4537",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "3a165f56799a5132f6bd9b623a166a0228aada82238c5b823cba4215f614259c"
+    },
+    {
+      "id": "cais/mmlu:81",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "008b7e161d459ceb49dd7415ed9b57392d0060856e6df31cf3bc7508a35c6acf"
+    },
+    {
+      "id": "cais/mmlu:75",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "99630cec5f389c970d9722c64f62d08f5644fe636f4e8904e36da02f661b94c6"
+    },
+    {
+      "id": "cais/mmlu:4753",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "87c0d84e29798c7e2e68ba75845cc7c78fce50523908a580e44813d719744c6f"
+    },
+    {
+      "id": "cais/mmlu:4350",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "4fb38b80a5218d1f3c2b8460f896753e78a5f623a9e1c4531b4206176bd740d2"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10279",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "314e9290f93bc2a8abcbe25662358afd41b80493be1aab64ff3c36ebe24ea3b2"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:4016",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "7041ca464395f866ce54ba75fdeba3d7cca79306da075e7d06ab432bd693cc6b"
+    },
+    {
+      "id": "cais/mmlu:1709",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "1e0b9c1836421aa8ba538f409137516696a5cca3ad8df2c4e3c9190675f86ee8"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:8218",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "5b3c3f5a0c37f4441d84d6c9ab2a7b9ee876ce569a25a0ceb17b72c4d4d39443"
+    },
+    {
+      "id": "cais/mmlu:3258",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "746f9d0f3f6dd4e92362122260e9a99f2cb790b496b409f38599ba4d639d7a25"
+    },
+    {
+      "id": "cais/mmlu:3051",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "92eb19e35ecc1bdb2c8aa636da4c16f1932151a91ca58e26345ff6ca3fef697f"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:8407",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "cbe2d6292876d69c48883f7356239e437d951e7883b956775f80f4772355a524"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:3288",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "40bcc96b9f140649f4c84c7f0791b3bff2337447ba8cba70d2cb71f7fedc3aec"
+    },
+    {
+      "id": "cais/mmlu:2343",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "7c115db8683e3458d90d8eb2e3e940e86de8e969edcbd336faf796cb17731458"
+    },
+    {
+      "id": "cais/mmlu:3175",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "01fc4aa9530bf57fc5f55c9a8c879e610a57c8935e2f697224fe2ededc1ee8ed"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:3899",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "7a06df708558d19c1c87ef44ba818f1d9a80f31944163ffa0ed7f59e3fd9bb5f"
+    },
+    {
+      "id": "cais/mmlu:1562",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "84ae2fabc4ba26e61ba2782aba942d88c0d26b9143e237b689da3fe038afb3b6"
+    },
+    {
+      "id": "cais/mmlu:1593",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "e8b7dcef97b9ed04a584f3aa4ece668bfac5a403b1132e53c69840afa2ed2a97"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:9063",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "ff254c106da20123e096640aead9be73bd2840e9ba36a1af679c82b566427df2"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:4200",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "3456dac7ccc027e30d5fc4b2e4338c733727c0d069eda9c7d86108b11166a10b"
+    },
+    {
+      "id": "cais/mmlu:3110",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "9b25670153e91163d071dd8231b841c078c8fc46ba6d6fc45f7903e8017cea39"
+    },
+    {
+      "id": "cais/mmlu:2068",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "c273395853cbdb14f5bb6c970b4f80d97d4a5aedac3fba4afcab87f90944bd0b"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:3278",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "2faeb41e1a89f069ab3164661d55f439658d6bcd59ab73e5ba7cdbd7837055ca"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:9592",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "12197d1fc2575ad6307cd38c3813d08e398288b8a7c89e83026871d29c6728e3"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:9695",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "326d42ed243d7871ec918e6fe3579e29da5f20485a73b7ff7deb8c18aec5f0e6"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:3243",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "a382a4a483d29ca5237b6fb36b56b3df3c6e01835e1aa046d4172283ee7a1c83"
+    },
+    {
+      "id": "cais/mmlu:813",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "7475565e44e93c53a4adcabb19ec6bd86b047cf65422ee06a98bec0f634cd714"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:8955",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "61f5dd560a98deea23f202ffb33ae983e281601d2fb837e173d752323b31e72c"
+    },
+    {
+      "id": "cais/mmlu:1572",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "7ed37b38f63755f9c3658999b2dfd43066ff271cb312f4d19fb5247b38d1ce5d"
+    },
+    {
+      "id": "cais/mmlu:2151",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "64d039e3565af7c646cfb13399e53b84016af0e91a94fb1cd1bc046405bb5856"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:4173",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "a07058bfd1e41411a4c4af491700403bd3e7cb52ffc457b88c2c1f8b8ef8490f"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:9034",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "1799b26649b22a7c4f5d95b188955eae6c445e5be45d167109adbec7b9db3076"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:8083",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "730cece73d8c5f075680cff8d0c6cdf7aae333e7debf8ab27e5ca48a66474d90"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:4322",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "f16fc7250a43e537ab8904b9212249e1c7938834cb7f42b4b957f0ddb99f0409"
+    },
+    {
+      "id": "cais/mmlu:2349",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "5befa8ad8cd3301373b6a6eb59de01845638f8cbbd437b8178c4057395a225b9"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:3920",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "e817e3d2e220bc4b8ffe4deea9ca92187e05f32b6bca4e171c84f19e2c7acfd5"
+    },
+    {
+      "id": "cais/mmlu:2254",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "d03017586944e8d4c4c5002929845e6519b3dc6686f4703b322242393a882803"
+    },
+    {
+      "id": "cais/mmlu:3035",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "0d19d22c17081f64dfad9fd382e5c3a32b5385d0369b6feea512a05fb04db31a"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:8741",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "9d47923d6eab7ef15040e3f8933434db745c4c7b3c84034245454034965415f9"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:4223",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "9c5f5b8de303c7376ef50126ca7a8f44800e62bcfdca383f253d84557c91587e"
+    },
+    {
+      "id": "cais/mmlu:2394",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "b714121a2286889e2731b1ff10ddfea21b022db0803cc1df6b484a1838dff416"
+    },
+    {
+      "id": "cais/mmlu:3144",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "d7d1e509c35011dce7d0bd670c6b302adf7e50eb414fe54175001c891d125064"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:3355",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "a51f40078f5c9a32fee7e4560da46281d9f750462f63e9c169413e315814e3ee"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:4216",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "dd9968f0463d22827bfbdbbdf8b73934148309e8a4a85b3fa44a8b200ddb7248"
+    },
+    {
+      "id": "cais/mmlu:4874",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "186d0058dad791d0b10e56f61dd318197831f1691bad9468ec35c7c34aeb2f66"
+    },
+    {
+      "id": "cais/mmlu:4353",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "728326184afc4dc4ad6ed868df790020cb193c15f21b5fda05044e7cdaf1c7d7"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10431",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "74647d85aacc5526ca90e868503a530eaec7008262c5d8341bcb267341d01a09"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:4489",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "116dc57220874fff34bb88d345b41603cc4fd832eac947f3b3c063daa65783ae"
+    },
+    {
+      "id": "cais/mmlu:2745",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "39bcea1cbd2d2fcbb3e81b9313d0b6599ab5dee0e843fdb46a6ce16949aa0190"
+    },
+    {
+      "id": "cais/mmlu:3216",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "e1765f20a66c5ba7e5de71931977e4d6bd25a8c5a7e4208e4dff7c99f234f6e3"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:9406",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "a75b6cafebf7fcc184c01cece9227069d01e2315092967443a4de7b24e891b72"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:4013",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "4a6f0b51365ecbad4d2eca8fac10334e0de617745948d625f3a36b74930b1e1a"
+    },
+    {
+      "id": "cais/mmlu:4396",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "8376eaf834dbaec85f149ad93546aafa25af11e19379a332716f51be83b359e7"
+    },
+    {
+      "id": "cais/mmlu:4229",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "3a372a434f16d23b48090f0870353bdd133bc1c770e6070c54fbd91e2127d0f3"
+    },
+    {
+      "id": "cais/mmlu:1016",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "5c499075eb97adf0cfecde08d4ec0025b14df37b99f4b1ab3df71d592de4b421"
+    },
+    {
+      "id": "cais/mmlu:2955",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "b005f37d4e8d3501e4af2ae3ca5effc4e3283a36c4361563b51b0c5a6062e600"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10118",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "6f8c7a1fd1765596fdffd04f25448d4347de39be4c9e528640a8eb8c0bcb8f08"
+    },
+    {
+      "id": "cais/mmlu:4239",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "19916e919baf7c2e165500e1fc979dae959dfa026de3e8fa1b8a32fdd73c284b"
+    },
+    {
+      "id": "cais/mmlu:4757",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "559c4489e5a38b99fe725d1775b18129c3d22a21ab8f7dcf1f73009fb32f04de"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:7984",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "4fa685a463ca54c03d3b9090490d4fbc46fdf86f13dec62b68c886e2331cb884"
+    },
+    {
+      "id": "cais/mmlu:1141",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "90ddbbbcc25dffcf1f05d7c2f997a511daa620f4047d8509b28f6437771e631a"
+    },
+    {
+      "id": "cais/mmlu:1696",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "619f977a4fec2cc1e7079bfee1171e2b045a78345022db52f1a497d87e39eb79"
+    },
+    {
+      "id": "cais/mmlu:3023",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "b8adc2373baf41776dbbf923c8bf2bfc0223a74e966f5a212ecc97fbbdb097d8"
+    },
+    {
+      "id": "cais/mmlu:1552",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "83564e3fcb049f4b057351a830eda832a58e85da0415cf73e581e976918f3bd1"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:9282",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "38f283ccd9546d8efc9bbd156ced6eea8fa933d1e1ad5476b7cfa3d7dfd096a7"
+    },
+    {
+      "id": "cais/mmlu:3166",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "f291182f9e8667999a10390490a4de428097a893e326900885e475b0809274c7"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:4172",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "0b6941c96be42c529cfa1d461993fdd4858f4fee15f22ad56df8bbff35deb36b"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:3946",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "2aa9d14accb599c1863918aa7425da0078ff60739bb2449bb5022e543737070e"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:3222",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "82c5fc7c728995d5e875435b219cf08bb671fe78b37126c9a3a8f22e474f249a"
+    },
+    {
+      "id": "cais/mmlu:1412",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "0fc958691f4c4e958745c0f50995fa6604ad68bd4113cb8d1c7d0ccce9f6dcd8"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:8092",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "d60348ff7248bdc8eff8e80eb27543a006c4ab4afd491329d92257555aa5c277"
+    },
+    {
+      "id": "cais/mmlu:1392",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "27c5ba273ab6fd97e9edd8f9f665037f2f44c240ded4b1b30af8ffe61b6aa023"
+    },
+    {
+      "id": "cais/mmlu:4420",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "68fab405b2ca0bd4f3473524e6e2e67520f976257217b4eac4fa3c3c344699c0"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:9510",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "2a0b14c75f1f5e43a4887cf0a04fde74483b5fec44a12c6788afa549ce800322"
+    },
+    {
+      "id": "cais/mmlu:1565",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "cda581ac392e79081d7f0964a1e5bfca2ab12e09ade6a354c2e59948be6f88cd"
+    },
+    {
+      "id": "cais/mmlu:4459",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "e99a30a814ecf917cd6c92971664fb6eb0449a859952e60d74160aee737a5478"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:4628",
+      "domain": "science",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "fe0faac4e091bc9844ce1689c9d58486e8deda2039d9e7cd1e8019c62b6c752e"
+    },
+    {
+      "id": "cais/mmlu:2796",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "63b49acd5aab3db362cc6896975989dfa26773ba13ed13ebde55990ba2e4971b"
+    },
+    {
+      "id": "cais/mmlu:1657",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "6410606bc53ab5b8e9ea543569bb4ef38f18586babf012a1590ba4d27d966730"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:7857",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "c69672717aeb8a4fbab2393c841098ae7fd3e15567dba0cda46e0c275505b09a"
+    },
+    {
+      "id": "cais/mmlu:2161",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "77f755d201d2f19e9371756aaaf0d5efd4b2bf943ea1cd13f484f140eeabc128"
+    },
+    {
+      "id": "cais/mmlu:2701",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "351e41a9c1e76ca194ba7c22c032542fd52192a806894d7f0ee1f290a98f1f64"
+    },
+    {
+      "id": "cais/mmlu:4286",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "d2cfd919dc3788dc91759b4b2c7c3de4b9a5716869552a9f1d865f396bf4b2fa"
+    },
+    {
+      "id": "cais/mmlu:3040",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "4f90736be794533ed49782c2210235746ee004357da206a2ccf80dce4bf8c39f"
+    },
+    {
+      "id": "cais/mmlu:3034",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "57045b9b4d210fc3026fe1a8c9d9efc1c2437d8f05cf112bfb9723c76bc1f639"
+    },
+    {
+      "id": "cais/mmlu:1488",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "1bfba420126f9568437f9c4827c5e7082802ee69fbb879e508dae2cb90367535"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:8510",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "ae496ba2c9f9c5d3955e2b6f2a342da8feb27290335c65ab8fd54b52c25890a6"
+    },
+    {
+      "id": "cais/mmlu:2704",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "8fcbf085fb1d5bd5e31b58e68c3b3a62023e3f0149d8579b813ef1159477abd5"
+    },
+    {
+      "id": "cais/mmlu:4808",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "7146802a6e5ec7f2501787458e913b6e9a6c41ac59e51f1c32d4bf0c531aa090"
+    },
+    {
+      "id": "cais/mmlu:2160",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "553c5c5abef25ec034c6dbc524a37be02952371f1cf63c85226ffdd427ca2ad5"
+    },
+    {
+      "id": "cais/mmlu:2676",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "e3a66f1d1d2e3cbed43640e24c9e86e0f593c2488017a478a7bb3194c5bc259b"
+    },
+    {
+      "id": "cais/mmlu:2879",
+      "domain": "science",
+      "source": "cais/mmlu",
+      "group_id": "552ec0e054d79e29ae3f92f907e7dce9b362a886c910de523d6d5e91fea46ad7"
+    },
+    {
+      "id": "cais/mmlu:1567",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "72a57138d58f20fba0417f5cfb112c520c874b64777f84caf8846d37328ffc4f"
+    },
+    {
+      "id": "cais/mmlu:76",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "5f7129084bff6698a9a37c128ca8d08ae2bbd379bc44e20b10a6346ec912c9c9"
+    },
+    {
+      "id": "cais/mmlu:2127",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "847840b7400626775782449f59816fee3005f931d1444f1a67d28cd2b101d657"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10540",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "5e7d5881e7aa774ee25cb0925ce1418bb1166fd89785bf9240e086181b2ea4b7"
+    },
+    {
+      "id": "cais/mmlu:95",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "ea7df068949fa09c7df6b8b5d73211994f5c7d9151eda00a813b9c8e8bdaf9d3"
+    },
+    {
+      "id": "cais/mmlu:1058",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "cb6eef9b501424568052e457aa0ed1e1b141bdd07dee0bc0a2fe44f063a4705b"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10697",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "32e327073a2231879de7a910dac334345af20fe18205fc30ea37a221f9d20cfc"
+    },
+    {
+      "id": "cais/mmlu:4465",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "ce270d954f92790906c3d7b91a4b41efdb622b4ebdecf17dd6ab791c49bcff26"
+    },
+    {
+      "id": "cais/mmlu:2076",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "cd462b5b8011445d97ef6e60869d37bd1547d05426f7b422d8d626cc7b11edfe"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:8632",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "5b6055886d167a69f19d287de6e36525c9174a29d11a4bd8585741a7e3445e7f"
+    },
+    {
+      "id": "cais/mmlu:2198",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "470715d19cccb2c35767a536da7556c5a8a95d9b3c9ad9f5400d5d77d28a90bb"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:7970",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "830a77ba82032df4b2aebf3594387f0dbb84a7d15a6789db4cebe2b69d69e714"
+    },
+    {
+      "id": "cais/mmlu:89",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "5c01caadeac4d9a5d8fac225d64e47165c4377f8918b16698e6448681d44c552"
+    },
+    {
+      "id": "cais/mmlu:1543",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "e30daa802cf95572d4a0189af00015376bdbad63683a2f0882a224c34621848c"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:8617",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "aa6739edaefd25d16ffaa64857fe2b51dddc84311e1acca98836c57d3331230f"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:7987",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "327972365af70893f9987fae3ba3f396fe1f6d62585092162d67f142901ca7a8"
+    },
+    {
+      "id": "cais/mmlu:2379",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "dca7ba973f7bb02d2032762e5de455abfcb455e22ece39bf442131046d0da794"
+    },
+    {
+      "id": "cais/mmlu:1006",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "4184b878ec72459a90e13ac42ca9cb58f6833be7d502d29932b9801447d67300"
+    },
+    {
+      "id": "cais/mmlu:1169",
+      "domain": "mathematics",
+      "source": "cais/mmlu",
+      "group_id": "f309a29b3e85b1f66e6940f6680e817a4f2df08a3a02789a0bddb5e825c2c1e9"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:8621",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "e6c41e9a5fcfc3d31889f1d4ea5d37274e4180170edfe9056722f26952ec6248"
+    },
+    {
+      "id": "cais/mmlu:1078",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "2dcbf3485f97f2cd6d21c77329f32335a04e8c97d136b0334a6fe634f70c3a38"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:8219",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "d7673872f4e4f35fd85979cec546c2760c6dc683911c051caa5758d0f357309d"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:8619",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "0dd6fddfd9f5b5f9d4382a47ee750c57043ee91270cc5cd689220e18bcc64717"
+    },
+    {
+      "id": "cais/mmlu:1005",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "472d2fa17a8b8c085cd1a58e6581b62cdb0cd2f758827451b79a3ad8137fcb5c"
+    },
+    {
+      "id": "cais/mmlu:1555",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "40ca4cc5cf18278e5f5ff817b6779fbe0fa330c773e4f28437ca119caea09cef"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:7781",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "65ab98f0b15c2fc0268d994359a21bb80b4eb3af56deaff8e0c149fd8f126141"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:7889",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "f131fb52d41af1dde089170efae7d66c8c8539204fc50c2ac4a55bc81c7dae87"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:8307",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "cd7c5c8fa9ab6d5e465ec913409fc5f8adf4c767940a94841e988d616cfdeb21"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:7863",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "ec287a9230d38e7cf5dc47663f41e11ae1ea64b9fa953bba553753b37ae0a65b"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:8300",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "418562801fe23dee5f18f1f43fe82695e71c316124ad66627d1d2436c4d4a967"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:8306",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "c4818d1734f441f031bdae223599ff8c76352d6c0c50e7315cc37a48c8ecafb3"
+    },
+    {
+      "id": "cais/mmlu:1001",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "3ff540d309aa959442a3d1c19a1947a078c092607c390fc106fff9eeb40d4795"
+    },
+    {
+      "id": "cais/mmlu:1546",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "06cd819fec39afba8caa04ca6796e94286fed8a04ac4d48a36a3c476fe16fe57"
+    },
+    {
+      "id": "cais/mmlu:1474",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "8259887faf935397357457fbb3aca9f54304d2d7d4c0a85513d60d21b0251c24"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:8081",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "feebafe648f470a393a8cf0bbf963e89937622592e641abbcd7063b89b5477ab"
+    },
+    {
+      "id": "cais/mmlu:1084",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "67604b81fbaa26eb680b985dd8ac1d0346b976d544c04b22b706f942a05339bb"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:8743",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "e92fef6e7dd27e06500c3c143afa148eaf910fe1bb5f491d49dbe27dcc856b40"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:8097",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "3d1976112f349923d28401fff89f5d1e0977b9a71aeadfaeec450c03fc01be03"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10748",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "ccb96e0204b046bcd9b5849f9fa148b494b570516f2b2b55118ec0144f0b75ca"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:8945",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "cac7f548ba0efb504a827007017e83a37dcfd232fe7f80880c9b6964f924ac87"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:8325",
+      "domain": "mathematics",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "27a1b18865799d6089b552b19aee05a511c044d9aefc6c1f9f1b60184f204e43"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10672",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "14e1e7ebda12a9ae5e46378ce931e9014fbd73eac1d1d04c6c6def671117595c"
+    },
+    {
+      "id": "cais/mmlu:1503",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "3efcc9b46c12009fe3c79f35c1e73b851043eae296c627afa55ad880d4914ceb"
+    },
+    {
+      "id": "cais/mmlu:1063",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "78665ad09f052b765028b3875abc97b25368709e965ff39024dda424c96a16e7"
+    },
+    {
+      "id": "cais/mmlu:3277",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "0819314895841c85281ced7382872a486a23da993b3e021bb22d684cc0b026b6"
+    },
+    {
+      "id": "cais/mmlu:3230",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "8fc73c749110832d072c29174cf8498c6e6d22b37f08f065c1c50d2d252fc7f3"
+    },
+    {
+      "id": "cais/mmlu:3242",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "9b2e3d7d7664ed5e276968926da25991400e0ce7852d0c6ae2817aeda1bca4be"
+    },
+    {
+      "id": "cais/mmlu:3201",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "841550a28bf583d45cf7ab30de4161ee72f9a4c5209dcd5cb67cceeec965ec95"
+    },
+    {
+      "id": "cais/mmlu:1079",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "315f4a78eafb95fdf1395c3de679bfcc5665ad6343544ce94871e3b75fa6d8e8"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10432",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "9894cd1d530dda080ac3e93da5648ec7b93c6987f0e914f76201f17dc34cca9e"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10372",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "be2cf2c6e9cb77579e2c185bb25bea63e436a4b7176f96dfd76b0d1b6c546f95"
+    },
+    {
+      "id": "cais/mmlu:1532",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "2c77bafed233a15e341b3662f1391fa548df67ffd8acdc825329a26a1827e682"
+    },
+    {
+      "id": "cais/mmlu:1496",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "97bbe04ef092914b9ea0e7aa583a2efb3bbfb7616d661405900caf89a4b48138"
+    },
+    {
+      "id": "cais/mmlu:1485",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "f45dea9a2379df3bf6fe59a128147587d9b3ba3138b282eeb1547acc0adca99c"
+    },
+    {
+      "id": "cais/mmlu:1012",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "e9575c892cdd1fae0a8294bdc0bba76203a87fa68a5be3ec15a943b77d386dac"
+    },
+    {
+      "id": "cais/mmlu:3204",
+      "domain": "computing",
+      "source": "cais/mmlu",
+      "group_id": "0843a1ff862ae58e389fe6e7e404e3b23bba64630c2db9be2519a993dbb36e56"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10571",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "bb9e99fd4c613b2887c5476be1aa5ee1b46732db1371c4f580b8a7a303f09a12"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10674",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "bf0fc48cdb30c0116675b445932998d80c31d3a9fa7f5f785b01a4fc3f8c7fca"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10435",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "a30c2ee56409154d5a123b86af0a32179102a1d9c60dcd459cf86278323dc2cd"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10616",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "a837d92c76133dce6ca8202d6a9adde657ad7fc1ab2e0059a692da5d08d97c88"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10611",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "a3f2ef5b0de2dfada26b495a0c304f7e07f3074ace99648dbb4b1e497be826ef"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10610",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "40750358b2dc9d0f5ae92b4dc229172498169f05f36e5093fb6da4e01e98f1c6"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10645",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "dd57771445d93eecb75d62083644a7ebbdef13013d2ff6898513c4058ddd46b4"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10745",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "a9bf5d9ecc02792beff5754fc9bda843060b29eff74a36641f62d25c64210a6d"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10680",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "43942e8950c82740dc11c5d8268563fb8f9def75007158fc6358e2407ba27903"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10534",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "9e96a95ec7adb21d067838e6f428ddd4a791ac9cbdfd9a7ad87b0f7fac33ccac"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10536",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "076738a1d6a6b53c85b77994ffccc2c6f11dab7d5f5d5276aec8af75ee6e5c67"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10497",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "34dfc8ad2095311f656fe067ff1a44716846cf6c43d6c7b07020f5de3516d2e2"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10677",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "3e4c77c4d3fb366460e170de9b0a163b90b6bf551ae783e8749011fc2ff6ca29"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10542",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "247406a689740fa13395e1d25e2203e78f18f9c7f93ae5b8352de4e3163018b7"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10768",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "1338c4080741ccade42a745178a712217af761fdc14d990d2317066a371930aa"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10463",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "d86fd4dd52160b3cbf57c4d68cf13a136412332c02be4f28b8857b681ed23419"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10704",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "ed61d1f53b137ddadc5f0b6d7955be6a1ef65b57c85dcac152d524d55de33f66"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10767",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "211ba2d6359d737fcbf621cc4ffdea6b983fb3459f638c2069b4ebbfc5e02d27"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10698",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "59f9a3861b323719da2b897a505f67361b771a652eeab5708f2d47a72779c92f"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10642",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "a4a14aba987769f00333816a304f3aa97e928b53e086fb1b6d1b51383c8eb49d"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10539",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "229c3dc3b0613d9a861479963563ecd62b1755aea2e7d108bdba97fd6ad4d460"
+    },
+    {
+      "id": "TIGER-Lab/MMLU-Pro:10499",
+      "domain": "computing",
+      "source": "TIGER-Lab/MMLU-Pro",
+      "group_id": "acc7cf4e1da724e39b5cc9af23c35a83031246d26a8566fb0fa249ac754bcaa3"
+    }
+  ]
+}

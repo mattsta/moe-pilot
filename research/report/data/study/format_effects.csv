@@ -1,0 +1,9 @@
+model,metric,estimate,ci_low,ci_high,pairs,interpretation
+olmoe-0125-instruct,accuracy,-0.05555555555555555,-0.11666666666666667,0.005555555555555558,180,exploratory within-checkpoint native-chat protocol comparison; unadjusted intervals
+olmoe-0125-instruct,choice_nll,0.08184447948458708,-0.2293300787101422,0.4028764587329025,180,exploratory within-checkpoint native-chat protocol comparison; unadjusted intervals
+olmoe-0125-instruct,aligned_loss,0.15624485816443517,0.1356379186423571,0.17666441653061468,180,exploratory within-checkpoint native-chat protocol comparison; unadjusted intervals
+olmoe-0125-instruct,routing_jsd_bits,0.005045201580767707,0.004721051512373461,0.005377431406607625,180,exploratory within-checkpoint native-chat protocol comparison; unadjusted intervals
+olmoe-0125-sft,accuracy,-0.049999999999999996,-0.11111111111111113,0.011111111111111112,180,exploratory within-checkpoint native-chat protocol comparison; unadjusted intervals
+olmoe-0125-sft,choice_nll,0.3766576423051043,0.09797489831896707,0.6561181492595155,180,exploratory within-checkpoint native-chat protocol comparison; unadjusted intervals
+olmoe-0125-sft,aligned_loss,0.0003266793968503036,-0.012970009186195577,0.0132392416744457,180,exploratory within-checkpoint native-chat protocol comparison; unadjusted intervals
+olmoe-0125-sft,routing_jsd_bits,0.0054897826279897465,0.005144687323813396,0.005842161450617256,180,exploratory within-checkpoint native-chat protocol comparison; unadjusted intervals

@@ -61,7 +61,7 @@ Local checks passed on 2026-10-19:
 | --------------------------------------------- | ---------------------------------------------------- |
 | Locked uv synchronization                     | Passed                                               |
 | Ruff lint and formatting                      | Passed                                               |
-| `pytest -q -W error`                          | 207 passed in 18.22 seconds; 2 absent CUDA/ROCm hardware tests skipped; no warnings |
+| `pytest -q -W error`                          | 208 passed in 22.77 seconds; 2 absent CUDA/ROCm hardware tests skipped; no warnings |
 | Historical CPU/MPS performance measurement    | 24 cases, 7 timed repeats each; retained from the original conversion; not repeated for release |
 | Offline CLI smoke                             | CPU and real MPS passed against CPU/Hugging Face |
 | Configured read-only inventory                | Passed without creating input/output directories     |
@@ -90,7 +90,7 @@ threads. Full-model parity is an explicitly budgeted diagnostic on the selected
 device; existing conversion evidence is retained without rerunning CPU work.
 The earlier 178-test release run completed in 16.13 seconds with two host
 threads; macOS `time -l` recorded 846,921,728 bytes (0.79 GiB) maximum RSS and
-zero swaps. The expanded 207-test suite completed in 18.22 seconds. That final
+zero swaps. The expanded 208-test suite completed in 22.77 seconds. That final
 run did not collect a new suite RSS measurement.
 
 The expanded checks cover exact paired native-chat token alignment, aligned-span

@@ -1,0 +1,764 @@
+{
+  "status": "complete for listed outputs",
+  "plan": {
+    "schema": 1,
+    "layer": 7,
+    "primary_modes": [
+      "remove",
+      "reroute"
+    ],
+    "secondary_modes": [
+      "rescale",
+      "substitute"
+    ],
+    "primary_metric": "document-mean next-token loss, nats/token",
+    "primary_contrast": "specialist-minus-control effect on-domain minus equally weighted off-domains",
+    "primary_family": "three domains by two primary modes; Holm adjustment",
+    "bootstrap": "paired documents stratified by source and domain; 10000 replicates",
+    "permutation": "domain labels permuted within source; 9999 replicates; plus-one two-sided p",
+    "selection": "rank by discovery on/off mass ratio; first of top eight admitting a calibration-matched control; otherwise top expert with failed balance explicitly retained",
+    "control_pool": "discovery specificity at or below its median, excluding discovery top eight",
+    "matching": "calibration on/off mass, on/off usage, and raw output norm; relative gaps <=10%, norm <=20%",
+    "weighting": "equal documents; frozen balanced source/domain cells",
+    "format": "identical plain question/choices/answer-label text across stages; no model-specific chat template",
+    "interpretation": "post-training comparisons are observational; failed matching blocks causal-specialization claims"
+  },
+  "completed_models": [
+    "olmoe-0125-base",
+    "olmoe-0125-dpo",
+    "olmoe-0125-instruct",
+    "olmoe-0125-sft",
+    "olmoe-0924"
+  ],
+  "implementation_sha256": "5901b4851171ac782e0db8649afbadbb1d7dd8aa4e146d307f1794c9dcdf0a05",
+  "permutation_statistic": "studentized source-stratified interaction",
+  "limits": "Intervals condition on one checkpoint. Paired stage contrasts are observational. Failed matching prevents causal-specialization claims.",
+  "additional_outcomes": "Correct-answer-label loss is an exploratory sensitivity analysis, separate from the frozen six-test primary text-loss family; its twelve tests receive their own Holm correction. It does not measure intervention accuracy.",
+  "producers": {
+    "olmoe-0125-base": {
+      "model": "29754622612df1d908522a156a13a78655d93e82c1463a838c87b9934bb21bea",
+      "target": {
+        "name": "olmoe-0125-base",
+        "repository": "allenai/OLMoE-1B-7B-0125",
+        "revision": "9b0c1aa87e34a20052389dce1f0cf01da783f654",
+        "stage": "base",
+        "lineage": "olmoe-0125"
+      },
+      "rows": "ffd144e780a1017b012823eb3594eaac157277bc4098cc12e97284f82d3f3413",
+      "token_ids_sha256": "3c5b240b861f8321071a12ecf3745c3711c238fb77704f25b52082a22b0ece1a",
+      "model_directory": "/Users/matt/Downloads/p/eschaton-research/moe-pilot/models/olmoe-0125-base",
+      "versions": {
+        "torch": "2.14.1",
+        "transformers": "5.20.1",
+        "numpy": "2.5.4",
+        "safetensors": "0.8.0"
+      },
+      "threads": 2,
+      "frequency": "ac3c14af5f31e0f1c26fe290f9834520111a9bd89aeea13579049e4f616b568a",
+      "implementation": {
+        "study.py": "8c6f8e5e0e8c58bdbd9b46d71bdf11e3aff985516ce93ee63941fcface8b02d2",
+        "engine.py": "bce5432c62b4e352a6239a85f9351aad3d4243616c0df0178e450d1efc345ecb",
+        "model.py": "e4d9291f8b2aba8112dc6ea851dff5e0e463181e225042b43ccefbb366277388",
+        "devices.py": "b9c4a3315fe0b1ef499edfb3c3b2deb2eaf527b681257d0ad07dc4bfd6528c07",
+        "resources.py": "c9efc07ea927dcb33c6a2b095a5b5f177523d3236407e6c75f634878ffec92dc",
+        "observations.py": "c1c2570241c74d0c57483e6a12a9f48d83d6ebc0a6312cb645ed6035cc978afc",
+        "perturbations.py": "bc06c394b2b234e16e4ec6afbe731bba7c6b10f55661f39fb19d2e765073bfc3",
+        "study_data.py": "95edfed59ac8173f6510195aff07cb9aa7fee1679281ddcc676c99570d9d2c09"
+      },
+      "device": {
+        "backend": "mps",
+        "device": "mps:0",
+        "name": "Apple Metal",
+        "machine": "arm64",
+        "platform": "macOS-26.5.1-arm64-arm-64bit",
+        "torch_cuda": null,
+        "torch_hip": null,
+        "dtype": "float32"
+      },
+      "max_tokens": 1024,
+      "batch_documents": 16,
+      "condition_group": 4,
+      "seed": 20261019,
+      "resources": {
+        "max_memory_gib": 5,
+        "reserve_memory_gib": 16
+      },
+      "conditions": {},
+      "selection": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+      "plan": "20930caa1f259f8c72c5f3f053cf5b7319d0d67fdc37e0d355e672742c66adc6"
+    },
+    "olmoe-0125-dpo": {
+      "model": "90236824e7e293f635582ffbe95c20c186ebbe0599152edffb2a921ca28368a7",
+      "target": {
+        "name": "olmoe-0125-dpo",
+        "repository": "allenai/OLMoE-1B-7B-0125-DPO",
+        "revision": "0f2e2e1bd78f146685c346ac0f797ae146ffa8f9",
+        "stage": "dpo",
+        "lineage": "olmoe-0125"
+      },
+      "rows": "ffd144e780a1017b012823eb3594eaac157277bc4098cc12e97284f82d3f3413",
+      "token_ids_sha256": "3c5b240b861f8321071a12ecf3745c3711c238fb77704f25b52082a22b0ece1a",
+      "model_directory": "/Users/matt/Downloads/p/eschaton-research/moe-pilot/models/olmoe-0125-dpo",
+      "versions": {
+        "torch": "2.14.1",
+        "transformers": "5.20.1",
+        "numpy": "2.5.4",
+        "safetensors": "0.8.0"
+      },
+      "threads": 2,
+      "frequency": "ac3c14af5f31e0f1c26fe290f9834520111a9bd89aeea13579049e4f616b568a",
+      "implementation": {
+        "study.py": "8c6f8e5e0e8c58bdbd9b46d71bdf11e3aff985516ce93ee63941fcface8b02d2",
+        "engine.py": "bce5432c62b4e352a6239a85f9351aad3d4243616c0df0178e450d1efc345ecb",
+        "model.py": "e4d9291f8b2aba8112dc6ea851dff5e0e463181e225042b43ccefbb366277388",
+        "devices.py": "b9c4a3315fe0b1ef499edfb3c3b2deb2eaf527b681257d0ad07dc4bfd6528c07",
+        "resources.py": "c9efc07ea927dcb33c6a2b095a5b5f177523d3236407e6c75f634878ffec92dc",
+        "observations.py": "c1c2570241c74d0c57483e6a12a9f48d83d6ebc0a6312cb645ed6035cc978afc",
+        "perturbations.py": "bc06c394b2b234e16e4ec6afbe731bba7c6b10f55661f39fb19d2e765073bfc3",
+        "study_data.py": "95edfed59ac8173f6510195aff07cb9aa7fee1679281ddcc676c99570d9d2c09"
+      },
+      "device": {
+        "backend": "mps",
+        "device": "mps:0",
+        "name": "Apple Metal",
+        "machine": "arm64",
+        "platform": "macOS-26.5.1-arm64-arm-64bit",
+        "torch_cuda": null,
+        "torch_hip": null,
+        "dtype": "float32"
+      },
+      "max_tokens": 1024,
+      "batch_documents": 16,
+      "condition_group": 4,
+      "seed": 20261019,
+      "resources": {
+        "max_memory_gib": 5,
+        "reserve_memory_gib": 8
+      },
+      "conditions": {},
+      "selection": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+      "plan": "20930caa1f259f8c72c5f3f053cf5b7319d0d67fdc37e0d355e672742c66adc6"
+    },
+    "olmoe-0125-instruct": {
+      "model": "9c205af79151ffda254849541c5ae6155f60715d21f2c0a12031254e6896ba17",
+      "target": {
+        "name": "olmoe-0125-instruct",
+        "repository": "allenai/OLMoE-1B-7B-0125-Instruct",
+        "revision": "b89a7c4bc24fb9e55ce2543c9458ce0ca5c4650e",
+        "stage": "final-rlvr",
+        "lineage": "olmoe-0125"
+      },
+      "rows": "ffd144e780a1017b012823eb3594eaac157277bc4098cc12e97284f82d3f3413",
+      "token_ids_sha256": "3c5b240b861f8321071a12ecf3745c3711c238fb77704f25b52082a22b0ece1a",
+      "model_directory": "/Users/matt/Downloads/p/eschaton-research/moe-pilot/models/olmoe-0125-instruct",
+      "versions": {
+        "torch": "2.14.1",
+        "transformers": "5.20.1",
+        "numpy": "2.5.4",
+        "safetensors": "0.8.0"
+      },
+      "threads": 2,
+      "frequency": "ac3c14af5f31e0f1c26fe290f9834520111a9bd89aeea13579049e4f616b568a",
+      "implementation": {
+        "study.py": "8c6f8e5e0e8c58bdbd9b46d71bdf11e3aff985516ce93ee63941fcface8b02d2",
+        "engine.py": "bce5432c62b4e352a6239a85f9351aad3d4243616c0df0178e450d1efc345ecb",
+        "model.py": "e4d9291f8b2aba8112dc6ea851dff5e0e463181e225042b43ccefbb366277388",
+        "devices.py": "b9c4a3315fe0b1ef499edfb3c3b2deb2eaf527b681257d0ad07dc4bfd6528c07",
+        "resources.py": "c9efc07ea927dcb33c6a2b095a5b5f177523d3236407e6c75f634878ffec92dc",
+        "observations.py": "c1c2570241c74d0c57483e6a12a9f48d83d6ebc0a6312cb645ed6035cc978afc",
+        "perturbations.py": "bc06c394b2b234e16e4ec6afbe731bba7c6b10f55661f39fb19d2e765073bfc3",
+        "study_data.py": "95edfed59ac8173f6510195aff07cb9aa7fee1679281ddcc676c99570d9d2c09"
+      },
+      "device": {
+        "backend": "mps",
+        "device": "mps:0",
+        "name": "Apple Metal",
+        "machine": "arm64",
+        "platform": "macOS-26.5.1-arm64-arm-64bit",
+        "torch_cuda": null,
+        "torch_hip": null,
+        "dtype": "float32"
+      },
+      "max_tokens": 1024,
+      "batch_documents": 16,
+      "condition_group": 4,
+      "seed": 20261019,
+      "resources": {
+        "max_memory_gib": 5,
+        "reserve_memory_gib": 8
+      },
+      "conditions": {},
+      "selection": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+      "plan": "20930caa1f259f8c72c5f3f053cf5b7319d0d67fdc37e0d355e672742c66adc6"
+    },
+    "olmoe-0125-sft": {
+      "model": "16d07f607efc2825b3373944fc537f55f0eeb413d2ca283c43ad36247036903c",
+      "target": {
+        "name": "olmoe-0125-sft",
+        "repository": "allenai/OLMoE-1B-7B-0125-SFT",
+        "revision": "6f7a5b02aa069fdcb8d0cb6b837b9905a3d995d7",
+        "stage": "sft",
+        "lineage": "olmoe-0125"
+      },
+      "rows": "ffd144e780a1017b012823eb3594eaac157277bc4098cc12e97284f82d3f3413",
+      "token_ids_sha256": "3c5b240b861f8321071a12ecf3745c3711c238fb77704f25b52082a22b0ece1a",
+      "model_directory": "/Users/matt/Downloads/p/eschaton-research/moe-pilot/models/olmoe-0125-sft",
+      "versions": {
+        "torch": "2.14.1",
+        "transformers": "5.20.1",
+        "numpy": "2.5.4",
+        "safetensors": "0.8.0"
+      },
+      "threads": 2,
+      "frequency": "ac3c14af5f31e0f1c26fe290f9834520111a9bd89aeea13579049e4f616b568a",
+      "implementation": {
+        "study.py": "8c6f8e5e0e8c58bdbd9b46d71bdf11e3aff985516ce93ee63941fcface8b02d2",
+        "engine.py": "bce5432c62b4e352a6239a85f9351aad3d4243616c0df0178e450d1efc345ecb",
+        "model.py": "e4d9291f8b2aba8112dc6ea851dff5e0e463181e225042b43ccefbb366277388",
+        "devices.py": "b9c4a3315fe0b1ef499edfb3c3b2deb2eaf527b681257d0ad07dc4bfd6528c07",
+        "resources.py": "c9efc07ea927dcb33c6a2b095a5b5f177523d3236407e6c75f634878ffec92dc",
+        "observations.py": "c1c2570241c74d0c57483e6a12a9f48d83d6ebc0a6312cb645ed6035cc978afc",
+        "perturbations.py": "bc06c394b2b234e16e4ec6afbe731bba7c6b10f55661f39fb19d2e765073bfc3",
+        "study_data.py": "95edfed59ac8173f6510195aff07cb9aa7fee1679281ddcc676c99570d9d2c09"
+      },
+      "device": {
+        "backend": "mps",
+        "device": "mps:0",
+        "name": "Apple Metal",
+        "machine": "arm64",
+        "platform": "macOS-26.5.1-arm64-arm-64bit",
+        "torch_cuda": null,
+        "torch_hip": null,
+        "dtype": "float32"
+      },
+      "max_tokens": 1024,
+      "batch_documents": 16,
+      "condition_group": 4,
+      "seed": 20261019,
+      "resources": {
+        "max_memory_gib": 5,
+        "reserve_memory_gib": 16
+      },
+      "conditions": {},
+      "selection": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+      "plan": "20930caa1f259f8c72c5f3f053cf5b7319d0d67fdc37e0d355e672742c66adc6"
+    },
+    "olmoe-0924": {
+      "model": "96655392614d3098627e50d14922335c52c6d78907a7a89ac7bb4ae64fdd9a2d",
+      "target": {
+        "name": "olmoe-0924",
+        "repository": "allenai/OLMoE-1B-7B-0924",
+        "revision": "6d84c48581ece794365f2b8e9cfb043c68ade9c5",
+        "stage": "base",
+        "lineage": "olmoe-0924"
+      },
+      "rows": "ffd144e780a1017b012823eb3594eaac157277bc4098cc12e97284f82d3f3413",
+      "source_rows": "ffd144e780a1017b012823eb3594eaac157277bc4098cc12e97284f82d3f3413",
+      "formatting": "plain",
+      "format_plan": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+      "token_ids_sha256": "3c5b240b861f8321071a12ecf3745c3711c238fb77704f25b52082a22b0ece1a",
+      "model_directory": "/Users/matt/Downloads/p/eschaton-research/moe-pilot/models/olmoe-0924",
+      "versions": {
+        "torch": "2.14.1",
+        "transformers": "5.20.1",
+        "numpy": "2.5.4",
+        "safetensors": "0.8.0"
+      },
+      "threads": 2,
+      "matmul_precision": "highest",
+      "tokenizer_files": {
+        "special_tokens_map.json": "b77491e270c6fcc5b2ecf22370f7318a6a18d3cabea09ba7bab92e9bf12656c2",
+        "tokenizer.json": "a094266ac6c4982efba277bc251349a5a6d6ad37efb39a2a90f53d8be2a40a40",
+        "tokenizer_config.json": "78a839c7851f14f9fb30e664c2b46166dc0628f2900679e5ec160656f702edff"
+      },
+      "frequency": "ac3c14af5f31e0f1c26fe290f9834520111a9bd89aeea13579049e4f616b568a",
+      "implementation": {
+        "study.py": "83f6df01967d1401e35f52fb653d88cc959d649d37eb8aa1e6f78918ff6c44b3",
+        "engine.py": "bce5432c62b4e352a6239a85f9351aad3d4243616c0df0178e450d1efc345ecb",
+        "model.py": "e4d9291f8b2aba8112dc6ea851dff5e0e463181e225042b43ccefbb366277388",
+        "devices.py": "b9c4a3315fe0b1ef499edfb3c3b2deb2eaf527b681257d0ad07dc4bfd6528c07",
+        "resources.py": "27ff93d52906c829eb6c376f2b547c26fbe5cf838d7c5b12addb084e665e7afc",
+        "observations.py": "d52b3134dd95648ca1fa4e4c7ba2c2a37946e062a699ac35ef80ecdaad12f04e",
+        "perturbations.py": "bc06c394b2b234e16e4ec6afbe731bba7c6b10f55661f39fb19d2e765073bfc3",
+        "study_data.py": "95edfed59ac8173f6510195aff07cb9aa7fee1679281ddcc676c99570d9d2c09",
+        "study_formats.py": "e5992f6578d91ece7a87f37a83785b914b53c2650107789c92370d036f9e2034"
+      },
+      "device": {
+        "backend": "mps",
+        "device": "mps:0",
+        "name": "Apple Metal",
+        "machine": "arm64",
+        "platform": "macOS-26.5.1-arm64-arm-64bit",
+        "torch_cuda": null,
+        "torch_hip": null,
+        "dtype": "float32"
+      },
+      "max_tokens": 1024,
+      "batch_documents": 16,
+      "condition_group": 4,
+      "seed": 20261019,
+      "resources": {
+        "max_memory_gib": 5,
+        "reserve_memory_gib": 8
+      },
+      "conditions": {
+        "computing_remove_specialist": {
+          "mode": "remove",
+          "strength": 1.0,
+          "mask": {
+            "7": [
+              6
+            ]
+          },
+          "donors": {},
+          "fixed_routing": "router choices on incoming states at each target site",
+          "zero_mass_rescaling": "zero output when every selected contribution is removed"
+        },
+        "computing_remove_control": {
+          "mode": "remove",
+          "strength": 1.0,
+          "mask": {
+            "7": [
+              27
+            ]
+          },
+          "donors": {},
+          "fixed_routing": "router choices on incoming states at each target site",
+          "zero_mass_rescaling": "zero output when every selected contribution is removed"
+        },
+        "computing_reroute_specialist": {
+          "mode": "reroute",
+          "strength": 1.0,
+          "mask": {
+            "7": [
+              6
+            ]
+          },
+          "donors": {},
+          "fixed_routing": "router choices on incoming states at each target site",
+          "zero_mass_rescaling": "zero output when every selected contribution is removed"
+        },
+        "computing_reroute_control": {
+          "mode": "reroute",
+          "strength": 1.0,
+          "mask": {
+            "7": [
+              27
+            ]
+          },
+          "donors": {},
+          "fixed_routing": "router choices on incoming states at each target site",
+          "zero_mass_rescaling": "zero output when every selected contribution is removed"
+        },
+        "computing_rescale_specialist": {
+          "mode": "rescale",
+          "strength": 1.0,
+          "mask": {
+            "7": [
+              6
+            ]
+          },
+          "donors": {},
+          "fixed_routing": "router choices on incoming states at each target site",
+          "zero_mass_rescaling": "zero output when every selected contribution is removed"
+        },
+        "computing_rescale_control": {
+          "mode": "rescale",
+          "strength": 1.0,
+          "mask": {
+            "7": [
+              27
+            ]
+          },
+          "donors": {},
+          "fixed_routing": "router choices on incoming states at each target site",
+          "zero_mass_rescaling": "zero output when every selected contribution is removed"
+        },
+        "computing_substitute_specialist": {
+          "mode": "substitute",
+          "strength": 1.0,
+          "mask": {
+            "7": [
+              6
+            ]
+          },
+          "donors": {
+            "7": {
+              "6": 27
+            }
+          },
+          "fixed_routing": "router choices on incoming states at each target site",
+          "zero_mass_rescaling": "zero output when every selected contribution is removed"
+        },
+        "computing_substitute_control": {
+          "mode": "substitute",
+          "strength": 1.0,
+          "mask": {
+            "7": [
+              27
+            ]
+          },
+          "donors": {
+            "7": {
+              "27": 6
+            }
+          },
+          "fixed_routing": "router choices on incoming states at each target site",
+          "zero_mass_rescaling": "zero output when every selected contribution is removed"
+        },
+        "computing_half": {
+          "mode": "remove",
+          "strength": 0.5,
+          "mask": {
+            "7": [
+              6
+            ]
+          },
+          "donors": {},
+          "fixed_routing": "router choices on incoming states at each target site",
+          "zero_mass_rescaling": "zero output when every selected contribution is removed"
+        },
+        "computing_restored": {
+          "mode": "remove",
+          "strength": 0.0,
+          "mask": {
+            "7": [
+              6
+            ]
+          },
+          "donors": {},
+          "fixed_routing": "router choices on incoming states at each target site",
+          "zero_mass_rescaling": "zero output when every selected contribution is removed"
+        },
+        "computing_joint": {
+          "mode": "remove",
+          "strength": 1.0,
+          "mask": {
+            "7": [
+              6,
+              27
+            ]
+          },
+          "donors": {},
+          "fixed_routing": "router choices on incoming states at each target site",
+          "zero_mass_rescaling": "zero output when every selected contribution is removed"
+        },
+        "mathematics_remove_specialist": {
+          "mode": "remove",
+          "strength": 1.0,
+          "mask": {
+            "7": [
+              37
+            ]
+          },
+          "donors": {},
+          "fixed_routing": "router choices on incoming states at each target site",
+          "zero_mass_rescaling": "zero output when every selected contribution is removed"
+        },
+        "mathematics_remove_control": {
+          "mode": "remove",
+          "strength": 1.0,
+          "mask": {
+            "7": [
+              27
+            ]
+          },
+          "donors": {},
+          "fixed_routing": "router choices on incoming states at each target site",
+          "zero_mass_rescaling": "zero output when every selected contribution is removed"
+        },
+        "mathematics_reroute_specialist": {
+          "mode": "reroute",
+          "strength": 1.0,
+          "mask": {
+            "7": [
+              37
+            ]
+          },
+          "donors": {},
+          "fixed_routing": "router choices on incoming states at each target site",
+          "zero_mass_rescaling": "zero output when every selected contribution is removed"
+        },
+        "mathematics_reroute_control": {
+          "mode": "reroute",
+          "strength": 1.0,
+          "mask": {
+            "7": [
+              27
+            ]
+          },
+          "donors": {},
+          "fixed_routing": "router choices on incoming states at each target site",
+          "zero_mass_rescaling": "zero output when every selected contribution is removed"
+        },
+        "mathematics_rescale_specialist": {
+          "mode": "rescale",
+          "strength": 1.0,
+          "mask": {
+            "7": [
+              37
+            ]
+          },
+          "donors": {},
+          "fixed_routing": "router choices on incoming states at each target site",
+          "zero_mass_rescaling": "zero output when every selected contribution is removed"
+        },
+        "mathematics_rescale_control": {
+          "mode": "rescale",
+          "strength": 1.0,
+          "mask": {
+            "7": [
+              27
+            ]
+          },
+          "donors": {},
+          "fixed_routing": "router choices on incoming states at each target site",
+          "zero_mass_rescaling": "zero output when every selected contribution is removed"
+        },
+        "mathematics_substitute_specialist": {
+          "mode": "substitute",
+          "strength": 1.0,
+          "mask": {
+            "7": [
+              37
+            ]
+          },
+          "donors": {
+            "7": {
+              "37": 27
+            }
+          },
+          "fixed_routing": "router choices on incoming states at each target site",
+          "zero_mass_rescaling": "zero output when every selected contribution is removed"
+        },
+        "mathematics_substitute_control": {
+          "mode": "substitute",
+          "strength": 1.0,
+          "mask": {
+            "7": [
+              27
+            ]
+          },
+          "donors": {
+            "7": {
+              "27": 37
+            }
+          },
+          "fixed_routing": "router choices on incoming states at each target site",
+          "zero_mass_rescaling": "zero output when every selected contribution is removed"
+        },
+        "mathematics_half": {
+          "mode": "remove",
+          "strength": 0.5,
+          "mask": {
+            "7": [
+              37
+            ]
+          },
+          "donors": {},
+          "fixed_routing": "router choices on incoming states at each target site",
+          "zero_mass_rescaling": "zero output when every selected contribution is removed"
+        },
+        "mathematics_restored": {
+          "mode": "remove",
+          "strength": 0.0,
+          "mask": {
+            "7": [
+              37
+            ]
+          },
+          "donors": {},
+          "fixed_routing": "router choices on incoming states at each target site",
+          "zero_mass_rescaling": "zero output when every selected contribution is removed"
+        },
+        "mathematics_joint": {
+          "mode": "remove",
+          "strength": 1.0,
+          "mask": {
+            "7": [
+              27,
+              37
+            ]
+          },
+          "donors": {},
+          "fixed_routing": "router choices on incoming states at each target site",
+          "zero_mass_rescaling": "zero output when every selected contribution is removed"
+        },
+        "science_remove_specialist": {
+          "mode": "remove",
+          "strength": 1.0,
+          "mask": {
+            "7": [
+              63
+            ]
+          },
+          "donors": {},
+          "fixed_routing": "router choices on incoming states at each target site",
+          "zero_mass_rescaling": "zero output when every selected contribution is removed"
+        },
+        "science_remove_control": {
+          "mode": "remove",
+          "strength": 1.0,
+          "mask": {
+            "7": [
+              16
+            ]
+          },
+          "donors": {},
+          "fixed_routing": "router choices on incoming states at each target site",
+          "zero_mass_rescaling": "zero output when every selected contribution is removed"
+        },
+        "science_reroute_specialist": {
+          "mode": "reroute",
+          "strength": 1.0,
+          "mask": {
+            "7": [
+              63
+            ]
+          },
+          "donors": {},
+          "fixed_routing": "router choices on incoming states at each target site",
+          "zero_mass_rescaling": "zero output when every selected contribution is removed"
+        },
+        "science_reroute_control": {
+          "mode": "reroute",
+          "strength": 1.0,
+          "mask": {
+            "7": [
+              16
+            ]
+          },
+          "donors": {},
+          "fixed_routing": "router choices on incoming states at each target site",
+          "zero_mass_rescaling": "zero output when every selected contribution is removed"
+        },
+        "science_rescale_specialist": {
+          "mode": "rescale",
+          "strength": 1.0,
+          "mask": {
+            "7": [
+              63
+            ]
+          },
+          "donors": {},
+          "fixed_routing": "router choices on incoming states at each target site",
+          "zero_mass_rescaling": "zero output when every selected contribution is removed"
+        },
+        "science_rescale_control": {
+          "mode": "rescale",
+          "strength": 1.0,
+          "mask": {
+            "7": [
+              16
+            ]
+          },
+          "donors": {},
+          "fixed_routing": "router choices on incoming states at each target site",
+          "zero_mass_rescaling": "zero output when every selected contribution is removed"
+        },
+        "science_substitute_specialist": {
+          "mode": "substitute",
+          "strength": 1.0,
+          "mask": {
+            "7": [
+              63
+            ]
+          },
+          "donors": {
+            "7": {
+              "63": 16
+            }
+          },
+          "fixed_routing": "router choices on incoming states at each target site",
+          "zero_mass_rescaling": "zero output when every selected contribution is removed"
+        },
+        "science_substitute_control": {
+          "mode": "substitute",
+          "strength": 1.0,
+          "mask": {
+            "7": [
+              16
+            ]
+          },
+          "donors": {
+            "7": {
+              "16": 63
+            }
+          },
+          "fixed_routing": "router choices on incoming states at each target site",
+          "zero_mass_rescaling": "zero output when every selected contribution is removed"
+        },
+        "science_half": {
+          "mode": "remove",
+          "strength": 0.5,
+          "mask": {
+            "7": [
+              63
+            ]
+          },
+          "donors": {},
+          "fixed_routing": "router choices on incoming states at each target site",
+          "zero_mass_rescaling": "zero output when every selected contribution is removed"
+        },
+        "science_restored": {
+          "mode": "remove",
+          "strength": 0.0,
+          "mask": {
+            "7": [
+              63
+            ]
+          },
+          "donors": {},
+          "fixed_routing": "router choices on incoming states at each target site",
+          "zero_mass_rescaling": "zero output when every selected contribution is removed"
+        },
+        "science_joint": {
+          "mode": "remove",
+          "strength": 1.0,
+          "mask": {
+            "7": [
+              16,
+              63
+            ]
+          },
+          "donors": {},
+          "fixed_routing": "router choices on incoming states at each target site",
+          "zero_mass_rescaling": "zero output when every selected contribution is removed"
+        }
+      },
+      "selection": "d0bfcb01a81d7f2e161c8d5603c175db798d4176088b243322c84220ad39e078",
+      "plan": "20930caa1f259f8c72c5f3f053cf5b7319d0d67fdc37e0d355e672742c66adc6"
+    }
+  },
+  "observation_manifests": {
+    "olmoe-0125-base/evaluation/manifest.json": "9176f750b10441e53436e9244ff06c7bb6fc1c33b4f26303dd513639ac2967c8",
+    "olmoe-0125-dpo/evaluation/manifest.json": "0af37b69a21f3d78e1e29cd84218743520f2dcd48b3b5dced643722d13865955",
+    "olmoe-0125-instruct/evaluation/manifest.json": "2f03203b52721eebccaf26d575cb39b33269cbcfebb0515ed6835ae5b12bd87a",
+    "olmoe-0125-sft/evaluation/manifest.json": "8f27ed6ec01f705a1a1c4ea8b2bb5a4afa9785fbe1a875686083b8cd7ee1b7f9",
+    "olmoe-0924/evaluation-interventions/manifest.json": "ca9e15a01eb32bb6c8a25dd0737fa112c29f1494f8e699404ddbb34cf47de961",
+    "olmoe-0125-instruct/evaluation-paired-chat/manifest.json": "f1ccef84a260dc367f0af27a0abde46fed8cc416a0c6d100e104fcfb25390bee",
+    "olmoe-0125-sft/evaluation-paired-chat/manifest.json": "5511e2257c447f213dc32fda88509a748f46316718f4a84d4614db6ef89cf8b0"
+  },
+  "table_sha256": {
+    "answer_label_effects.csv": "3249723179aa25b83a9066ea7b4453c7a1d28c7c16113290fd03c61bbfc6104c",
+    "baseline_by_model_domain.csv": "a551d22b0fac4d049bf27dde2fad398bd65c4066d57296a11915731946fb74f1",
+    "baseline_by_model_source_domain.csv": "cf289c07a0c98a34634ec4a3f7b4ddea7548aec38b687c1a3af05bf71e132961",
+    "causal_by_source_domain.csv": "353778f2634adaeb9a9afa726088d4aebde76a1942c2e4307ed3cfe530ad25e7",
+    "causal_effects.csv": "7d37f5ed587f568b328e015542197db269bec89ec49d44d26bd0d5aa14d7f54a",
+    "causal_paired_documents.csv": "26eebde4ada45cefb768626e93d11516ec9f6924db53b0f3147a220c92cc6736",
+    "control_balance.csv": "e51f9e3fc65884553bc94340aa22629f3a8c600ea7d4f7e2552e4316af2648e7",
+    "expert_norm_changes.csv": "3731eecd2dbe350220d1f38bb6655e4485581d67945f7e5c8f273c97027b3347",
+    "format_alignment.csv": "62b87e8b677623dbb8e4e3f7f869968146e050541b2816d07a09c223bfb1be73",
+    "format_effects.csv": "e8b696ae55c462edd2453fdf11ca4c75f3710e99faaa33b8ff38fab9606bdc45",
+    "format_paired_documents.csv": "e0eeab008b707762e57b96fd33a532d14d9116c5d98ee5f25af33b12e390b345",
+    "intervention_diagnostics.csv": "120916a430cb6a250eeed587f17766202dff0b864663e8ee10d99dc99a0e1ffb",
+    "intervention_gate_diagnostics.csv": "74c713df903160ffd90095c2ba9a91f0473234a8838b210153fcd91d095f6eb3",
+    "model_paired_documents.csv": "f8d95f2066f645c59d4ab37e58ca448a9340d4c91cec303b33f207106befbd7a",
+    "model_summary.csv": "269c41d054392707da005b1cfd2ca44096b470037b912f8e87b951b1da3cdbc5",
+    "posttraining_contrasts.csv": "426a03ad46a03305d6fa670c4eb44df42d60123f51b6de146f46bf9dd4e3476f",
+    "reconstruction_interactions.csv": "778421bfd26adaea25866e132a4b71574f37c5b9b8ee17f04f2f2b801272a1b0",
+    "reconstruction_paired_documents.csv": "12955c7b965e730bae3d8f86334b14cd8abd1445c4ef715753037d3a89d0955f",
+    "routing_shift.csv": "d150695ec89f5d8727de50b8fe475d99ad2fa54decaf1749c51b921e668ae525",
+    "selected_gate_mass.csv": "521ba91c22633e17b34f491d72c779daead775a03f5b91d1e81d95d30bdf01b8"
+  }
+}
