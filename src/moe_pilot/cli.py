@@ -13,7 +13,7 @@ from moe_pilot.experiment import STEPS, ExperimentRunner
 def parser():
     result = argparse.ArgumentParser(description="Configured MoE research experiments")
     result.add_argument(
-        "--config", type=Path, help="Experiment TOML file; required except for smoke and devices"
+        "--config", type=Path, help="Experiment TOML; not needed for smoke, devices, or benchmark"
     )
     commands = result.add_subparsers(dest="command", required=True)
     for name in STEPS:
@@ -30,12 +30,46 @@ def parser():
         "devices", help="Probe available backends and report the selected device"
     )
     devices.add_argument("--device", default="auto", help="Requested device (default: auto)")
+    benchmark = commands.add_parser("benchmark", help="Compare synchronized engine performance")
+    benchmark.add_argument("--model", type=Path, help="Local model; omit for synthetic weights")
+    benchmark.add_argument("--profile", choices=("tiny", "medium"), default="medium")
+    benchmark.add_argument("--devices", nargs="+", default=["cpu", "auto"])
+    benchmark.add_argument("--documents", type=int, nargs="+", default=[1, 16])
+    benchmark.add_argument("--max-tokens", type=int, default=64)
+    benchmark.add_argument("--warmup", type=int, default=2)
+    benchmark.add_argument("--repeats", type=int, default=5)
+    benchmark.add_argument("--threads", type=int, default=8)
+    benchmark.add_argument("--output", type=Path, required=True, help="JSON measurement record")
     return result
 
 
 def main(argv=None):
     arguments = parser().parse_args(argv)
     try:
+        if arguments.command == "benchmark":
+            from moe_pilot.benchmark import benchmark_engine
+
+            report = benchmark_engine(
+                arguments.model,
+                profile=arguments.profile,
+                devices=arguments.devices,
+                document_counts=arguments.documents,
+                max_tokens=arguments.max_tokens,
+                warmup=arguments.warmup,
+                repeats=arguments.repeats,
+                threads=arguments.threads,
+                output=arguments.output,
+            )
+            print("workload documents backend median_seconds speedup_vs_cpu")
+            for row in report["results"]:
+                ratio = row["speedup_vs_cpu"]
+                speedup = f"{ratio:.2f}x" if ratio is not None else "n/a"
+                print(
+                    f"{row['workload']} {row['documents']} {row['backend']} "
+                    f"{row['median_seconds']:.6f} {speedup}"
+                )
+            print(f"Measurement record: {arguments.output}")
+            return 0
         if arguments.command == "devices":
             from moe_pilot.devices import resolve_device
 

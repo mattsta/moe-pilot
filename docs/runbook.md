@@ -77,6 +77,53 @@ It first requires the requested device, then runs the suite with that wheel
 profile. Normal hosted CI uses the optional CPU Linux wheel profile for speed;
 macOS retains native MPS support and exercises it whenever the host exposes it.
 
+## Measure performance
+
+Compare CPU with the automatically selected accelerator without downloading a
+model or running a scientific experiment:
+
+```sh
+uv run --locked moe-pilot benchmark --output runs/benchmarks/medium.json
+```
+
+`moe_pilot.benchmark.benchmark_engine` is the reusable library API. The CLI
+defaults to deterministic synthetic weights: two layers, eight experts, hidden
+size 512, intermediate size 768, vocabulary 1,024, and top-two routing. The
+`--profile tiny` option uses the numerical smoke model. Neither model represents
+the full historical OLMoE checkpoint. Default batches contain 1 and 16 documents
+of 64 tokens, with two warmups, five timed repeats, and eight host threads.
+
+To measure a local real checkpoint with the same synthetic token inputs:
+
+```sh
+uv run --locked moe-pilot benchmark --model models/olmoe --devices cpu mps --documents 1 16 --max-tokens 64 --warmup 2 --repeats 7 --threads 8 --output runs/benchmarks/local-model.json
+```
+
+Use `cuda` or `rocm` in place of `mps` on those hosts and retain the appropriate
+uv wheel profile. Explicit devices must pass their capability probes. If `auto`
+resolves to CPU, duplicate CPU measurements are removed.
+
+Every case measures baseline inference, routing with all-layer geometry on up
+to 100 sampled tokens, and baseline plus early/late single-expert ablations.
+GPU work is synchronized before and after each timed call. Backend order
+alternates between repeats. All timed losses must agree with CPU within
+`2e-4` absolute/relative tolerance; numerical failures abort publication.
+
+Timings include engine layer reads, weight/activation transfers, computation,
+and returned host arrays. They exclude imports, model creation, tokenization,
+device probes, and JSON writes. Warmups populate the process/filesystem cache;
+these are not cold-start timings. No saved inference result or checkpoint is
+reused. The JSON contains raw elapsed samples, median/min/max, effective
+devices, model configuration/identity, environment, and source hashes.
+Throughput counts input tokens per engine call, including ablation calls,
+and is not autoregressive generation throughput.
+
+Keep the machine otherwise idle. Compare workload, batch, precision, threads,
+and timing boundaries before interpreting speedup. The synthetic benchmark
+excludes corpus construction, statistics, plots, and persisted checkpoint I/O;
+it cannot establish full-pipeline or scientific-result improvements.
+See [local measurements and limitations](performance.md).
+
 ## Define an experiment
 
 Start with `configurations/pilot.toml`. Paths resolve relative to that file,

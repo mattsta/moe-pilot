@@ -13,6 +13,15 @@ from moe_pilot.devices import resolve_device
 from moe_pilot.engine import Engine
 
 
+def synthetic_model(directory, config):
+    """Save deterministic CPU-generated weights without changing global RNG state."""
+    with torch.random.fork_rng(devices=[]), torch.device("cpu"):
+        torch.random.default_generator.manual_seed(42)
+        model = OlmoeForCausalLM(config).eval()
+    model.save_pretrained(directory, safe_serialization=True)
+    return model
+
+
 def tiny_model(directory, *, layers=2, experts=4, norm_topk_prob=False, clip_qkv=None):
     """Create a deterministic local test checkpoint without network access."""
     config = OlmoeConfig(
@@ -31,11 +40,7 @@ def tiny_model(directory, *, layers=2, experts=4, norm_topk_prob=False, clip_qkv
         norm_topk_prob=norm_topk_prob,
         clip_qkv=clip_qkv,
     )
-    with torch.random.fork_rng(devices=[]), torch.device("cpu"):
-        torch.random.default_generator.manual_seed(42)
-        model = OlmoeForCausalLM(config).eval()
-    model.save_pretrained(directory, safe_serialization=True)
-    return model
+    return synthetic_model(directory, config)
 
 
 @torch.inference_mode()

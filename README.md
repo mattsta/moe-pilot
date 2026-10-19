@@ -22,6 +22,11 @@ Apple MPS, and uses CPU only after accelerator availability/capability checks
 fail. Explicit `cuda[:index]`, `rocm[:index]`, `mps`, and `cpu` choices are also
 supported. `devices` reports the selected backend and rejected candidates.
 
+For synchronized CPU/accelerator timings, use the reusable `benchmark` command;
+see the [benchmark procedure](docs/runbook.md#measure-performance) and
+[recorded local results](docs/performance.md). Backend availability alone does
+not establish a speedup.
+
 The smoke check is offline and uses a tiny random model on the selected device.
 The experiment pipeline
 uses one validated [TOML configuration](configurations/pilot.toml) for model,

@@ -40,6 +40,7 @@ model layers. Explicit layer indices are validated against the actual model.
 | `model.py`                    | Local configuration and safetensors tensor access        |
 | `checkpoints.py`              | Atomic arrays and inference resume identities            |
 | `probes.py`                   | Read-only geometry observer of the shared engine         |
+| `benchmark.py`                | Repeated synchronized engine measurements and parity checks |
 | `plotting.py`                 | Headless figures without process-wide plotting state     |
 | `interventions.py`            | Versioned, validated specialist/control metadata         |
 | `controls.py`                 | Specialist ranking and routing-mass matching             |
@@ -53,6 +54,8 @@ Imports never download data, load model weights, or start experiments. Optional
 dataset dependencies are imported only by source-download workflows. The CLI
 sets the configured CPU-thread count; library embedding leaves process-wide
 thread policy with the caller. Engine objects own independent local model state.
+The benchmark API temporarily applies its explicit thread setting and restores
+the caller's setting on success or failure.
 
 ## Compute device selection
 
