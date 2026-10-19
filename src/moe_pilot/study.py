@@ -323,6 +323,19 @@ def collect(
             raise ValueError(
                 "Study observation identity changed; retain old run and use a new output"
             )
+        expected_start = 0
+        for chunk in manifest["chunks"]:
+            if (
+                chunk["start"] != expected_start
+                or type(chunk["documents"]) is not int
+                or chunk["documents"] < 1
+            ):
+                raise ValueError("Saved batches must cover documents once, in order")
+            expected_start += chunk["documents"]
+        if expected_start > len(rows) or (
+            manifest["status"] == "complete" and expected_start != len(rows)
+        ):
+            raise ValueError("Saved batch coverage differs from the declared cohort")
         done = {chunk["start"]: chunk for chunk in manifest["chunks"]}
         start = 0
         while start < len(rows):
@@ -334,6 +347,14 @@ def collect(
                     or hashlib.sha256(path.read_bytes()).hexdigest() != done[start]["sha256"]
                 ):
                     raise ValueError("Previously completed observation changed")
+                if "trace_file" in done[start]:
+                    trace_path = (directory / done[start]["trace_file"]).resolve()
+                    if (
+                        trace_path.parent != directory.resolve()
+                        or hashlib.sha256(trace_path.read_bytes()).hexdigest()
+                        != done[start]["trace_sha256"]
+                    ):
+                        raise ValueError("Previously completed intervention diagnostics changed")
                 start += done[start]["documents"]
                 continue
             stop = admit_batch(
@@ -346,7 +367,7 @@ def collect(
                 config.execution.condition_group,
             )
             before = perf_counter()
-            arrays, _ = observe_documents(
+            arrays, observation_record = observe_documents(
                 engine,
                 rows[start:stop],
                 max_tokens=config.execution.max_tokens,
@@ -359,6 +380,14 @@ def collect(
             )
             engine.release_stream_memory()
             save_arrays(path, arrays)
+            trace_record = {}
+            if conditions:
+                trace_path = directory / f"trace-{start:05d}.json"
+                write_json(trace_path, observation_record["intervention_diagnostics"])
+                trace_record = {
+                    "trace_file": trace_path.name,
+                    "trace_sha256": hashlib.sha256(trace_path.read_bytes()).hexdigest(),
+                }
             manifest["chunks"].append(
                 {
                     "file": filename,
@@ -367,6 +396,7 @@ def collect(
                     "sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
                     "seconds": perf_counter() - before,
                     "peak_process_bytes": peak_process_bytes(),
+                    **trace_record,
                 }
             )
             manifest["chunks"].sort(key=lambda item: item["start"])

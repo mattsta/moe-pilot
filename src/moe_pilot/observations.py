@@ -110,6 +110,7 @@ def observe_documents(
         raise ValueError("microbatch_documents must be a nonnegative integer")
     count, experts = len(rows), engine.E
     conditions = conditions or {}
+    intervention_diagnostics = []
     condition_names = tuple(conditions)
     condition_loss = np.zeros((len(conditions), count))
     condition_answer_loss = np.zeros_like(condition_loss)
@@ -188,6 +189,11 @@ def observe_documents(
                 choice_accuracy[start + index] = float(values.argmax().item() == answer)
                 choice_log_probability[start + index] = float(values.log_softmax(-1)[answer].item())
 
+        def trace(name, layer, record, start=start):
+            intervention_diagnostics.append(
+                {"condition": name, "layer": layer, "document_start": start, **record}
+            )
+
         results, valid, routes = engine.run(
             batch,
             conditions,
@@ -195,6 +201,7 @@ def observe_documents(
             log_routing=True,
             on_layer=probe,
             on_output=score,
+            on_intervention=trace if conditions else None,
             verbose=False,
         )
         loss[start:stop] = document_means(results["base"], batch.doc, valid)
@@ -255,6 +262,7 @@ def observe_documents(
         "token_ids_sha256": hashlib.sha256(json.dumps(ids).encode()).hexdigest(),
         "norm_sampling": "one uniform deterministic valid position per document; unweighted expert outputs",
         "routing_weighting": "equal document means; selected gate mass and selected frequency",
+        "intervention_diagnostics": intervention_diagnostics,
         "records": [
             {key: row[key] for key in ("id", "domain", "source", "origin", "group_id")}
             for row in rows

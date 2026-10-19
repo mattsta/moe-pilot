@@ -117,6 +117,29 @@ def test_choice_prediction_cannot_read_the_given_answer(observation_inputs):
     np.testing.assert_allclose(np.exp(arrays["choice_log_probability"]).sum(), 1, atol=1e-6)
 
 
+def test_intervention_observations_record_gate_changes_and_exact_restoration(observation_inputs):
+    from moe_pilot.perturbations import Intervention
+
+    engine, rows = observation_inputs
+    arrays, metadata = observe_documents(
+        engine,
+        rows[:2],
+        max_tokens=128,
+        layers=(0,),
+        seed=17,
+        conditions={
+            "remove": Intervention({0: [0]}, "remove"),
+            "restore": Intervention({0: [0]}, "remove", 0),
+        },
+    )
+    np.testing.assert_array_equal(arrays["condition_loss"][1], arrays["loss"])
+    traces = metadata["intervention_diagnostics"]
+    assert len(traces) == 1
+    assert traces[0]["condition"] == "remove" and traces[0]["layer"] == 0
+    assert traces[0]["fraction_changed_expert_sets"] == 0
+    assert traces[0]["post_selected_mass_mean"] <= traces[0]["original_selected_mass_mean"]
+
+
 def test_matched_question_spans_keep_probe_and_routing_invariant_to_batching(observation_inputs):
     engine, rows = observation_inputs
     engine.tok.chat_template = (
