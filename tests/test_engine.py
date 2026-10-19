@@ -125,7 +125,16 @@ def test_original_sharded_expert_format_matches_packed(local_model, tmp_path):
 
 
 @pytest.mark.parametrize(
-    "ids,limit", [([], 8), ([[]], 8), ([[1]], 8), ([[1, 2]], 1), ([[-1, 2]], 4)]
+    "ids,limit",
+    [
+        ([], 8),
+        ([[]], 8),
+        ([[1]], 8),
+        ([[1, 2]], 1),
+        ([[-1, 2]], 4),
+        ([[1.5, 2]], 4),
+        ([[1, 2]], 3.5),
+    ],
 )
 def test_invalid_batches_fail_early(ids, limit):
     with pytest.raises(ValueError):
@@ -179,10 +188,10 @@ def test_checkpoint_skips_completed_work_and_adds_new_conditions(
     engine.run_ckpt(batch, {"first": {1: [0]}, "second": {0: [1]}}, directory)
 
 
-def test_legacy_checkpoint_is_rejected(local_model, tmp_path):
+def test_checkpoint_without_provenance_is_rejected(local_model, tmp_path):
     _, engine = local_model
     directory = tmp_path / "checkpoints"
     (directory / "losses").mkdir(parents=True)
     np.save(directory / "losses/base.npy", [0.0])
-    with pytest.raises(ValueError, match="Legacy"):
+    with pytest.raises(ValueError, match="provenance"):
         engine.run_ckpt(engine.batch([[2, 3]], 4), {}, directory)

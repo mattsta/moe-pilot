@@ -1,64 +1,66 @@
 """Subtopics pilot workflow."""
 
 
-def main(model_dir="models/olmoe"):
+def run(config):
     import itertools
-    import os
+    import json
 
-    import matplotlib
     import numpy as np
     import pandas as pd
 
-    matplotlib.use("Agg")
-    import matplotlib.pyplot as plt
-
-    from moe_pilot.artifacts import read_json
+    from moe_pilot.artifacts import load_corpus
+    from moe_pilot.engine import Engine
     from moe_pilot.metrics import entropy_bits as H2
     from moe_pilot.metrics import jensen_shannon as jsd
     from moe_pilot.metrics import ratio
+    from moe_pilot.plotting import subplots
 
-    OUT = "results/subtopics"
-    os.makedirs("plots/subtopics", exist_ok=True)
-    os.makedirs(OUT, exist_ok=True)
-    C = read_json("subtopic_corpus.json")
-    if not os.path.exists(f"{OUT}/routing.npz"):
-        from moe_pilot.engine import Engine
-
-        M = Engine(model_dir)
-
-        ids = [M.tok(x["text"]).input_ids for x in C]
-        B = M.batch(ids, 64)
-        res, valid, rl = M.run(B, {}, log_routing=True)
-        np.savez_compressed(
-            f"{OUT}/routing.npz",
-            topi=np.stack([r[0] for r in rl]),
-            topw=np.stack([r[1] for r in rl]),
-            ent=np.stack(
-                [
-                    -(
-                        r[2].astype(np.float32)
-                        * np.log2(np.clip(r[2].astype(np.float32), 1e-12, 1))
-                    ).sum(1)
-                    for r in rl
-                ]
-            ),
-            tok=B.tok.numpy(),
-            doc=B.doc,
-            loss=res["base"],
-            valid=valid,
-        )
-    R = np.load(f"{OUT}/routing.npz")
+    paths = config.paths
+    paths.prepare_outputs()
+    OUT = paths.tables / "subtopics"
+    figures = paths.figures / "subtopics"
+    OUT.mkdir(parents=True, exist_ok=True)
+    figures.mkdir(parents=True, exist_ok=True)
+    C = load_corpus(paths.data / "subtopic_corpus.json", subtopics=True)
+    M = Engine(paths.model)
+    ids = [M.tok(x["text"]).input_ids for x in C]
+    B = M.batch(ids, config.execution.max_tokens)
+    res, valid, rl = M.run(B, {}, log_routing=True)
+    routing_path = paths.artifacts / "subtopics.npz"
+    np.savez_compressed(
+        routing_path,
+        topi=np.stack([r[0] for r in rl]),
+        topw=np.stack([r[1] for r in rl]),
+        ent=np.stack(
+            [
+                -(
+                    r[2].astype(np.float32) * np.log2(np.clip(r[2].astype(np.float32), 1e-12, 1))
+                ).sum(1)
+                for r in rl
+            ]
+        ),
+        tok=B.tok.numpy(),
+        doc=B.doc,
+        loss=res["base"],
+        valid=valid,
+    )
+    R = np.load(routing_path)
     topi = R["topi"].astype(int)
     doc = R["doc"]
     tok = R["tok"]
     L, N, K = topi.shape
-    E = 64
-    subs = list(dict.fromkeys(f"{c['domain']}/{c['subtopic']}" for c in C))
+    E = M.E
+    subtopic_keys = list(dict.fromkeys((c["domain"], c["subtopic"]) for c in C))
+    subs = [json.dumps(key, ensure_ascii=False) for key in subtopic_keys]
     S = len(subs)
-    sub_of_doc = np.array([subs.index(f"{c['domain']}/{c['subtopic']}") for c in C])
+    sub_of_doc = np.array([subtopic_keys.index((c["domain"], c["subtopic"])) for c in C])
     sub = sub_of_doc[doc]
-    doms = list(dict.fromkeys(s.split("/")[0] for s in subs))
-    dom_of_sub = np.array([doms.index(s.split("/")[0]) for s in subs])
+    doms = list(dict.fromkeys(domain for domain, _ in subtopic_keys))
+    dom_of_sub = np.array([doms.index(domain) for domain, _ in subtopic_keys])
+    if len(doms) < 2 or any((dom_of_sub == d).sum() < 2 for d in range(len(doms))):
+        raise ValueError(
+            "Subtopic analysis requires at least two domains and two subtopics per domain"
+        )
 
     def P_of(l, lab):
         Cn = np.stack(
@@ -66,8 +68,8 @@ def main(model_dir="models/olmoe"):
         ).astype(float)
         return Cn / Cn.sum(1, keepdims=True), Cn
 
-    rng = np.random.default_rng(0)
-    NP = 20
+    rng = np.random.default_rng(config.analysis.seed)
+    NP = config.analysis.permutations
 
     def perm_within_domain():
         p = sub_of_doc.copy()
@@ -204,18 +206,15 @@ def main(model_dir="models/olmoe"):
                         )
                     )
     dsp = pd.DataFrame(sp)
-    try:
-        from transformers import AutoTokenizer
-
-        T = AutoTokenizer.from_pretrained(model_dir, local_files_only=True)
+    if not dsp.empty:
         dsp["top_tokens"] = [
-            " | ".join(repr(T.decode([int(t)])) for t in s.split()) for s in dsp.top_token_ids
+            " | ".join(repr(M.tok.decode([int(t)])) for t in s.split()) for s in dsp.top_token_ids
         ]
-    except Exception as ex:
-        print("tok decode failed", ex)
     dsp.to_csv(f"{OUT}/subtopic_specialists.csv", index=False)
-    # do original domain specialists (from the 5-domain run) split by subtopic or stay shared?
-    orig = pd.read_csv("results/expert_domain_distribution.csv")
+    # Compare reference domain specialists with within-domain subtopic specialization.
+    orig = pd.read_csv(paths.tables / "expert_domain_distribution.csv")
+    if any(f"P({domain}|e)" not in orig for domain in doms):
+        raise ValueError("Subtopic domains must also be present in the domain corpus")
     rows = []
     for l in range(L):
         for dn in doms:
@@ -225,7 +224,7 @@ def main(model_dir="models/olmoe"):
             ss = np.where(dom_of_sub == doms.index(dn))[0]
             nullmax = max(
                 np.nanmax(si_within(Q, doms.index(dn))[0])
-                for Q in [P_of(l, pl)[0] for pl in perms_w[:5]]
+                for Q in [P_of(l, pl)[0] for pl in perms_w]
             )
             for _, r in o.iterrows():
                 e = int(r.expert)
@@ -246,7 +245,7 @@ def main(model_dir="models/olmoe"):
                 )
     pd.DataFrame(rows).to_csv(f"{OUT}/domain_specialists_by_subtopic.csv", index=False)
     # plots
-    fig, axs = plt.subplots(1, 2, figsize=(14, 5))
+    fig, axs = subplots(1, 2, figsize=(14, 5))
     for dn in doms:
         s = dl[dl.domain == dn]
         axs[0].plot(s.layer, s.within_domain_pair_jsd, marker="o", label=f"within {dn}")
@@ -279,23 +278,23 @@ def main(model_dir="models/olmoe"):
     axs[1].legend()
     axs[1].set_title("within-domain subtopic SI (dotted = shuffled)")
     fig.tight_layout()
-    fig.savefig("plots/subtopics/jsd_within_vs_between.png", dpi=130)
-    for l in (0, 7, 15):
+    fig.savefig(figures / "jsd_within_vs_between.png", dpi=130)
+    for l in config.analysis.selected_layers(L):
         P = Ps[l][0]
         lift = np.clip(ratio(P, P.mean(0), empty=1), 1 / 8, 8)
         order = np.lexsort((-lift.max(0), lift.argmax(0)))
-        fig, ax = plt.subplots(figsize=(16, 6))
+        fig, ax = subplots(figsize=(16, 6))
         im = ax.imshow(np.log2(lift[:, order]), aspect="auto", cmap="RdBu_r", vmin=-3, vmax=3)
         ax.set_yticks(range(S))
         ax.set_yticklabels(subs, fontsize=8)
         ax.set_xticks(range(E))
         ax.set_xticklabels(order, fontsize=6, rotation=90)
         ax.set_title(f"layer {l}: log2 lift of P(e|subtopic) over mean across subtopics")
-        plt.colorbar(im, ax=ax)
+        fig.colorbar(im, ax=ax)
         fig.tight_layout()
-        fig.savefig(f"plots/subtopics/subtopic_expert_heatmap_layer{l:02d}.png", dpi=130)
-    fig, ax = plt.subplots(figsize=(9, 8))
-    l = 15
+        fig.savefig(figures / f"subtopic_expert_heatmap_layer{l:02d}.png", dpi=130)
+    fig, ax = subplots(figsize=(9, 8))
+    l = L - 1
     P = Ps[l][0]
     J = np.array([[jsd(P[a], P[b]) for b in range(S)] for a in range(S)])
     im = ax.imshow(J, cmap="viridis")
@@ -303,8 +302,27 @@ def main(model_dir="models/olmoe"):
     ax.set_xticklabels(subs, rotation=90, fontsize=7)
     ax.set_yticks(range(S))
     ax.set_yticklabels(subs, fontsize=7)
-    ax.set_title("layer 15 pairwise JSD between subtopics [bits]")
-    plt.colorbar(im)
+    ax.set_title(f"layer {l} pairwise JSD between subtopics [bits]")
+    fig.colorbar(im, ax=ax)
     fig.tight_layout()
-    fig.savefig("plots/subtopics/subtopic_jsd_matrix_layer15.png", dpi=130)
-    print("ok")
+    fig.savefig(figures / f"subtopic_jsd_matrix_layer{l:02d}.png", dpi=130)
+    R.close()
+    return [
+        routing_path,
+        *[
+            OUT / f"{name}.csv"
+            for name in (
+                "layer_within_vs_between_jsd",
+                "subtopic_pair_jsd",
+                "expert_subtopic_distribution",
+                "subtopic_specialists",
+                "domain_specialists_by_subtopic",
+            )
+        ],
+        figures / "jsd_within_vs_between.png",
+        figures / f"subtopic_jsd_matrix_layer{L - 1:02d}.png",
+        *[
+            figures / f"subtopic_expert_heatmap_layer{layer:02d}.png"
+            for layer in config.analysis.selected_layers(L)
+        ],
+    ]

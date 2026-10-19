@@ -1,5 +1,5 @@
-"""Original pilot workflows, exposed through explicit main() functions.
+"""Configured experiment stages. Each run(config) returns the artifacts it produced.
 
-Paths within these workflows are relative to the CLI workspace. The engine is
-the reusable library API; these analyses retain the original pilot's schema.
+Use ExperimentRunner for provenance validation and dependency orchestration.
+All paths are explicit, and stages never change the working directory.
 """

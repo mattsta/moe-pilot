@@ -9,13 +9,14 @@ description = "CPU layer-streaming OLMoE research workflows and reproducible exp
 readme = "README.md"
 requires-python = ">=3.11,<3.15"
 dependencies = [
+    "filelock>=3.16,<5",
     "huggingface-hub>=0.28,<3",
     "matplotlib>=3.9,<4",
     "numpy>=2.0,<3",
     "pandas>=2.2,<4",
     "safetensors>=0.5,<1",
     "torch>=2.6,<3",
-    "transformers>=4.48,<6",
+    "transformers>=5.20,<6",
 ]
 
 [project.optional-dependencies]
@@ -31,7 +32,7 @@ dev = ["build>=1.2,<2", "pytest>=8.3,<10", "ruff>=0.11,<1"]
 packages = ["src/moe_pilot"]
 
 [tool.hatch.build.targets.sdist]
-include = ["src/", "tests/", "docs/", "README.md", "CONTRIBUTING.md", "pyproject.toml", "uv.lock", ".python-version"]
+include = ["src/", "tests/", "docs/", "configurations/", "README.md", "CONTRIBUTING.md", "pyproject.toml", "uv.lock", ".python-version"]
 
 [tool.uv.sources]
 torch = [{ index = "pytorch-cpu", marker = "sys_platform == 'linux'" }]

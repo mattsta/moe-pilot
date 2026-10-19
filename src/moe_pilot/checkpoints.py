@@ -40,7 +40,9 @@ class Checkpoints:
             if self.data.get("schema") != 1 or self.data.get("identity") != identity:
                 raise ValueError("Checkpoint inputs changed; use a new output directory")
         elif any(self.directory.glob("losses/*.npy")) or any(self.directory.glob("cache/*.npy")):
-            raise ValueError("Legacy checkpoints lack provenance; use a new output directory")
+            raise ValueError(
+                "Untracked checkpoint files lack provenance; use a new output directory"
+            )
         for name, mask in conditions.items():
             signature = hashlib.sha256(json.dumps(mask, sort_keys=True).encode()).hexdigest()
             previous = self.data["conditions"].get(name)

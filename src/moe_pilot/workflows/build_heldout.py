@@ -1,15 +1,19 @@
 """Build heldout pilot workflow."""
 
 
-def main(model_dir="models/olmoe"):
+def run(config):
     # Held-out eval texts: same sources as corpus.json, disjoint texts, different seed.
-    from datasets import load_dataset
-
-    from moe_pilot.artifacts import read_json, write_json
+    from moe_pilot.artifacts import load_corpus, write_json
     from moe_pilot.corpora import CorpusBuilder
+    from moe_pilot.datasets import DatasetLoader
+
+    loader = DatasetLoader(config)
+    load_dataset = loader.load
 
     builder = CorpusBuilder(
-        count=40, seed=123, exclude=(c["text"] for c in read_json("corpus.json"))
+        count=config.corpora.heldout_count,
+        seed=config.analysis.seed + 1,
+        exclude=(c["text"] for c in load_corpus(config.paths.data / "corpus.json")),
     )
     add = builder.add
 
@@ -39,6 +43,8 @@ def main(model_dir="models/olmoe"):
         [r["text"] for r in d if r["labels"] != "en"],
         "papluca/language-identification test non-English (disjoint)",
     )
-    write_json("heldout.json", builder.records)
-    write_json("heldout_sources.json", builder.sources)
-    print(builder.sources)
+    corpus = config.paths.data / "heldout.json"
+    sources = config.paths.data / "heldout_sources.json"
+    write_json(corpus, builder.records)
+    write_json(sources, {"groups": builder.sources, "datasets": loader.sources})
+    return [corpus, sources]

@@ -1,0 +1,46 @@
+schema_version = 1
+
+[paths]
+model = "../models/olmoe"
+data = "../data/pilot"
+output = "../runs/pilot"
+
+[model]
+repository = "allenai/OLMoE-1B-7B-0924"
+# Set the exact model commit SHA before running download-model.
+revision = ""
+
+[execution]
+threads = 8
+max_tokens = 64
+condition_group = 10
+
+[analysis]
+seed = 0
+permutations = 20
+bootstrap_samples = 2000
+probe_tokens_per_domain = 100
+layers = [0, 7, 15]
+
+[ablations]
+expert_counts = [1, 4, 8]
+control_seeds = 3
+control_candidates = 4000
+on_domain_candidates = 6000
+
+[corpora]
+analysis_count = 100
+heldout_count = 40
+subtopic_count = 60
+
+# To rebuild corpora, add immutable repository commit SHAs in this table.
+# Reusing the archived sampled JSON files does not require dataset downloads.
+[datasets]
+# "openai/openai_humaneval" = "40-character dataset commit SHA"
+# "EleutherAI/hendrycks_math" = "40-character dataset commit SHA"
+# "allenai/sciq" = "40-character dataset commit SHA"
+# "abisee/cnn_dailymail" = "40-character dataset commit SHA"
+# "papluca/language-identification" = "40-character dataset commit SHA"
+# "claudios/code_search_net" = "40-character dataset commit SHA"
+# "b-mc2/sql-create-context" = "40-character dataset commit SHA"
+# "cais/mmlu" = "40-character dataset commit SHA"

@@ -8,6 +8,7 @@ os.environ["MPLBACKEND"] = "Agg"
 import pytest
 import torch
 
+from moe_pilot.config import load_experiment
 from moe_pilot.engine import Engine
 from moe_pilot.smoke import tiny_model
 
@@ -25,3 +26,37 @@ def local_model(tmp_path):
     directory = tmp_path / "model"
     reference = tiny_model(directory)
     return reference, Engine(directory)
+
+
+@pytest.fixture
+def config_file(tmp_path):
+    directory = tmp_path / "configuration"
+    directory.mkdir()
+    filename = directory / "experiment.toml"
+    filename.write_text("""schema_version = 1
+[paths]
+model = "../model"
+data = "../data"
+output = "../output"
+[execution]
+threads = 2
+max_tokens = 32
+condition_group = 4
+[analysis]
+seed = 17
+layers = [0, 1]
+permutations = 3
+bootstrap_samples = 20
+probe_tokens_per_domain = 10
+[ablations]
+expert_counts = [1]
+control_seeds = 1
+control_candidates = 8
+on_domain_candidates = 8
+""")
+    return filename
+
+
+@pytest.fixture
+def experiment(config_file):
+    return load_experiment(config_file)

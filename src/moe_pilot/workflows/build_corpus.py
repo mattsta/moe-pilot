@@ -1,13 +1,15 @@
 """Build corpus pilot workflow."""
 
 
-def main(model_dir="models/olmoe"):
-    from datasets import load_dataset
-
+def run(config):
     from moe_pilot.artifacts import write_json
     from moe_pilot.corpora import CorpusBuilder
+    from moe_pilot.datasets import DatasetLoader
 
-    builder = CorpusBuilder(count=100, seed=0)
+    loader = DatasetLoader(config)
+    load_dataset = loader.load
+
+    builder = CorpusBuilder(count=config.corpora.analysis_count, seed=config.analysis.seed)
     add = builder.add
 
     d = load_dataset("openai/openai_humaneval", split="test")
@@ -37,6 +39,8 @@ def main(model_dir="models/olmoe"):
         [r["text"] for r in rows],
         "papluca/language-identification test, non-English (19 languages)",
     )
-    write_json("corpus.json", builder.records)
-    write_json("corpus_sources.json", builder.sources)
-    print(builder.sources)
+    corpus = config.paths.data / "corpus.json"
+    sources = config.paths.data / "corpus_sources.json"
+    write_json(corpus, builder.records)
+    write_json(sources, {"groups": builder.sources, "datasets": loader.sources})
+    return [corpus, sources]

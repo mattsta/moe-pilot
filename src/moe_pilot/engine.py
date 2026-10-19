@@ -8,6 +8,7 @@ import hashlib
 import json
 from dataclasses import dataclass
 from importlib.metadata import version
+from numbers import Integral
 from pathlib import Path
 
 import numpy as np
@@ -27,11 +28,17 @@ class Batch:
     T: int
 
     def __post_init__(self):
-        if self.T < 2:
+        if type(self.T) is not int or self.T < 2:
             raise ValueError("max_tokens must be at least 2 for next-token evaluation")
         self.ids = [list(document[: self.T]) for document in self.ids]
         if not self.ids or any(len(document) < 2 for document in self.ids):
             raise ValueError("Each batch must contain documents with at least two tokens")
+        if any(
+            not isinstance(token, Integral) or isinstance(token, bool)
+            for document in self.ids
+            for token in document
+        ):
+            raise ValueError("Token IDs must be integers")
         self.lens = np.array([len(document) for document in self.ids])
         self.N = int(self.lens.sum())
         self.tok = torch.tensor(np.concatenate(self.ids), dtype=torch.long)
@@ -50,7 +57,7 @@ class Engine:
     caller; constructing this library object does not change process settings.
     """
 
-    def __init__(self, model_dir="models/olmoe"):
+    def __init__(self, model_dir):
         self.store = ModelStore(model_dir)
         self.cfg = self.store.config
         cfg = self.cfg
@@ -61,6 +68,8 @@ class Engine:
         if cfg.hidden_act != "silu":
             raise ValueError("Engine supports the SiLU expert activation only")
         self.L, self.E, self.K = cfg.num_hidden_layers, cfg.num_experts, cfg.num_experts_per_tok
+        if self.L < 1 or not 1 <= self.K <= self.E:
+            raise ValueError("Model must have positive depth and a valid expert/top-k count")
         self.H, self.NH = cfg.hidden_size, cfg.num_attention_heads
         self.HD = self.H // self.NH
         if self.H % self.NH or self.HD % 2:
@@ -216,7 +225,7 @@ class Engine:
                     raise ValueError("Mask must leave at least top-k experts available")
 
     @torch.inference_mode()
-    def run(self, batch, conditions, group=12, log_routing=False, verbose=True):
+    def run(self, batch, conditions, group=12, log_routing=False, verbose=True, on_layer=None):
         """Return per-token losses, valid-target mask, and optional baseline routing.
 
         Each condition maps a name to ``{layer_index: [masked_expert_ids]}``.
@@ -233,7 +242,13 @@ class Engine:
             if layer in starts:
                 caches[layer] = hidden.clone()
             weights = self.load_layer(layer)
-            hidden = self.moe(self.attn(hidden, weights, batch), weights, log=routing)
+            attended = self.attn(hidden, weights, batch)
+            if on_layer is not None:
+                on_layer(
+                    layer, self.rms(attended, weights["post_attention_layernorm.weight"]), weights
+                )
+            hidden = self.moe(attended, weights, log=routing)
+            del attended
             del weights
         results["base"], valid = self.token_losses(hidden, batch, norm, head)
         del hidden
@@ -297,6 +312,10 @@ class Engine:
                     "dependencies": {
                         name: version(name)
                         for name in ("torch", "transformers", "numpy", "safetensors")
+                    },
+                    "runtime": {
+                        "threads": torch.get_num_threads(),
+                        "matmul_precision": torch.get_float32_matmul_precision(),
                     },
                 },
                 sort_keys=True,

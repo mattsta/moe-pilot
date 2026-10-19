@@ -1,16 +1,17 @@
 """Build subtopics pilot workflow."""
 
 
-def main(model_dir="models/olmoe"):
-    from pathlib import Path
-
-    Path("results/subtopics").mkdir(parents=True, exist_ok=True)
-    from datasets import concatenate_datasets, load_dataset
+def run(config):
+    from datasets import concatenate_datasets
 
     from moe_pilot.artifacts import write_json
     from moe_pilot.corpora import CorpusBuilder
+    from moe_pilot.datasets import DatasetLoader
 
-    builder = CorpusBuilder(count=60, seed=7)
+    loader = DatasetLoader(config)
+    load_dataset = loader.load
+
+    builder = CorpusBuilder(count=config.corpora.subtopic_count, seed=config.analysis.seed + 2)
 
     def add(dom, sub, texts, source, minlen=100):
         builder.add(dom, texts, source, subtopic=sub, min_length=minlen)
@@ -67,5 +68,8 @@ def main(model_dir="models/olmoe"):
             f"papluca/language-identification test labels=={lang}",
             minlen=60 if lang != "zh" else 30,
         )
-    write_json("subtopic_corpus.json", builder.records)
-    write_json("results/subtopics/corpus_sources.json", builder.sources)
+    corpus = config.paths.data / "subtopic_corpus.json"
+    sources = config.paths.data / "subtopic_sources.json"
+    write_json(corpus, builder.records)
+    write_json(sources, {"groups": builder.sources, "datasets": loader.sources})
+    return [corpus, sources]

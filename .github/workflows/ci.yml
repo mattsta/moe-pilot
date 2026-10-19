@@ -34,6 +34,6 @@ jobs:
       - run: uv sync --locked --all-extras
       - run: uv run --locked ruff check .
       - run: uv run --locked ruff format --check .
-      - run: uv run --locked pytest
-      - run: uv run --locked moe-pilot --workspace smoke-output smoke
+      - run: uv run --locked pytest -W error
+      - run: uv run --locked moe-pilot smoke --output smoke-output/verification.json
       - run: uv build

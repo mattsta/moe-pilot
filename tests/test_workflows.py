@@ -2,7 +2,9 @@
 
 import json
 import sys
+from dataclasses import replace
 from types import SimpleNamespace
+from unittest.mock import patch
 
 import numpy as np
 import pandas as pd
@@ -14,13 +16,17 @@ from transformers import PreTrainedTokenizerFast
 
 from moe_pilot.artifacts import read_json, write_json
 from moe_pilot.cli import main
+from moe_pilot.config import DatasetRevision, load_experiment
+from moe_pilot.experiment import ExperimentRunner
+from moe_pilot.interventions import Conditions
 from moe_pilot.smoke import tiny_model
 
 
 @pytest.fixture
-def research_workspace(tmp_path):
-    model_dir = tmp_path / "models/olmoe"
-    tiny_model(model_dir, layers=16, experts=64)
+def research_experiment(config_file):
+    config = load_experiment(config_file)
+    model_dir = config.paths.model
+    tiny_model(model_dir)
     vocabulary = {"[UNK]": 0, **{f"token{i}": i for i in range(1, 32)}}
     tokenizer = Tokenizer(WordLevel(vocabulary, unk_token="[UNK]"))
     tokenizer.pre_tokenizer = Whitespace()
@@ -31,68 +37,86 @@ def research_workspace(tmp_path):
     corpus = [
         {"domain": domain, "text": " ".join(f"token{(i + offset) % 31 + 1}" for i in range(48))}
         for domain in domains
-        for offset in range(3)
+        for offset in range(4)
     ]
-    write_json(tmp_path / "corpus.json", corpus)
-    write_json(tmp_path / "heldout.json", corpus)
+    write_json(config.paths.data / "corpus.json", corpus)
     write_json(
-        tmp_path / "subtopic_corpus.json",
+        config.paths.data / "heldout.json",
+        [{**record, "text": "token31 " + record["text"] + " heldout"} for record in corpus],
+    )
+    write_json(
+        config.paths.data / "subtopic_corpus.json",
         [
             {**document, "subtopic": f"topic{index % 2}"}
             for index, document in enumerate(corpus)
             if document["domain"] != "prose"
         ],
     )
-    return tmp_path
+    return config
 
 
-def test_forward_analysis_ablations_and_subtopic_reports(research_workspace):
-    root = research_workspace
-    arguments = ["--workspace", str(root), "--threads", "2"]
-    for command in ("forward", "analyze", "activation-extra"):
-        assert main([*arguments, command]) == 0
-    routing = np.load(root / "routing.npz")
-    assert routing["topi"].shape == (16, 720, 2)
-    assert pd.read_csv(root / "results/layer_domain_metrics.csv").shape[0] == 80
-    assert pd.read_csv(root / "results/activation_orthogonality_extra.csv").shape[0] == 16
-    assert (root / "plots/jsd_by_layer.png").stat().st_size > 1000
-
-    assert main([*arguments, "build-conditions", "--control-candidates", "16"]) == 0
-    generated = read_json(root / "results/ablations/conditions.json")
-    assert len(generated) > 20
-    for mask in generated.values():
-        assert all(0 <= int(layer) < 16 for layer in mask)
-        assert all(0 <= expert < 64 for experts in mask.values() for expert in experts)
-
-    # A small valid condition family exercises the complete held-out reporting
-    # path without running the original hundreds-of-conditions experiment.
-    directory = root / "results/ablations"
-    names = ["single_L0_E21", *[f"single_L0_E21_rand{i}" for i in range(3)]]
-    write_json(directory / "conditions.json", {n: {"0": [21 + i]} for i, n in enumerate(names)})
-    pd.DataFrame(
-        [{"name": name, "aliases": "[]", "control": index > 0} for index, name in enumerate(names)]
-    ).to_csv(directory / "conditions.csv", index=False)
-    for command in ("ablate", "analyze-ablations", "ondomain-controls", "analyze-ablations"):
-        assert main([*arguments, command]) == 0
-    first = pd.read_csv(directory / "delta_loss_long.csv")
-    assert len(first) == 20
-    assert main([*arguments, "ablate"]) == 0
-    pd.testing.assert_frame_equal(first, pd.read_csv(directory / "delta_loss_long.csv"))
-    assert len(pd.read_csv(directory / "ablation_summary.csv")) == 1
-    assert len(pd.read_csv(directory / "ablation_vs_ondomain_mass_controls.csv")) == 1
-    assert main([*arguments, "subtopics"]) == 0
-    assert len(pd.read_csv(root / "results/subtopics/layer_within_vs_between_jsd.csv")) == 64
-    assert (root / "plots/subtopics/jsd_within_vs_between.png").stat().st_size > 1000
+def test_complete_configured_pipeline_from_an_unrelated_directory(
+    research_experiment, config_file, tmp_path, monkeypatch
+):
+    config = research_experiment
+    unrelated = tmp_path / "unrelated"
+    unrelated.mkdir()
+    monkeypatch.chdir(unrelated)
+    with patch("os.chdir", side_effect=AssertionError("Directory change forbidden")):
+        assert main(["--config", str(config_file), "run"]) == 0
+    assert not list(unrelated.iterdir())
+    paths = config.paths
+    with np.load(paths.routing) as routing:
+        assert routing["topi"].shape == (2, 640, 2)
+        assert np.isfinite(routing["loss"]).all()
+    assert len(pd.read_csv(paths.tables / "layer_domain_metrics.csv")) == 10
+    assert len(pd.read_csv(paths.tables / "activation_orthogonality.csv")) == 2
+    assert (paths.figures / "jsd_by_layer.png").stat().st_size > 1000
+    conditions = Conditions.load(paths.ablations / "conditions.json")
+    assert len(conditions.items) == 45
+    assert {item.family for item in conditions.items} == {
+        "specialist",
+        "global-control",
+        "on-domain-control",
+    }
+    assert len(pd.read_csv(paths.tables / "ablations/delta_loss.csv")) == 225
+    assert len(pd.read_csv(paths.tables / "ablations/ablation_summary.csv")) == 30
+    assert len(pd.read_csv(paths.tables / "subtopics/layer_within_vs_between_jsd.csv")) == 8
+    assert (paths.figures / "subtopics/jsd_within_vs_between.png").stat().st_size > 1000
+    manifest = read_json(paths.output / "experiment.json")
+    assert all(record["status"] == "complete" for record in manifest["steps"].values())
+    # A second pipeline call should reuse only fully validated artifacts.
+    before = paths.routing.stat().st_mtime_ns
+    ExperimentRunner(config).run_pipeline()
+    assert paths.routing.stat().st_mtime_ns == before
 
 
-def test_corpus_builders_with_stubbed_sources(tmp_path, monkeypatch):
+def test_corpus_builders_with_stubbed_sources(experiment, monkeypatch):
     from moe_pilot.workflows import build_corpus, build_heldout, build_subtopics
+
+    experiment = replace(
+        experiment,
+        datasets=tuple(
+            DatasetRevision(name, "a" * 40)
+            for name in (
+                "openai/openai_humaneval",
+                "EleutherAI/hendrycks_math",
+                "allenai/sciq",
+                "abisee/cnn_dailymail",
+                "papluca/language-identification",
+                "claudios/code_search_net",
+                "b-mc2/sql-create-context",
+                "cais/mmlu",
+            )
+        ),
+    )
 
     class Rows(list):
         def select(self, indices):
             return Rows(self[i] for i in indices)
 
     def load_dataset(name, *args, **kwargs):
+        assert kwargs["revision"] == "a" * 40
         labels = ["de", "fr", "es", "zh", "ru", "ar", "hi"] if "language" in name else ["en"]
         return Rows(
             {
@@ -124,14 +148,15 @@ def test_corpus_builders_with_stubbed_sources(tmp_path, monkeypatch):
             concatenate_datasets=lambda groups: Rows(row for group in groups for row in group),
         ),
     )
-    monkeypatch.chdir(tmp_path)
-    build_corpus.main()
-    build_heldout.main()
-    build_subtopics.main()
-    corpus, heldout = read_json("corpus.json"), read_json("heldout.json")
+    build_corpus.run(experiment)
+    build_heldout.run(experiment)
+    build_subtopics.run(experiment)
+    data = experiment.paths.data
+    corpus, heldout = read_json(data / "corpus.json"), read_json(data / "heldout.json")
     assert len(corpus) == 500
     assert len(heldout) == 200
     assert not {r["text"] for r in corpus} & {r["text"] for r in heldout}
-    assert len(read_json("subtopic_corpus.json")) == 19 * 60
-    sources = json.loads((tmp_path / "results/subtopics/corpus_sources.json").read_text())
-    assert all(source["n"] == 60 for source in sources.values())
+    assert len(read_json(data / "subtopic_corpus.json")) == 19 * 60
+    sources = json.loads((data / "subtopic_sources.json").read_text())
+    assert all(source["n"] == 60 for source in sources["groups"].values())
+    assert all(source["revision"] == "a" * 40 for source in sources["datasets"])

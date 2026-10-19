@@ -19,6 +19,8 @@ def matched_experts(mass, selected, seed, *, random_seed, exclude=(), candidates
     """
     if candidates < 1:
         raise ValueError("control candidates must be positive")
+    if not selected:
+        raise ValueError("At least one selected expert is required")
     forbidden = set(selected) | set(exclude)
     pool = [expert for expert in range(len(mass)) if expert not in forbidden]
     if len(pool) < len(selected):
@@ -26,6 +28,8 @@ def matched_experts(mass, selected, seed, *, random_seed, exclude=(), candidates
     target = mass[list(selected)].sum()
     if len(selected) == 1:
         ordered = sorted(pool, key=lambda expert: abs(mass[expert] - target))
+        if not 0 <= seed < len(ordered):
+            raise ValueError("control_seeds exceeds the available singleton control pool")
         return [ordered[seed]]
     random = np.random.default_rng(random_seed)
     subsets = [random.choice(pool, len(selected), replace=False) for _ in range(candidates)]

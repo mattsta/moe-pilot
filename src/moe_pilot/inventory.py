@@ -1,32 +1,31 @@
-"""Read-only inventory of research inputs and archived CSV outputs."""
+"""Read-only experiment inspection without model loading or directory creation."""
 
 import csv
-import json
-from pathlib import Path
+
+from moe_pilot.artifacts import load_corpus, read_json
 
 
-def inspect_workspace(workspace, model_dir=None):
-    workspace = Path(workspace)
-    model_dir = Path(model_dir) if model_dir else workspace / "models/olmoe"
+def inspect_experiment(config):
+    paths = config.paths
     lines = [
-        f"Workspace: {workspace}",
-        f"Model config: {'present' if (model_dir / 'config.json').is_file() else 'missing'}",
+        f"Data: {paths.data}",
+        f"Model: {paths.model}",
+        f"Output: {paths.output}",
+        f"Model config: {'present' if (paths.model / 'config.json').is_file() else 'missing'}",
     ]
     for name in ("corpus.json", "heldout.json", "subtopic_corpus.json"):
-        path = workspace / name
-        if path.is_file():
-            records = json.loads(path.read_text())
-            lines.append(f"{name}: {len(records)} documents")
-        else:
-            lines.append(f"{name}: missing")
-    for name in ("routing.npz", "ortho_raw.npz", "probe_moe_inputs.npy"):
-        lines.append(f"{name}: {'present' if (workspace / name).is_file() else 'missing'}")
-    tables = sorted((workspace / "results").rglob("*.csv"))
-    lines.append(f"Result tables: {len(tables)} (historical outputs; not revalidated by inventory)")
-    for path in tables:
+        path = paths.data / name
+        lines.append(f"{name}: {len(load_corpus(path)) if path.is_file() else 'missing'}")
+    for path in (paths.routing, paths.orthogonality):
+        lines.append(f"{path.name}: {'present' if path.is_file() else 'missing'}")
+    manifest = paths.output / "experiment.json"
+    if manifest.exists():
+        for step, record in read_json(manifest).get("steps", {}).items():
+            lines.append(f"Step {step}: {record['status']}")
+    for path in sorted(paths.tables.rglob("*.csv")):
         with path.open(newline="") as stream:
             reader = csv.reader(stream)
             columns = next(reader, [])
             rows = sum(1 for _ in reader)
-        lines.append(f"  {path.relative_to(workspace)}: {rows} rows, {len(columns)} columns")
+        lines.append(f"{path.relative_to(paths.output)}: {rows} rows, {len(columns)} columns")
     return "\n".join(lines)

@@ -1,28 +1,24 @@
-"""Analyze pilot workflow."""
+"""Domain specialization and geometry reports from explicit experiment artifacts."""
 
 
-def main(model_dir="models/olmoe"):
+def run(config):
     import itertools
     import keyword
-    import os
     import re
 
-    import matplotlib
     import numpy as np
     import pandas as pd
-
-    matplotlib.use("Agg")
-    import matplotlib.pyplot as plt
     from transformers import AutoTokenizer
 
+    from moe_pilot.metrics import correlation_or_nan, mean_or_nan, ratio
     from moe_pilot.metrics import entropy_bits as H2
     from moe_pilot.metrics import jensen_shannon as jsd
-    from moe_pilot.metrics import ratio
+    from moe_pilot.plotting import subplots
 
-    os.makedirs("results", exist_ok=True)
-    os.makedirs("plots", exist_ok=True)
-    R = np.load("routing.npz")
-    O = np.load("ortho_raw.npz")
+    paths = config.paths
+    paths.prepare_outputs()
+    R = np.load(paths.routing)
+    O = np.load(paths.orthogonality)
     topi, topw, probs, tok_ids, doc, dom = (
         R["topi"].astype(int),
         R["topw"].astype(np.float32),
@@ -35,7 +31,7 @@ def main(model_dir="models/olmoe"):
     ND = len(doms)
     L, N, K = topi.shape
     E = probs.shape[2]
-    tok = AutoTokenizer.from_pretrained(model_dir, local_files_only=True)
+    tok = AutoTokenizer.from_pretrained(paths.model, local_files_only=True)
 
     def counts(l, dlab):
         C = np.zeros((ND, E))
@@ -43,10 +39,10 @@ def main(model_dir="models/olmoe"):
             C[d] = np.bincount(topi[l][dlab == d].ravel(), minlength=E)
         return C
 
-    rng = np.random.default_rng(0)
+    rng = np.random.default_rng(config.analysis.seed)
     ndoc = doc.max() + 1
     docdom = np.array([dom[doc == i][0] for i in range(ndoc)])
-    NPERM = 20
+    NPERM = config.analysis.permutations
     perm_labels = [rng.permutation(docdom)[doc] for _ in range(NPERM)]
     rows = []
     pair_rows = []
@@ -74,7 +70,7 @@ def main(model_dir="models/olmoe"):
             )
         null_j = np.array(null_j)
         ent_tok = H2(probs[l])  # per token full-router entropy (bits)
-        top8 = [set(np.argsort(-Pd[d])[:8]) for d in range(ND)]
+        topk = [set(np.argsort(-Pd[d])[:K]) for d in range(ND)]
         for d in range(ND):
             m = dom == d
             rows.append(
@@ -87,11 +83,11 @@ def main(model_dir="models/olmoe"):
                     usage_entropy_bits=H2(Pd[d]),
                     effective_experts=2 ** H2(Pd[d]),
                     token_router_entropy_bits=ent_tok[m].mean(),
-                    top8_router_mass=topw[l][m].sum(1).mean(),
+                    topk_router_mass=topw[l][m].sum(1).mean(),
                     isolation_expected_share=np.nansum(Pd[d] * Pbal[d]),
                     exclusive_mass_share_ge_0p5=Pd[d][Pbal[d] >= 0.5].sum(),
                     n_experts_share_ge_0p5=int((Pbal[d] >= 0.5).sum()),
-                    top8_experts=" ".join(map(str, np.argsort(-Pd[d])[:8])),
+                    topk_experts=" ".join(map(str, np.argsort(-Pd[d])[:K])),
                 )
             )
         for a, b in itertools.combinations(range(ND), 2):
@@ -102,8 +98,8 @@ def main(model_dir="models/olmoe"):
                     dom_b=doms[b],
                     jsd=jsd(Pd[a], Pd[b]),
                     jsd_null_mean_allpairs=np.mean(null_pair),
-                    top8_jaccard=len(top8[a] & top8[b]) / len(top8[a] | top8[b]),
-                    top8_overlap=len(top8[a] & top8[b]),
+                    topk_jaccard=len(topk[a] & topk[b]) / len(topk[a] | topk[b]),
+                    topk_overlap=len(topk[a] & topk[b]),
                 )
             )
         SI = 1 - H2(Pbal.T) / np.log2(ND)
@@ -128,13 +124,14 @@ def main(model_dir="models/olmoe"):
     dl = pd.DataFrame(rows)
     dp = pd.DataFrame(pair_rows)
     de = pd.DataFrame(exp_rows)
-    dl.to_csv("results/layer_domain_metrics.csv", index=False)
-    dp.to_csv("results/domain_pair_metrics.csv", index=False)
-    de.to_csv("results/expert_domain_distribution.csv", index=False)
+    dl.to_csv(paths.tables / "layer_domain_metrics.csv", index=False)
+    dp.to_csv(paths.tables / "domain_pair_metrics.csv", index=False)
+    de.to_csv(paths.tables / "expert_domain_distribution.csv", index=False)
+    (paths.tables / "counts").mkdir(parents=True, exist_ok=True)
     for l in range(L):
         pd.DataFrame(Cs[l], index=doms).to_csv(
-            f"results/counts/layer{l:02d}_domain_x_expert_counts.csv"
-        ) if os.makedirs("results/counts", exist_ok=True) is None else None
+            paths.tables / "counts" / f"layer{l:02d}_domain_x_expert_counts.csv"
+        )
     # ---------- orthogonality
     orows = []
     hist = {}
@@ -182,9 +179,9 @@ def main(model_dir="models/olmoe"):
                 if kk != jj:
                     np.add.at(co, (topi[l][:, kk], topi[l][:, jj]), 1)
         s = O[f"a_{l}_real_signed"][iu]
-        orows[-2]["corr_actcos_vs_coroute"] = np.corrcoef(s, co[iu])[0, 1]
+        orows[-2]["corr_actcos_vs_coroute"] = correlation_or_nan(s, co[iu])
     do = pd.DataFrame(orows)
-    do.to_csv("results/orthogonality_by_layer.csv", index=False)
+    do.to_csv(paths.tables / "orthogonality_by_layer.csv", index=False)
     # ---------- token-level / specialists
     cats = [
         "newline/space",
@@ -274,9 +271,9 @@ def main(model_dir="models/olmoe"):
                     )
                 )
     ds = pd.DataFrame(spec_rows)
-    ds.to_csv("results/specialists_by_layer_domain.csv", index=False)
+    ds.to_csv(paths.tables / "specialists_by_layer_domain.csv", index=False)
     pd.DataFrame([dict(category=c, corpus_share=base_cat[i]) for i, c in enumerate(cats)]).to_csv(
-        "results/token_category_baseline.csv", index=False
+        paths.tables / "token_category_baseline.csv", index=False
     )
     # token-identity vs context: Jaccard of top-8 sets for same token type within domain / across domains / random pairs
     jrows = []
@@ -301,16 +298,16 @@ def main(model_dir="models/olmoe"):
         jrows.append(
             dict(
                 layer=l,
-                same_token_same_domain=np.mean(same_in),
-                same_token_cross_domain=np.mean(same_x),
+                same_token_same_domain=mean_or_nan(same_in),
+                same_token_cross_domain=mean_or_nan(same_x),
                 random_token_pairs=np.mean(rand),
                 n_types=len(types),
             )
         )
     dj = pd.DataFrame(jrows)
-    dj.to_csv("results/token_vs_context_routing_jaccard.csv", index=False)
+    dj.to_csv(paths.tables / "token_vs_context_routing_jaccard.csv", index=False)
     # ---------- plots
-    fig, ax = plt.subplots(figsize=(8, 5))
+    fig, ax = subplots(figsize=(8, 5))
     for d in doms:
         s = dl[dl.domain == d]
         ax.plot(s.layer, s.jsd_vs_overall, marker="o", label=d)
@@ -322,15 +319,15 @@ def main(model_dir="models/olmoe"):
     )
     ax.set_xlabel("layer")
     ax.set_ylabel("JSD(P(e|domain) || P(e)) [bits]")
-    ax.set_title("OLMoE-1B-7B-0924: routing divergence by layer")
+    ax.set_title("Routing divergence by layer")
     ax.legend()
     fig.tight_layout()
-    fig.savefig("plots/jsd_by_layer.png", dpi=130)
-    for l in dict.fromkeys((0, min(7, L - 1), L - 1)):
+    fig.savefig(paths.figures / "jsd_by_layer.png", dpi=130)
+    for l in config.analysis.selected_layers(L):
         Pd = Cs[l] / Cs[l].sum(1, keepdims=True)
         lift = ratio(Pd, Pd.mean(0), empty=1)
         order = np.lexsort((-lift.max(0), lift.argmax(0)))
-        fig, ax = plt.subplots(figsize=(16, 3.6))
+        fig, ax = subplots(figsize=(16, 3.6))
         im = ax.imshow(
             np.log2(np.clip(lift[:, order], 1 / 8, 8)),
             aspect="auto",
@@ -344,10 +341,10 @@ def main(model_dir="models/olmoe"):
         ax.set_xticklabels(order, fontsize=6, rotation=90)
         ax.set_xlabel("expert id (sorted by preferred domain)")
         ax.set_title(f"layer {l}: log2 lift = log2[P(e|domain)/mean_d P(e|d)]")
-        plt.colorbar(im, ax=ax)
+        fig.colorbar(im, ax=ax)
         fig.tight_layout()
-        fig.savefig(f"plots/expert_domain_heatmap_layer{l:02d}.png", dpi=130)
-    fig, axs = plt.subplots(1, 3, figsize=(16, 4.5))
+        fig.savefig(paths.figures / f"expert_domain_heatmap_layer{l:02d}.png", dpi=130)
+    fig, axs = subplots(1, 3, figsize=(16, 4.5))
     for ax, nm in zip(axs[:2], ("down", "up"), strict=True):
         r = np.concatenate(hist[("w", nm, "real")])
         b = np.concatenate(hist[("w", nm, "random")])
@@ -366,8 +363,8 @@ def main(model_dir="models/olmoe"):
     axs[2].legend()
     axs[2].set_yscale("log")
     fig.tight_layout()
-    fig.savefig("plots/orthogonality_hist.png", dpi=130)
-    fig, ax = plt.subplots(figsize=(8, 4.5))
+    fig.savefig(paths.figures / "orthogonality_hist.png", dpi=130)
+    fig, ax = subplots(figsize=(8, 4.5))
     a = do[do.space == "activation"]
     for k in ("real", "random"):
         s = a[a.kind == k]
@@ -378,15 +375,47 @@ def main(model_dir="models/olmoe"):
     ax.set_title("activation-space expert-output cosine by layer")
     ax.legend()
     fig.tight_layout()
-    fig.savefig("plots/activation_cos_by_layer.png", dpi=130)
-    fig, ax = plt.subplots(figsize=(8, 4.5))
+    fig.savefig(paths.figures / "activation_cos_by_layer.png", dpi=130)
+    fig, ax = subplots(figsize=(8, 4.5))
     for d in doms:
         s = dl[dl.domain == d]
         ax.plot(s.layer, s.token_router_entropy_bits, marker="o", label=d)
-    ax.axhline(6, color="k", ls=":", label="uniform (6 bits)")
+    ax.axhline(np.log2(E), color="k", ls=":", label=f"uniform ({np.log2(E):.2f} bits)")
     ax.set_xlabel("layer")
     ax.set_ylabel("per-token router entropy [bits]")
     ax.legend()
     fig.tight_layout()
-    fig.savefig("plots/router_entropy_by_layer.png", dpi=130)
-    print("ok")
+    fig.savefig(paths.figures / "router_entropy_by_layer.png", dpi=130)
+    R.close()
+    O.close()
+    return (
+        [
+            paths.tables / f"{name}.csv"
+            for name in (
+                "layer_domain_metrics",
+                "domain_pair_metrics",
+                "expert_domain_distribution",
+                "orthogonality_by_layer",
+                "specialists_by_layer_domain",
+                "token_category_baseline",
+                "token_vs_context_routing_jaccard",
+            )
+        ]
+        + [
+            paths.tables / "counts" / f"layer{layer:02d}_domain_x_expert_counts.csv"
+            for layer in range(L)
+        ]
+        + [
+            paths.figures / f"{name}.png"
+            for name in (
+                "jsd_by_layer",
+                "orthogonality_hist",
+                "activation_cos_by_layer",
+                "router_entropy_by_layer",
+            )
+        ]
+        + [
+            paths.figures / f"expert_domain_heatmap_layer{layer:02d}.png"
+            for layer in config.analysis.selected_layers(L)
+        ]
+    )

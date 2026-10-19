@@ -17,3 +17,13 @@ def ratio(numerator, denominator, *, empty=np.nan):
     numerator, denominator = np.broadcast_arrays(numerator, denominator)
     output = np.full(numerator.shape, empty, dtype=float)
     return np.divide(numerator, denominator, out=output, where=denominator != 0)
+
+
+def mean_or_nan(values):
+    return float(np.mean(values)) if len(values) else np.nan
+
+
+def correlation_or_nan(first, second):
+    if np.std(first) == 0 or np.std(second) == 0:
+        return np.nan
+    return float(np.corrcoef(first, second)[0, 1])
