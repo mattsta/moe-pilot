@@ -58,3 +58,10 @@ Add accelerator tests for new operations; tests skip only hardware absent from
 the host and fail when an advertised backend cannot execute required kernels.
 Use `--extra rocm` consistently for AMD installs, or `--extra cpu` for optional
 CPU-only Linux installs. Do not use `--all-extras`: those wheel profiles conflict.
+
+Treat local hardware as a shared workstation. Keep the resource policy in every
+engine workflow, use streaming weights and conservative batches by default,
+and reject oversized work before allocating model tensors. Release checks use
+tiny offline fixtures, never full-model CPU comparisons or research sweeps.
+Benchmarks measure requested devices only. Do not raise memory/thread budgets
+or retain full-model caches just because the host exposes more capacity.

@@ -37,10 +37,14 @@ model layers. Explicit layer indices are validated against the actual model.
 | `experiment.py`               | Stage graph, writer lock, manifests, reuse/invalidation  |
 | `engine.py`                   | Device-aware attention, expert routing, and token losses |
 | `devices.py`                  | Backend selection, capability probes, host array transfer |
+| `resources.py`                | Shared-host admission checks and per-process allocator limits |
 | `model.py`                    | Local configuration and safetensors tensor access        |
 | `checkpoints.py`              | Atomic arrays and inference resume identities            |
 | `probes.py`                   | Read-only geometry observer of the shared engine         |
 | `benchmark.py`                | Repeated synchronized engine measurements and parity checks |
+| `observations.py`             | Document-level routing, norms, features, and target losses |
+| `acquisition.py`, `catalog.py` | Immutable local checkpoints and declared model lineages |
+| `publication.py`              | Evidence validation and generated local research reports |
 | `plotting.py`                 | Headless figures without process-wide plotting state     |
 | `interventions.py`            | Versioned, validated specialist/control metadata         |
 | `perturbations.py`            | Immutable mode, strength, expert mask, and donor semantics |
@@ -86,6 +90,26 @@ hidden states are saved on the host and restored to the selected compute device.
 Geometry uses a private host RNG and transfers random tensors to that device;
 it does not depend on MPS supporting `torch.Generator`.
 
+`execution.weight_cache` is `stream` by default. The explicit `resident` policy
+caches tensors lazily on the compute device for repeated passes. It retains the
+same float32 values and arithmetic, requires adequate memory, and records its
+policy in configuration/checkpoint identities. Embedding rows are gathered on
+the host, so the full embedding table is not cached. An engine rejects changed
+model shards or configuration after construction. A failed allocation remains
+an error; the engine does not silently change its cache or device policy.
+
+`ResourcePolicy` admits estimates before loading weights, preserves free host
+memory, limits this process's accelerator allocator, and rechecks between
+layers. Engine calls, explicit reference verification, and benchmarks share a
+per-user compute lease. Budget failures stop execution without switching to
+CPU. See the [resource policy](runbook.md#shared-workstation-resource-policy).
+
+`Batch.limit` preserves the requested token cap while `Batch.T` is the actual
+longest retained document. Padding uses the latter to avoid allocating context
+windows larger than the observations require. Checkpoints retain both values.
+Study observations can also use `execution.microbatch_documents`, with fixed
+document/answer mapping and deterministic probe samples across batch sizes.
+
 Backend, concrete device, device name, platform, CUDA/HIP build versions, and
 float32 precision are included in runtime identity. Stage records also preserve
 rejected candidates and the requested policy. Moving from CPU to MPS/CUDA/ROCm,
@@ -119,8 +143,9 @@ immutable downloaded revisions and preserve the model snapshot for research.
 
 Routing and geometry share `Engine.run`; an `OrthogonalityProbe` observes the
 same per-layer expert inputs. It has a private RNG and does not replace the
-engine's attention/router computations. Full router probabilities and selected
-weights are stored in float16; losses and computation use float32.
+engine's attention/router computations. New routing probabilities and selected
+weights retain float32 precision. The frozen reconstruction used its recorded
+float16 artifact schema; its original source remains with the run.
 
 ## Interventions and statistics
 

@@ -44,8 +44,10 @@ with mocks and real-device integration tests are provided, but actual CUDA/ROCm
 kernel execution is not claimed by this local record.
 
 Performance is measured separately from correctness. The reusable benchmark
-compares identical inputs across synchronized devices, checks every timed loss
-against CPU, and records all elapsed samples. The [local performance report](performance.md)
+measures only requested devices and records all elapsed samples. Every timed
+loss must agree with the first requested backend's warmup; single-device runs
+check repeat consistency, not independent parity. CPU benchmarking is explicit
+and is not a release requirement. The [local performance report](performance.md)
 covers synthetic baseline, geometry, and ablation workloads across four batch
 sizes; it makes no full-model or full-pipeline speedup claim.
 
@@ -59,8 +61,8 @@ Local checks passed on 2026-10-19:
 | --------------------------------------------- | ---------------------------------------------------- |
 | Locked uv synchronization                     | Passed                                               |
 | Ruff lint and formatting                      | Passed                                               |
-| `pytest -q -W error`                          | 154 passed; 2 absent CUDA/ROCm hardware tests skipped; no warnings |
-| CPU/MPS performance measurement               | 24 cases, 7 timed repeats each; numerical parity passed |
+| `pytest -q -W error`                          | 178 passed; 2 absent CUDA/ROCm hardware tests skipped; no warnings |
+| Historical CPU/MPS performance measurement    | 24 cases, 7 timed repeats each; retained from the original conversion; not repeated for release |
 | Offline CLI smoke                             | CPU and real MPS passed against CPU/Hugging Face |
 | Configured read-only inventory                | Passed without creating input/output directories     |
 | Wheel and source distribution                 | Built; new modules and sample configuration verified |
@@ -79,3 +81,12 @@ The full reconstruction has completed every configured inference/report stage
 on MPS. Its [published analysis](../research/reconstruction-0924/analysis.md)
 and [evidence inventory](../research/reconstruction-0924/evidence.json) retain
 the validated source/input/output identities, tables, figures, and study limits.
+
+Resource regression tests reject oversized model/reference estimates before
+weight loading, stop on host pressure and job-budget violations, verify the
+per-process MPS allocator limit, and prevent implicit CPU reference engines in
+benchmarks. Default release validation uses tiny offline fixtures and two host
+threads. Full-model parity is an explicitly budgeted diagnostic on the selected
+device; existing conversion evidence is retained without rerunning CPU work.
+The final suite completed in 16.13 seconds with two host threads; macOS
+`time -l` recorded 846,921,728 bytes (0.79 GiB) maximum RSS and zero swaps.

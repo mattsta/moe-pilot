@@ -5,6 +5,12 @@ The active program follows the local execution contract in
 implementation, measured execution, validation, and evidence are recorded.
 Software checks and proposed methods do not count as completed science.
 
+The oversized resident-cache benchmark was stopped at the user's request. It
+produced no accepted performance result. Recurring CPU comparisons have been
+removed; ongoing inference defaults to streaming, a shared-host reserve, and
+an explicit job budget. Release validation uses tiny offline fixtures. The
+pending research phases below remain pending and are not release prerequisites.
+
 | Phase | Deliverable and completion evidence | Status |
 | --- | --- | --- |
 | 1 | Immutable OLMoE 0924 snapshot, archived inputs, and full-depth CPU-reference/device parity | Complete; [evidence](../research/reconstruction-0924/full-model-verification.json) |

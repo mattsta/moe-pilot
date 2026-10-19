@@ -79,8 +79,9 @@ macOS retains native MPS support and exercises it whenever the host exposes it.
 
 ## Measure performance
 
-Compare CPU with the automatically selected accelerator without downloading a
-model or running a scientific experiment:
+Measure the automatically selected device without downloading a model or
+running a scientific experiment. CPU is used only if accelerator selection
+actually falls back to it, or if explicitly requested:
 
 ```sh
 uv run --locked moe-pilot benchmark --output runs/benchmarks/medium.json
@@ -90,24 +91,26 @@ uv run --locked moe-pilot benchmark --output runs/benchmarks/medium.json
 defaults to deterministic synthetic weights: two layers, eight experts, hidden
 size 512, intermediate size 768, vocabulary 1,024, and top-two routing. The
 `--profile tiny` option uses the numerical smoke model. Neither model represents
-the full historical OLMoE checkpoint. Default batches contain 1 and 16 documents
-of 64 tokens, with two warmups, five timed repeats, and eight host threads.
+the full historical OLMoE checkpoint. Defaults are one document of 64 tokens,
+one warmup, three repeats, two host threads, and baseline inference only.
 
 To measure a local real checkpoint with the same synthetic token inputs:
 
 ```sh
-uv run --locked moe-pilot benchmark --model models/olmoe --devices cpu mps --documents 1 16 --max-tokens 64 --warmup 2 --repeats 7 --threads 8 --output runs/benchmarks/local-model.json
+uv run --locked moe-pilot benchmark --model models/olmoe-0924 --devices auto --documents 1 --max-tokens 64 --output runs/benchmarks/local-model.json
 ```
 
 Use `cuda` or `rocm` in place of `mps` on those hosts and retain the appropriate
 uv wheel profile. Explicit devices must pass their capability probes. If `auto`
 resolves to CPU, duplicate CPU measurements are removed.
 
-Every case measures baseline inference, routing with all-layer geometry on up
-to 100 sampled tokens, and baseline plus early/late single-expert ablations.
-GPU work is synchronized before and after each timed call. Backend order
-alternates between repeats. All timed losses must agree with CPU within
-`2e-4` absolute/relative tolerance; numerical failures abort publication.
+Use `--workloads routing_geometry ablations` only when those measurements are
+needed. GPU work is synchronized before and after each timed call. Backends
+run sequentially, releasing each model cache before the next backend. Losses
+must agree with the first requested device's warmup within `2e-4`
+absolute/relative tolerance. With one device this checks repeat consistency;
+it is not an independent numerical reference. A CPU comparison runs only with
+an explicit `--devices cpu ...` request and is not a recurring release check.
 
 Timings include engine layer reads, weight/activation transfers, computation,
 and returned host arrays. They exclude imports, model creation, tokenization,
@@ -118,11 +121,51 @@ devices, model configuration/identity, environment, and source hashes.
 Throughput counts input tokens per engine call, including ablation calls,
 and is not autoregressive generation throughput.
 
-Keep the machine otherwise idle. Compare workload, batch, precision, threads,
+Treat the machine as shared. Compare workload, batch, precision, threads,
 and timing boundaries before interpreting speedup. The synthetic benchmark
 excludes corpus construction, statistics, plots, and persisted checkpoint I/O;
 it cannot establish full-pipeline or scientific-result improvements.
 See [local measurements and limitations](performance.md).
+
+## Shared-workstation resource policy
+
+All engine workflows default to streaming weights and an 8 GiB job budget.
+They preserve 16 GiB of immediately free host memory on this Mac; on smaller
+hosts the reserve is capped at a quarter of physical memory. The reusable
+`ResourcePolicy` checks weights, staging, activations, and routing estimates
+before inference and checks memory again between layers. Budget or pressure
+failures stop the job; they do not trigger a CPU retry. MPS/CUDA allocator
+limits apply to this process only. A per-user compute lock prevents cooperating
+local jobs from running inference concurrently, even across output directories.
+These conservative admission checks cannot
+guarantee a total RSS ceiling under every framework allocation or other apps'
+concurrent allocations.
+
+`execution.max_memory_gib` and `execution.reserve_memory_gib` configure the
+policy. Benchmark equivalents are `--max-memory-gib` and
+`--reserve-memory-gib`. Raising a budget requires an explicit configuration
+decision. Defaults use two host threads and one simultaneous condition.
+Resident caching is opt-in and is rejected when the estimate exceeds budget;
+the full OLMoE float32 cache alone is approximately 25.4 GiB.
+
+For release validation, run the offline tiny-fixture test suite and package
+build. Do not repeat a full-model CPU comparison, download models, or start a
+research sweep as part of a release check. Use the existing independently
+validated reconstruction evidence for its recorded model/source identities.
+Source changes still require software tests; old evidence does not validate a
+changed full-model implementation.
+
+The checked-in reconstruction configuration now uses conservative execution
+settings. The completed reconstruction retains its original configuration in
+`experiment.json` and its frozen runtime. Do not overwrite that completed run;
+select a fresh `paths.output` before executing changed settings or source.
+
+`--weight-cache resident` measures an explicit resident-weight policy; default
+`stream` reloads layers on each pass. Choose `--workloads baseline ablations` to
+omit expensive all-layer geometry when measuring inference itself. Every
+measurement records the cache policy and cached parameter bytes. Warmups for
+resident measurements exclude initial weight population; report cold loading
+separately rather than interpreting these as startup timings.
 
 ## Define an experiment
 
@@ -148,8 +191,12 @@ Downloads are explicit and can consume many GB. The command writes
 `model_revision.json` alongside the local snapshot. An existing local model can
 be used by setting `paths.model` directly; retain its identity with the run.
 
-Before a full scientific run, compare the full local checkpoint with the CPU
-Transformers reference on bounded inputs:
+Full-checkpoint parity is an explicit diagnostic, not a prerequisite to each
+run or release. The original conversion comparison is already recorded in
+[the reconstruction evidence](../research/reconstruction-0924/full-model-verification.json).
+Only when validating a new model implementation, compare against Transformers
+on the selected device with bounded inputs and a deliberately provisioned
+memory budget:
 
 ```sh
 uv run --locked moe-pilot --config configurations/reconstruction-0924.toml verify-model --documents 5 --max-tokens 64 --output runs/verification/olmoe-0924.json
@@ -157,10 +204,20 @@ uv run --locked moe-pilot --config configurations/reconstruction-0924.toml verif
 
 The verification selects available domains from `corpus.json`, checks every
 layer and valid next-token loss, and reports router-set agreement separately.
-The CPU reference is released before device inference. This requires memory
-for the full float32 reference model and uses only local model/tokenizer files.
+The reference runs on the selected device and is released before engine
+inference. This requires memory for a full float32 reference plus staging;
+the default budget rejects oversized references before loading them. It uses
+only local model/tokenizer files.
 Its reference-loading and streaming timings have different boundaries and must
 not be interpreted as a performance speedup measurement.
+
+For a frozen study corpus, add `--partition discovery` to verify on discovery
+inputs. The configured `execution.weight_cache` applies to verification. A
+full OLMoE 0924 resident check uses approximately 27.26 GB of cached float32
+parameters, excluding embedding rows and live activations. Set
+`execution.weight_cache = "stream"` when resident weights do not fit. The study
+configuration also sets a document microbatch size; document-level observations
+reject truncation that would silently discard their declared answer targets.
 
 ## Prepare corpora
 

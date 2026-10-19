@@ -29,7 +29,7 @@ Apple MPS, and uses CPU only after accelerator availability/capability checks
 fail. Explicit `cuda[:index]`, `rocm[:index]`, `mps`, and `cpu` choices are also
 supported. `devices` reports the selected backend and rejected candidates.
 
-For synchronized CPU/accelerator timings, use the reusable `benchmark` command;
+For synchronized selected-device timings, use the reusable `benchmark` command;
 see the [benchmark procedure](docs/runbook.md#measure-performance) and
 [recorded local results](docs/performance.md). Backend availability alone does
 not establish a speedup.
