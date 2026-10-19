@@ -1,0 +1,74 @@
+schema_version = 1
+root = "../models"
+
+[[models]]
+name = "olmoe-0924"
+repository = "allenai/OLMoE-1B-7B-0924"
+revision = "6d84c48581ece794365f2b8e9cfb043c68ade9c5"
+family = "olmoe"
+lineage = "olmoe-0924"
+stage = "base"
+layers = [7]
+
+[[models]]
+name = "olmoe-0924-step10000"
+repository = "allenai/OLMoE-1B-7B-0924"
+revision = "e5642d2d7b37c138775ddf59f685f91788e173b7"
+family = "olmoe"
+lineage = "olmoe-0924"
+stage = "pretraining-41B-tokens"
+layers = [7]
+
+[[models]]
+name = "olmoe-0924-step500000"
+repository = "allenai/OLMoE-1B-7B-0924"
+revision = "847a3441998b90b3b55323eaa47e2ca6a039bb39"
+family = "olmoe"
+lineage = "olmoe-0924"
+stage = "pretraining-2097B-tokens"
+layers = [7]
+
+[[models]]
+name = "olmoe-0924-step1000000"
+repository = "allenai/OLMoE-1B-7B-0924"
+revision = "33d21fb2f1382acb824dcdf25e893f44f3ad57ed"
+family = "olmoe"
+lineage = "olmoe-0924"
+stage = "pretraining-4194B-tokens"
+layers = [7]
+
+[[models]]
+name = "olmoe-0125-base"
+repository = "allenai/OLMoE-1B-7B-0125"
+revision = "9b0c1aa87e34a20052389dce1f0cf01da783f654"
+family = "olmoe"
+lineage = "olmoe-0125"
+stage = "base"
+layers = [7]
+
+[[models]]
+name = "olmoe-0125-sft"
+repository = "allenai/OLMoE-1B-7B-0125-SFT"
+revision = "6f7a5b02aa069fdcb8d0cb6b837b9905a3d995d7"
+family = "olmoe"
+lineage = "olmoe-0125"
+stage = "sft"
+layers = [7]
+
+[[models]]
+name = "olmoe-0125-dpo"
+repository = "allenai/OLMoE-1B-7B-0125-DPO"
+revision = "0f2e2e1bd78f146685c346ac0f797ae146ffa8f9"
+family = "olmoe"
+lineage = "olmoe-0125"
+stage = "dpo"
+layers = [7]
+
+[[models]]
+name = "olmoe-0125-instruct"
+repository = "allenai/OLMoE-1B-7B-0125-Instruct"
+revision = "b89a7c4bc24fb9e55ce2543c9458ce0ca5c4650e"
+family = "olmoe"
+lineage = "olmoe-0125"
+stage = "final-rlvr"
+layers = [7]

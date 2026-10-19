@@ -2,7 +2,6 @@
 
 import argparse
 import json
-import re
 import sys
 from pathlib import Path
 
@@ -13,13 +12,18 @@ from moe_pilot.experiment import STEPS, ExperimentRunner
 def parser():
     result = argparse.ArgumentParser(description="Configured MoE research experiments")
     result.add_argument(
-        "--config", type=Path, help="Experiment TOML; not needed for smoke, devices, or benchmark"
+        "--config", type=Path, help="Experiment TOML for configured research commands"
     )
     commands = result.add_subparsers(dest="command", required=True)
     for name in STEPS:
         commands.add_parser(name, help=f"Run the {name} experiment step")
     commands.add_parser("run", help="Run inference, conditions, ablations, and reports in order")
     commands.add_parser("download-model", help="Download the exact configured model revision")
+    catalog = commands.add_parser(
+        "download-models", help="Acquire named immutable local model targets"
+    )
+    catalog.add_argument("--catalog", type=Path, required=True)
+    catalog.add_argument("--names", nargs="+", required=True)
     commands.add_parser("download-study-data", help="Acquire pinned local study source files")
     audit = commands.add_parser(
         "inspect-study-data", help="Audit local source origins and eligible cells"
@@ -59,6 +63,18 @@ def parser():
 def main(argv=None):
     arguments = parser().parse_args(argv)
     try:
+        if arguments.command == "download-models":
+            from moe_pilot.acquisition import acquire_model
+            from moe_pilot.catalog import load_catalog
+
+            targets = {target.name: target for target in load_catalog(arguments.catalog)}
+            if set(arguments.names) - set(targets):
+                raise ValueError("Requested names are absent from the model catalog")
+            for name in arguments.names:
+                target = targets[name]
+                print(f"Acquiring {name} at {target.revision}", flush=True)
+                acquire_model(target.model, target.directory)
+            return 0
         if arguments.command == "benchmark":
             from moe_pilot.benchmark import benchmark_engine
 
@@ -119,22 +135,9 @@ def main(argv=None):
             print(inspect_experiment(config))
             return 0
         if arguments.command == "download-model":
-            if not re.fullmatch(r"[0-9a-fA-F]{40}", config.model.revision):
-                raise ValueError("model.revision must be a full 40-character commit SHA")
-            from huggingface_hub import snapshot_download
+            from moe_pilot.acquisition import acquire_model
 
-            from moe_pilot.artifacts import write_json
-
-            snapshot_download(
-                config.model.repository,
-                revision=config.model.revision,
-                local_dir=config.paths.model,
-                allow_patterns=["*.json", "*.safetensors", "*.txt"],
-            )
-            write_json(
-                config.paths.model / "model_revision.json",
-                {"repository": config.model.repository, "revision": config.model.revision},
-            )
+            acquire_model(config.model, config.paths.model)
             return 0
         import torch
 
