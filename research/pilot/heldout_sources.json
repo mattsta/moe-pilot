@@ -1,0 +1,22 @@
+{
+ "code": {
+  "source": "openai/openai_humaneval test (disjoint from corpus.json)",
+  "n": 40
+ },
+ "math": {
+  "source": "EleutherAI/hendrycks_math algebra test (disjoint)",
+  "n": 40
+ },
+ "science": {
+  "source": "allenai/sciq test support (disjoint)",
+  "n": 40
+ },
+ "prose": {
+  "source": "abisee/cnn_dailymail 3.0.0 test[:2000] (disjoint)",
+  "n": 40
+ },
+ "multilingual": {
+  "source": "papluca/language-identification test non-English (disjoint)",
+  "n": 40
+ }
+}

@@ -1,0 +1,22 @@
+{
+ "code": {
+  "source": "openai/openai_humaneval test (prompt+canonical_solution)",
+  "n": 100
+ },
+ "math": {
+  "source": "EleutherAI/hendrycks_math algebra test (problem+solution)",
+  "n": 100
+ },
+ "science": {
+  "source": "allenai/sciq test (support paragraphs)",
+  "n": 100
+ },
+ "prose": {
+  "source": "abisee/cnn_dailymail 3.0.0 test[:2000] (article, first 1500 chars)",
+  "n": 100
+ },
+ "multilingual": {
+  "source": "papluca/language-identification test, non-English (19 languages)",
+  "n": 100
+ }
+}

@@ -1,0 +1,78 @@
+{
+ "math/algebra": {
+  "source": "EleutherAI/hendrycks_math algebra test (problem+solution)",
+  "n": 60
+ },
+ "math/geometry": {
+  "source": "EleutherAI/hendrycks_math geometry test (problem+solution)",
+  "n": 60
+ },
+ "math/number_theory": {
+  "source": "EleutherAI/hendrycks_math number_theory test (problem+solution)",
+  "n": 60
+ },
+ "math/counting_probability": {
+  "source": "EleutherAI/hendrycks_math counting_and_probability test (problem+solution)",
+  "n": 60
+ },
+ "code/python": {
+  "source": "claudios/code_search_net python test[:3000] whole_func_string",
+  "n": 60
+ },
+ "code/javascript": {
+  "source": "claudios/code_search_net javascript test[:3000] whole_func_string",
+  "n": 60
+ },
+ "code/java": {
+  "source": "claudios/code_search_net java test[:3000] whole_func_string",
+  "n": 60
+ },
+ "code/go": {
+  "source": "claudios/code_search_net go test[:3000] whole_func_string",
+  "n": 60
+ },
+ "code/sql": {
+  "source": "b-mc2/sql-create-context train[:5000] (context+answer SQL)",
+  "n": 60
+ },
+ "science/biology": {
+  "source": "cais/mmlu high_school_biology+college_biology test (question+choices)",
+  "n": 60
+ },
+ "science/chemistry": {
+  "source": "cais/mmlu high_school_chemistry+college_chemistry test (question+choices)",
+  "n": 60
+ },
+ "science/physics": {
+  "source": "cais/mmlu high_school_physics+college_physics+conceptual_physics test (question+choices)",
+  "n": 60
+ },
+ "multilingual/de": {
+  "source": "papluca/language-identification test labels==de",
+  "n": 60
+ },
+ "multilingual/fr": {
+  "source": "papluca/language-identification test labels==fr",
+  "n": 60
+ },
+ "multilingual/es": {
+  "source": "papluca/language-identification test labels==es",
+  "n": 60
+ },
+ "multilingual/zh": {
+  "source": "papluca/language-identification test labels==zh",
+  "n": 60
+ },
+ "multilingual/ru": {
+  "source": "papluca/language-identification test labels==ru",
+  "n": 60
+ },
+ "multilingual/ar": {
+  "source": "papluca/language-identification test labels==ar",
+  "n": 60
+ },
+ "multilingual/hi": {
+  "source": "papluca/language-identification test labels==hi",
+  "n": 60
+ }
+}
