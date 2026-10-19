@@ -74,8 +74,8 @@ mocks. Inference stays float32; accelerator parity tests allow a documented
 The optional `Accelerator validation` workflow can be dispatched for CUDA,
 ROCm, or MPS on a self-hosted runner labeled `gpu` and its Linux/macOS platform.
 It first requires the requested device, then runs the suite with that wheel
-profile. Normal hosted CI uses the optional CPU Linux wheel profile for speed;
-macOS retains native MPS support and exercises it whenever the host exposes it.
+profile. No automatic push or pull-request CI is configured. Run validation
+locally when needed; publishing commits does not launch a hosted test matrix.
 
 ## Measure performance
 

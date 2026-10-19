@@ -32,8 +32,10 @@ Use `devices` to inspect automatic selection or `smoke --device mps|cuda|rocm|cp
 to require and verify a specific backend.
 
 Local verification uses macOS arm64, Python 3.12.13, uv 0.11.19, PyTorch 2.14.1,
-and Transformers 5.20.1. CI is configured for Linux Python 3.11/3.12 and macOS
-Python 3.12; hosted CI has not been executed locally.
+and Transformers 5.20.1. Validation runs locally on demand. There is no
+automatic push or pull-request CI matrix. Publishing the repository briefly
+triggered the former workflow; it was cancelled and the automatic workflow
+removed at the owner's request.
 
 Actual local accelerator verification used Apple MPS, including the automatic
 end-to-end experiment, geometry, both control families, ablation checkpoints,
