@@ -176,6 +176,68 @@ def inspect_sources(config, output=None):
     return report
 
 
+def load_study_split(config, name):
+    """Validate a frozen cohort before any model-dependent selection or outcome."""
+    directory = config.paths.data / "study"
+    manifest = read_json(directory / "manifest.json")
+    if (
+        manifest.get("schema") != 1
+        or manifest.get("seed") != config.analysis.seed
+        or manifest.get("max_bytes") != config.study.max_bytes
+        or manifest.get("grouping", {}).get("threshold") != config.study.near_duplicate_threshold
+    ):
+        raise ValueError("Study cohort definition differs from the configured study")
+    if name not in ("discovery", "calibration", "evaluation", "format_pairs"):
+        raise ValueError("Unknown study partition")
+    expected_sources = {
+        (source.repository, source.revision, source.filename) for source in config.study.sources
+    }
+    actual_sources = {
+        (source["repository"], source["revision"], source["filename"])
+        for source in manifest["source_audits"]
+    }
+    if expected_sources != actual_sources:
+        raise ValueError("Study source identities differ from the frozen cohort")
+    audits = {audit["repository"]: audit for audit in manifest["source_audits"]}
+    for source in config.study.sources:
+        audit = audits[source.repository]
+        required_columns = (
+            {"subject", "choices", "answer"}
+            if source.format == "mmlu"
+            else {"category", "options", "answer_index"}
+        )
+        if (
+            audit.get("domain_subjects")
+            != {domain: list(subjects) for domain, subjects in source.domains}
+            or audit.get("exclude_origin_patterns") != list(source.exclude_origins)
+            or not required_columns.issubset(audit.get("columns", []))
+        ):
+            raise ValueError("Study source selection differs from the frozen cohort")
+    for filename, expected in manifest["files"].items():
+        path = Path(filename)
+        if not path.is_relative_to(directory) or not path.is_file() or _hash(path) != expected:
+            raise ValueError("Study partition bytes changed after freezing")
+    groups = []
+    cells = {
+        (source.repository, domain)
+        for source in config.study.sources
+        for domain, _ in source.domains
+    }
+    for split, count in (
+        ("discovery", config.study.discovery_per_cell),
+        ("calibration", config.study.calibration_per_cell),
+        ("evaluation", config.study.evaluation_per_cell),
+    ):
+        rows = read_json(directory / f"{split}.json")
+        counts = Counter((row["source"], row["domain"]) for row in rows)
+        if set(counts) != cells or any(value != count for value in counts.values()):
+            raise ValueError("Frozen study cells differ from the declared sample counts")
+        groups.append({row["group_id"] for row in rows})
+    if any(first & second for index, first in enumerate(groups) for second in groups[index + 1 :]):
+        raise ValueError("Study partitions share content groups")
+    return read_json(directory / f"{name}.json")
+
+
 def group_near_duplicates(records, threshold):
     """Conservatively group normalized question matches and word-shingle overlap.
 

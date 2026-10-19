@@ -11,6 +11,7 @@ from moe_pilot.experiment import ExperimentRunner
 from moe_pilot.study_data import (
     group_near_duplicates,
     inspect_sources,
+    load_study_split,
     partition_records,
     prepare_study,
     source_record_path,
@@ -153,3 +154,19 @@ computing = ["computer_science"]
     assert config.study.sources[0].path == tmp_path / "raw/test.parquet"
     assert config.study.sources[0].domains == (("computing", ("computer_science",)),)
     assert config.record()["study"]["sources"][0]["path"] == str(tmp_path / "raw/test.parquet")
+
+
+def test_frozen_cohort_loader_rejects_mutation_and_changed_selection(experiment, tmp_path):
+    source = source_fixture(tmp_path)
+    config = replace(experiment, study=Study(2, 2, 2, sources=(source,)))
+    prepare_study(config)
+    assert len(load_study_split(config, "discovery")) == 4
+    changed = replace(source, exclude_origins=("new-pattern",))
+    with pytest.raises(ValueError, match="selection differs"):
+        load_study_split(
+            replace(config, study=replace(config.study, sources=(changed,))), "discovery"
+        )
+    path = config.paths.data / "study" / "evaluation.json"
+    path.write_text(path.read_text() + " ")
+    with pytest.raises(ValueError, match="bytes changed"):
+        load_study_split(config, "discovery")
