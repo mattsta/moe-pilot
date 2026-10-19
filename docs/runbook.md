@@ -148,6 +148,20 @@ Downloads are explicit and can consume many GB. The command writes
 `model_revision.json` alongside the local snapshot. An existing local model can
 be used by setting `paths.model` directly; retain its identity with the run.
 
+Before a full scientific run, compare the full local checkpoint with the CPU
+Transformers reference on bounded inputs:
+
+```sh
+uv run --locked moe-pilot --config configurations/reconstruction-0924.toml verify-model --documents 5 --max-tokens 64 --output runs/verification/olmoe-0924.json
+```
+
+The verification selects available domains from `corpus.json`, checks every
+layer and valid next-token loss, and reports router-set agreement separately.
+The CPU reference is released before device inference. This requires memory
+for the full float32 reference model and uses only local model/tokenizer files.
+Its reference-loading and streaming timings have different boundaries and must
+not be interpreted as a performance speedup measurement.
+
 ## Prepare corpora
 
 For the supplied pilot inputs, copy the archived samples into the configured

@@ -1,0 +1,34 @@
+schema_version = 1
+
+[paths]
+model = "../models/olmoe-0924"
+data = "../data/reconstruction"
+output = "../runs/reconstruction-0924"
+
+[model]
+repository = "allenai/OLMoE-1B-7B-0924"
+revision = "6d84c48581ece794365f2b8e9cfb043c68ade9c5"
+
+[execution]
+device = "auto"
+threads = 8
+max_tokens = 64
+condition_group = 10
+
+[analysis]
+seed = 0
+permutations = 20
+bootstrap_samples = 2000
+probe_tokens_per_domain = 100
+layers = [0, 7, 15]
+
+[ablations]
+expert_counts = [1, 4, 8]
+control_seeds = 3
+control_candidates = 4000
+on_domain_candidates = 6000
+
+[corpora]
+analysis_count = 100
+heldout_count = 40
+subtopic_count = 60

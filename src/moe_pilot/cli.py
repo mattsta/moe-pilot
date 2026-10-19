@@ -21,6 +21,10 @@ def parser():
     commands.add_parser("run", help="Run inference, conditions, ablations, and reports in order")
     commands.add_parser("download-model", help="Download the exact configured model revision")
     commands.add_parser("inventory", help="Read configured input and output availability")
+    verification = commands.add_parser("verify-model", help="Full-depth local CPU reference parity")
+    verification.add_argument("--documents", type=int, default=5)
+    verification.add_argument("--max-tokens", type=int)
+    verification.add_argument("--output", type=Path, required=True)
     smoke = commands.add_parser("smoke", help="Offline tiny-model numerical verification")
     smoke.add_argument("--output", type=Path, help="Optional JSON report destination")
     smoke.add_argument(
@@ -110,6 +114,38 @@ def main(argv=None):
         import torch
 
         torch.set_num_threads(config.execution.threads)
+        if arguments.command == "verify-model":
+            from moe_pilot.artifacts import load_corpus
+            from moe_pilot.engine import Engine
+            from moe_pilot.verification import verify_local_model
+
+            if arguments.documents < 1:
+                raise ValueError("documents must be positive")
+            corpus = load_corpus(config.paths.data / "corpus.json")
+            # First represent each available domain, then add remaining rows.
+            chosen, seen = [], set()
+            for index, record in enumerate(corpus):
+                if record["domain"] not in seen:
+                    chosen.append(index)
+                    seen.add(record["domain"])
+            chosen.extend(index for index in range(len(corpus)) if index not in chosen)
+            engine = Engine(config.paths.model, device=config.execution.device)
+            report = verify_local_model(
+                config.paths.model,
+                [
+                    engine.tok(corpus[index]["text"]).input_ids
+                    for index in chosen[: arguments.documents]
+                ],
+                max_tokens=(
+                    config.execution.max_tokens
+                    if arguments.max_tokens is None
+                    else arguments.max_tokens
+                ),
+                device=engine.selection,
+                output=arguments.output,
+            )
+            print(f"Full-depth parity passed; max loss error {report['max_loss_error']:.3g}")
+            return 0
         runner = ExperimentRunner(config)
         print(f"Compute device: {runner.selection.backend} ({runner.selection.device})")
         if arguments.command == "run":
