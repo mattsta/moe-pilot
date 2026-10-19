@@ -3,6 +3,7 @@
 import hashlib
 
 import numpy as np
+from matplotlib import rc_context
 
 from moe_pilot.artifacts import write_json
 from moe_pilot.plotting import subplots
@@ -31,7 +32,17 @@ def build_study_figures(root):
         files = {}
         for extension in ("png", "svg", "pdf"):
             path = output / f"{name}.{extension}"
-            figure.savefig(path, dpi=180, bbox_inches="tight")
+            metadata = (
+                {"Date": None}
+                if extension == "svg"
+                else (
+                    {"CreationDate": None, "ModDate": None}
+                    if extension == "pdf"
+                    else {"Software": "moe-pilot"}
+                )
+            )
+            with rc_context({"svg.hashsalt": "moe-pilot-study-v1"}):
+                figure.savefig(path, dpi=180, bbox_inches="tight", metadata=metadata)
             files[path.name] = hashlib.sha256(path.read_bytes()).hexdigest()
         inventory[name] = {
             "caption": caption,
@@ -52,7 +63,10 @@ def build_study_figures(root):
         ):
             rows = sorted(
                 [row for row in summary if row["metric"] == metric],
-                key=lambda row: list(NAMES).index(row["model"]),
+                key=lambda row: (
+                    list(NAMES).index(row["model"]) if row["model"] in NAMES else len(NAMES),
+                    row["model"],
+                ),
             )
             estimates = np.array([row["estimate"] for row in rows]) * scale
             bounds = np.array([[row["ci_low"], row["ci_high"]] for row in rows]) * scale
@@ -64,7 +78,9 @@ def build_study_figures(root):
                 color="#006d77",
                 capsize=4,
             )
-            ax.set_yticks(np.arange(len(rows)), [NAMES[row["model"]] for row in rows])
+            ax.set_yticks(
+                np.arange(len(rows)), [NAMES.get(row["model"], row["model"]) for row in rows]
+            )
             ax.invert_yaxis()
             ax.set_xlabel(label)
             ax.grid(axis="x", alpha=0.2)
@@ -82,6 +98,7 @@ def build_study_figures(root):
     for name, title in (
         ("reconstruction_interactions", "Archived-input reconstruction · post-hoc interactions"),
         ("causal_effects", "New source-balanced study · exploratory interactions"),
+        ("answer_label_effects", "Correct-answer-label loss · exploratory sensitivity"),
     ):
         rows = load(name)
         if not rows:
@@ -107,7 +124,9 @@ def build_study_figures(root):
             figure,
             name,
             [f"{name}.csv"],
-            "Paired 95% bootstrap intervals are unadjusted. Read the table for primary-family Holm p values. Imperfect controls prevent semantic-specialization claims.",
+            "Paired 95% bootstrap intervals are unadjusted. Read the table for exploratory-family Holm p values across twelve answer-label tests. Imperfect controls prevent semantic-specialization claims."
+            if name == "answer_label_effects"
+            else "Paired 95% bootstrap intervals are unadjusted. Read the table for declared-family Holm p values. Imperfect controls prevent semantic-specialization claims.",
         )
 
     norms = load("expert_norm_changes")
@@ -124,7 +143,7 @@ def build_study_figures(root):
         image = ax.imshow(
             matrix, aspect="auto", cmap="RdBu_r", vmin=-limit, vmax=limit, interpolation="nearest"
         )
-        ax.set_yticks(range(len(models)), [NAMES[model] for model in models])
+        ax.set_yticks(range(len(models)), [NAMES.get(model, model) for model in models])
         ax.set_xlabel("Layer-7 expert index within the 0125 lineage")
         ax.set_title("Change in relative expert-output magnitude from 0125 base")
         figure.colorbar(image, ax=ax, label="Mean log relative norm ratio")
@@ -153,7 +172,7 @@ def build_study_figures(root):
                 color="#345ca0",
                 capsize=4,
             )
-            ax.set_yticks(range(len(rows)), [NAMES[row["model"]] for row in rows])
+            ax.set_yticks(range(len(rows)), [NAMES.get(row["model"], row["model"]) for row in rows])
             ax.set_xlabel(label)
             ax.axvline(0, color="#777777", linestyle="--", linewidth=1)
             ax.grid(axis="x", alpha=0.2)
