@@ -43,6 +43,12 @@ CUDA and ROCm hardware were absent: their runtime selection paths are tested
 with mocks and real-device integration tests are provided, but actual CUDA/ROCm
 kernel execution is not claimed by this local record.
 
+Performance is measured separately from correctness. The reusable benchmark
+compares identical inputs across synchronized devices, checks every timed loss
+against CPU, and records all elapsed samples. The [local performance report](performance.md)
+covers synthetic baseline, geometry, and ablation workloads across four batch
+sizes; it makes no full-model or full-pipeline speedup claim.
+
 An optional manually dispatched accelerator workflow targets self-hosted
 runners labeled `gpu` and Linux or macOS. It requires the chosen backend before
 running the suite, so an absent expected GPU cannot be hidden by skipped tests.
@@ -53,7 +59,8 @@ Local checks passed on 2026-10-19:
 | --------------------------------------------- | ---------------------------------------------------- |
 | Locked uv synchronization                     | Passed                                               |
 | Ruff lint and formatting                      | Passed                                               |
-| `pytest -q -W error`                          | 97 passed; 2 absent CUDA/ROCm hardware tests skipped; no warnings |
+| `pytest -q -W error`                          | 103 passed; 2 absent CUDA/ROCm hardware tests skipped; no warnings |
+| CPU/MPS performance measurement               | 24 cases, 7 timed repeats each; numerical parity passed |
 | Offline CLI smoke                             | CPU and real MPS passed against CPU/Hugging Face |
 | Configured read-only inventory                | Passed without creating input/output directories     |
 | Wheel and source distribution                 | Built; new modules and sample configuration verified |
