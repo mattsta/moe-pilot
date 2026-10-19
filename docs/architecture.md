@@ -8,19 +8,19 @@ default; package metadata permits 3.11–3.14. CI checks 3.11 and 3.12 on Linux 
 
 ## Module responsibilities
 
-| Module | Responsibility |
-| --- | --- |
-| `model.py` | Local configuration, safetensors mapping, model identity |
-| `engine.py` | Batches, attention, expert routing, losses, condition execution |
-| `checkpoints.py` | Atomic arrays, resume manifest, condition identities |
-| `corpora.py` | Seeded sampling, deduplication, exclusions, group-size checks |
-| `controls.py` | Specialist ranking and routing-mass-matched control selection |
-| `artifacts.py` | UTF-8 JSON artifact reads and writes |
-| `metrics.py` | Entropy and Jensen–Shannon divergence in bits |
-| `inventory.py` | Read-only inventory of inputs and historical tables |
-| `smoke.py` | Offline numerical and checkpoint verification infrastructure |
-| `workflows/` | Explicit research steps retaining the original artifact schemas |
-| `cli.py` | Arguments, CPU thread policy, workspace selection, workflow dispatch |
+| Module           | Responsibility                                                       |
+| ---------------- | -------------------------------------------------------------------- |
+| `model.py`       | Local configuration, safetensors mapping, model identity             |
+| `engine.py`      | Batches, attention, expert routing, losses, condition execution      |
+| `checkpoints.py` | Atomic arrays, resume manifest, condition identities                 |
+| `corpora.py`     | Seeded sampling, deduplication, exclusions, group-size checks        |
+| `controls.py`    | Specialist ranking and routing-mass-matched control selection        |
+| `artifacts.py`   | UTF-8 JSON artifact reads and writes                                 |
+| `metrics.py`     | Entropy and Jensen–Shannon divergence in bits                        |
+| `inventory.py`   | Read-only inventory of inputs and historical tables                  |
+| `smoke.py`       | Offline numerical and checkpoint verification infrastructure         |
+| `workflows/`     | Explicit research steps retaining the original artifact schemas      |
+| `cli.py`         | Arguments, CPU thread policy, workspace selection, workflow dispatch |
 
 Imports never download datasets, load a checkpoint, or execute an experiment.
 `Engine` loads local configuration when constructed; tokenizer loading is lazy.

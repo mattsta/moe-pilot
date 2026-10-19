@@ -32,7 +32,7 @@ def main(model_dir="models/olmoe", max_tokens=64, layers=None):
     HD = H // NH
     get = engine.get
     tok = engine.tok
-    if L > cfg.num_hidden_layers:
+    if cfg.num_hidden_layers < L:
         raise ValueError("Requested layers exceed model depth")
     corpus = read_json("corpus.json")
     ids = [tok(c["text"]).input_ids[:MAXTOK] for c in corpus]

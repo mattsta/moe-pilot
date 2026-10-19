@@ -83,16 +83,16 @@ parameter with any reported experiment.
 
 ## Inputs and outputs
 
-| Step | Required inputs | Main outputs |
-| --- | --- | --- |
-| `forward` | local model/tokenizer, `corpus.json` | `routing.npz`, `ortho_raw.npz`, `probe_moe_inputs.npy` |
-| `analyze` | those two NPZs, tokenizer | `results/*.csv`, `results/counts/`, `plots/*.png` |
-| `activation-extra` | model, probe NPY | `results/activation_orthogonality_extra.csv` |
-| `build-conditions` | routing NPZ, expert domain CSV | `results/ablations/conditions.{json,csv}` |
-| `ablate` | local model, held-out corpus, conditions | checkpoint manifest, losses/cache NPYs, delta-loss CSV |
-| `analyze-ablations` | routing, condition metadata, held-out losses | summaries, expanded aliases, ablation plots |
-| `ondomain-controls` | routing, expert distribution, expanded aliases, held-out corpus | extra masks and checkpointed losses |
-| `subtopics` | local model, subtopic corpus, original expert distribution | subtopic routing, CSVs, plots |
+| Step                | Required inputs                                                 | Main outputs                                           |
+| ------------------- | --------------------------------------------------------------- | ------------------------------------------------------ |
+| `forward`           | local model/tokenizer, `corpus.json`                            | `routing.npz`, `ortho_raw.npz`, `probe_moe_inputs.npy` |
+| `analyze`           | those two NPZs, tokenizer                                       | `results/*.csv`, `results/counts/`, `plots/*.png`      |
+| `activation-extra`  | model, probe NPY                                                | `results/activation_orthogonality_extra.csv`           |
+| `build-conditions`  | routing NPZ, expert domain CSV                                  | `results/ablations/conditions.{json,csv}`              |
+| `ablate`            | local model, held-out corpus, conditions                        | checkpoint manifest, losses/cache NPYs, delta-loss CSV |
+| `analyze-ablations` | routing, condition metadata, held-out losses                    | summaries, expanded aliases, ablation plots            |
+| `ondomain-controls` | routing, expert distribution, expanded aliases, held-out corpus | extra masks and checkpointed losses                    |
+| `subtopics`         | local model, subtopic corpus, original expert distribution      | subtopic routing, CSVs, plots                          |
 
 ## Stop, resume, and recover
 

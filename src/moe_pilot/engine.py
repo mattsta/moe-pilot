@@ -193,7 +193,7 @@ class Engine:
     def _validate(self, batch, conditions, group):
         if group < 1:
             raise ValueError("group must be positive")
-        if batch.T > self.cfg.max_position_embeddings:
+        if self.cfg.max_position_embeddings < batch.T:
             raise ValueError("max_tokens exceeds the model context window")
         if batch.tok.max() >= self.cfg.vocab_size:
             raise ValueError("Token ID exceeds the model vocabulary")
