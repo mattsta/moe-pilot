@@ -339,7 +339,10 @@ class Engine:
         attention = len(batch.ids) * batch.T * self.H * 4 * 12
         logits = min(batch.N, 256) * self.cfg.vocab_size * 4 * 3
         routing = batch.N * self.L * (self.E + 2 * self.K) * 8
-        return weights * 2 + states + attention + logits + routing
+        # ModelStore releases each source mapping after conversion. Only the
+        # largest current tensor needs source/conversion staging, rather than
+        # a second full layer or resident model copy.
+        return weights + 2 * max(sizes.values()) + states + attention + logits + routing
 
     @bounded_inference
     @torch.inference_mode()
@@ -352,6 +355,7 @@ class Engine:
         verbose=True,
         on_layer=None,
         on_intervention=None,
+        on_output=None,
     ):
         """Return per-token losses, valid-target mask, and optional baseline routing.
 
@@ -377,6 +381,8 @@ class Engine:
             hidden = self.moe(attended, weights, log=routing)
             del attended
             del weights
+        if on_output is not None:
+            on_output(hidden, batch, norm, head)
         results["base"], valid = self.token_losses(hidden, batch, norm, head)
         del hidden
         for name, condition in conditions.items():

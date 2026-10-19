@@ -30,7 +30,6 @@ class ModelStore:
         if not (self.directory / "config.json").is_file():
             raise FileNotFoundError(f"Missing local model config: {self.directory / 'config.json'}")
         self.config = AutoConfig.from_pretrained(self.directory, local_files_only=True)
-        self._handles = {}
         index = self.directory / "model.safetensors.index.json"
         if index.exists():
             self.weight_map = json.loads(index.read_text())["weight_map"]
@@ -45,9 +44,11 @@ class ModelStore:
         if name not in self.weight_map:
             raise KeyError(f"Checkpoint has no tensor {name!r}")
         filename = self.weight_map[name]
-        if filename not in self._handles:
-            self._handles[filename] = safe_open(self.directory / filename, framework="pt")
-        return self._handles[filename].get_tensor(name).float()
+        # Do not retain every shard mapping after streaming through a model.
+        # BF16 conversion owns its float32 result; float32 source tensors keep
+        # their mapping alive only for the lifetime of that returned tensor.
+        with safe_open(self.directory / filename, framework="pt") as handle:
+            return handle.get_tensor(name).float()
 
     def tensor_bytes(self, name):
         """Float32 allocation size from safetensors metadata, without loading values."""

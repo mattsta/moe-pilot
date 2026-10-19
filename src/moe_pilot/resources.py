@@ -116,7 +116,9 @@ class ResourcePolicy:
             raise ValueError("Process memory exceeded the job budget; stop and use a smaller run")
         if available < self.reserve_bytes + required_bytes:
             raise ValueError(
-                f"Insufficient free memory to preserve the {self.reserve_bytes / GIB:.1f} GiB "
+                f"Insufficient free memory ({available / GIB:.2f} GiB available, "
+                f"{required_bytes / GIB:.2f} GiB estimated additional allocation) "
+                f"to preserve the {self.reserve_bytes / GIB:.1f} GiB "
                 "workstation reserve; no CPU fallback or larger allocation was attempted"
             )
 

@@ -75,6 +75,8 @@ def observe_documents(
     microbatch_documents=4,
     discovery_counts=None,
     output=None,
+    conditions=None,
+    condition_group=1,
 ):
     """Collect paired document observations without truncating target content."""
     ids, answer_masks = encode_rows(engine, rows, max_tokens)
@@ -89,6 +91,12 @@ def observe_documents(
     if type(microbatch_documents) is not int or microbatch_documents < 0:
         raise ValueError("microbatch_documents must be a nonnegative integer")
     count, experts = len(rows), engine.E
+    conditions = conditions or {}
+    condition_names = tuple(conditions)
+    condition_loss = np.zeros((len(conditions), count))
+    condition_answer_loss = np.zeros_like(condition_loss)
+    choice_accuracy = np.zeros(count)
+    choice_log_probability = np.zeros(count)
     mass = np.zeros((len(layers), count, experts))
     usage, norms = np.zeros_like(mass), np.zeros_like(mass)
     loss, answer_loss = np.zeros(count), np.zeros(count)
@@ -129,12 +137,48 @@ def observe_documents(
             positions.append(offset + number % (len(tokens) - 1))
             offset += len(tokens)
         probe = ExpertNormProbe(layers, positions)
+        choice_tokens = []
+        for row, tokens in zip(rows[start:stop], ids[start:stop], strict=True):
+            candidates = []
+            for index in range(len(row["choices"])):
+                candidate = engine.tok(
+                    row["text"][: row["answer_start"]] + " " + chr(65 + index)
+                ).input_ids
+                if len(candidate) != len(tokens) or candidate[:-1] != tokens[:-1]:
+                    raise ValueError(
+                        "Choice scoring requires one context-stable answer-label token"
+                    )
+                candidates.append(candidate[-1])
+            choice_tokens.append(candidates)
+
+        def score(hidden, batch, norm, head, choice_tokens=choice_tokens, start=start):
+            positions = np.cumsum(batch.lens) - 2
+            logits = (
+                engine.rms(hidden[torch.tensor(positions, device=engine.device)], norm) @ head.T
+            )
+            for index, candidates in enumerate(choice_tokens):
+                values = logits[index, candidates]
+                answer = rows[start + index]["answer_index"]
+                choice_accuracy[start + index] = float(values.argmax().item() == answer)
+                choice_log_probability[start + index] = float(values.log_softmax(-1)[answer].item())
+
         results, valid, routes = engine.run(
-            batch, {}, log_routing=True, on_layer=probe, verbose=False
+            batch,
+            conditions,
+            group=condition_group,
+            log_routing=True,
+            on_layer=probe,
+            on_output=score,
+            verbose=False,
         )
         loss[start:stop] = document_means(results["base"], batch.doc, valid)
         answer_targets = np.concatenate(answer_masks[start:stop]) & valid
         answer_loss[start:stop] = document_means(results["base"], batch.doc, answer_targets)
+        for index, name in enumerate(condition_names):
+            condition_loss[index, start:stop] = document_means(results[name], batch.doc, valid)
+            condition_answer_loss[index, start:stop] = document_means(
+                results[name], batch.doc, answer_targets
+            )
         for position, layer in enumerate(layers):
             indices, gates, _ = routes[layer]
             selected_docs = np.repeat(batch.doc[valid], engine.K)
@@ -158,6 +202,11 @@ def observe_documents(
         "unigram": unigram,
         "features": np.array(features),
         "feature_names": np.array(FEATURES),
+        "choice_accuracy": choice_accuracy,
+        "choice_log_probability": choice_log_probability,
+        "condition_names": np.array(condition_names, dtype=str),
+        "condition_loss": condition_loss,
+        "condition_answer_loss": condition_answer_loss,
     }
     metadata = {
         "schema": 1,
