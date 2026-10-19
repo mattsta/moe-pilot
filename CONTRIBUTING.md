@@ -21,6 +21,13 @@ Do not use inline Python or throwaway command-line validation programs. Prefer
 focused modules to additional service layers or dependencies. Keep imports
 free of downloads, model loading, experiment execution, and output writes.
 
+Research execution is local, using inspectable model weights and direct access
+to routing, activations, expert outputs, and intervention points. Managed model
+APIs do not satisfy that execution contract. Network use is limited to explicit
+input/model acquisition and literature access. Follow the
+[research program](docs/research-program.md) when extending scientific scope;
+new model families require validated local architecture support.
+
 Tests are offline and use tiny local random models. For numerical changes,
 compare to Hugging Face and test padding, document boundaries, router masking,
 checkpoint restart, and both safetensors layouts. Preserve existing research

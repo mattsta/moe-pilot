@@ -1,8 +1,15 @@
 # MoE Pilot
 
-A Python library and executable research pipeline for studying expert routing,
-specialization, geometry, and causal ablations in OLMoE. Inference streams
-one decoder layer at a time onto CUDA, ROCm, MPS, or CPU from local safetensors.
+A local Python research library and executable reference project for studying
+expert routing, specialization, geometry, and causal contributions in open
+mixture-of-experts models. The current engine supports OLMoE and streams one
+decoder layer at a time onto CUDA, ROCm, MPS, or CPU from local safetensors.
+Experiments inspect and intervene on model internals during local execution.
+
+The [research program](docs/research-program.md) defines the project purpose,
+audits current capabilities, and prioritizes additional models and studies.
+The [causal specialization protocol](docs/studies/causal-specialization.md)
+specifies the next proposed experiment and its analysis requirements.
 
 ## Start here
 
