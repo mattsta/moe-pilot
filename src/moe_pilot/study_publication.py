@@ -96,6 +96,21 @@ def write_reader_analysis(root):
             ]
         )
     if effects:
+        primary = [row for row in effects if row["primary"] in (True, "True")]
+        surviving = [row for row in primary if row["holm_p"] < 0.05]
+        document.append(
+            "**Primary interaction results:** "
+            + (
+                "; ".join(
+                    f"{row['domain']} / {row['mode']} ({row['interaction']:+.6f} nats/token, Holm p={row['holm_p']:.4f})"
+                    for row in surviving
+                )
+                + " clear the declared Holm threshold."
+                if surviving
+                else "None of the six primary interactions clears the declared Holm threshold."
+            )
+            + " This threshold result does not repair failed control matching or establish equivalence for undetected effects.\n"
+        )
         document.extend(
             [
                 "## Held-out intervention findings\n",

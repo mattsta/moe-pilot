@@ -390,6 +390,22 @@ function renderStudy() {
       );
   }
   const effects = DATA.study.causal_effects;
+  if (effects?.length) {
+    const primary = effects.filter(
+      (row) => row.primary === true || row.primary === "True",
+    );
+    const surviving = primary.filter((row) => row.holm_p < 0.05);
+    $("study-overview").insertAdjacentHTML(
+      "beforeend",
+      "<p><strong>New held-out interactions:</strong> " +
+        (surviving.length
+          ? surviving
+              .map((row) => esc(row.domain + " / " + row.mode))
+              .join(", ") + " clear the six-test primary Holm threshold."
+          : "None of the six primary on/off interactions clears Holm’s threshold.") +
+        " Failed control balance still prevents a semantic-specialization claim; an undetected effect is not proof of equivalence.</p>",
+    );
+  }
   if (effects?.length)
     $("new-effects").innerHTML +=
       "<h3>New held-out interaction contrasts</h3>" +
