@@ -20,6 +20,11 @@ def parser():
         commands.add_parser(name, help=f"Run the {name} experiment step")
     commands.add_parser("run", help="Run inference, conditions, ablations, and reports in order")
     commands.add_parser("download-model", help="Download the exact configured model revision")
+    commands.add_parser("download-study-data", help="Acquire pinned local study source files")
+    audit = commands.add_parser(
+        "inspect-study-data", help="Audit local source origins and eligible cells"
+    )
+    audit.add_argument("--output", type=Path, required=True)
     commands.add_parser("inventory", help="Read configured input and output availability")
     verification = commands.add_parser("verify-model", help="Full-depth local CPU reference parity")
     verification.add_argument("--documents", type=int, default=5)
@@ -88,6 +93,17 @@ def main(argv=None):
         if arguments.config is None:
             parser().error("--config is required for experiment commands")
         config = load_experiment(arguments.config)
+        if arguments.command == "download-study-data":
+            from moe_pilot.study_data import acquire_sources
+
+            acquire_sources(config)
+            return 0
+        if arguments.command == "inspect-study-data":
+            from moe_pilot.study_data import inspect_sources
+
+            report = inspect_sources(config, arguments.output)
+            print(json.dumps(report, indent=2))
+            return 0
         if arguments.command == "inventory":
             from moe_pilot.inventory import inspect_experiment
 

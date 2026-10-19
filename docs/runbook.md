@@ -164,6 +164,12 @@ not be interpreted as a performance speedup measurement.
 
 ## Prepare corpora
 
+For the source-balanced causal study, follow the
+[data design and acquisition procedure](studies/data-design.md). It uses pinned
+local parquet inputs with explicit origin filtering and grouped discovery,
+calibration, evaluation, and formatting-diagnostic partitions. The study
+commands require the optional `data` dependencies.
+
 For the supplied pilot inputs, copy the archived samples into the configured
 data directory (the example config uses `data/pilot`):
 

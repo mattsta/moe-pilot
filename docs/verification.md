@@ -59,7 +59,7 @@ Local checks passed on 2026-10-19:
 | --------------------------------------------- | ---------------------------------------------------- |
 | Locked uv synchronization                     | Passed                                               |
 | Ruff lint and formatting                      | Passed                                               |
-| `pytest -q -W error`                          | 146 passed; 2 absent CUDA/ROCm hardware tests skipped; no warnings |
+| `pytest -q -W error`                          | 153 passed; 2 absent CUDA/ROCm hardware tests skipped; no warnings |
 | CPU/MPS performance measurement               | 24 cases, 7 timed repeats each; numerical parity passed |
 | Offline CLI smoke                             | CPU and real MPS passed against CPU/Hugging Face |
 | Configured read-only inventory                | Passed without creating input/output directories     |

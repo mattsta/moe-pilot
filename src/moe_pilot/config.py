@@ -104,6 +104,87 @@ class DatasetRevision:
     revision: str
 
 
+@dataclass(frozen=True)
+class StudySource:
+    repository: str
+    revision: str
+    format: str
+    filename: str
+    path: Path
+    domains: tuple[tuple[str, tuple[str, ...]], ...]
+    exclude_origins: tuple[str, ...] = ()
+
+    def __post_init__(self):
+        if not re.fullmatch(r"[0-9a-fA-F]{40}", self.revision):
+            raise ValueError("Study sources need immutable dataset commit SHAs")
+        if not self.repository or self.format not in ("mmlu", "mmlu-pro"):
+            raise ValueError("Study source requires a repository and supported format")
+        if (
+            not self.filename
+            or Path(self.filename).is_absolute()
+            or ".." in Path(self.filename).parts
+        ):
+            raise ValueError("Study source filename must be a safe repository-relative path")
+        if not Path(self.path).is_absolute():
+            raise ValueError("Study source path must be absolute in the library API")
+        object.__setattr__(self, "path", Path(self.path).resolve())
+        domain_items = self.domains.items() if isinstance(self.domains, dict) else self.domains
+        domains = tuple(sorted((name, tuple(subjects)) for name, subjects in domain_items))
+        if not domains or any(
+            not isinstance(domain, str)
+            or not domain
+            or not subjects
+            or any(not isinstance(subject, str) or not subject for subject in subjects)
+            for domain, subjects in domains
+        ):
+            raise ValueError("Study source needs nonempty domain/subject mappings")
+        if len({name for name, _ in domains}) != len(domains):
+            raise ValueError("Study source domains must be unique")
+        object.__setattr__(self, "domains", domains)
+        object.__setattr__(self, "exclude_origins", tuple(self.exclude_origins))
+        subjects = [subject for _, values in domains for subject in values]
+        if len(subjects) != len(set(subjects)):
+            raise ValueError("Study source subjects cannot belong to multiple domains")
+        for pattern in self.exclude_origins:
+            re.compile(pattern)
+
+
+@dataclass(frozen=True)
+class Study:
+    discovery_per_cell: int = 30
+    calibration_per_cell: int = 20
+    evaluation_per_cell: int = 30
+    max_bytes: int = 900
+    near_duplicate_threshold: float = 0.8
+    sources: tuple[StudySource, ...] = ()
+
+    def __post_init__(self):
+        for name in (
+            "discovery_per_cell",
+            "calibration_per_cell",
+            "evaluation_per_cell",
+            "max_bytes",
+        ):
+            _integer(getattr(self, name), f"study.{name}")
+        threshold = self.near_duplicate_threshold
+        if (
+            isinstance(threshold, bool)
+            or not isinstance(threshold, (int, float))
+            or not 0 < threshold <= 1
+        ):
+            raise ValueError("Near-duplicate threshold must be in (0, 1]")
+        if not isinstance(self.sources, tuple) or any(
+            not isinstance(s, StudySource) for s in self.sources
+        ):
+            raise ValueError("Study sources must be a tuple of StudySource definitions")
+        if len({s.repository for s in self.sources}) != len(self.sources):
+            raise ValueError("Study source repositories must be unique")
+        if self.sources and any(
+            set(dict(s.domains)) != set(dict(self.sources[0].domains)) for s in self.sources
+        ):
+            raise ValueError("Study sources must supply the same domain cells")
+
+
 def _integer(value, name, minimum=1):
     if type(value) is not int or value < minimum:
         raise ValueError(f"{name} must be an integer >= {minimum}")
@@ -118,11 +199,15 @@ class Experiment:
     corpora: Corpora = field(default_factory=Corpora)
     model: Model = field(default_factory=Model)
     datasets: tuple[DatasetRevision, ...] = ()
+    study: Study = field(default_factory=Study)
 
     def __post_init__(self):
         from moe_pilot.devices import validate_device_name
 
         validate_device_name(self.execution.device)
+        for source in self.study.sources:
+            if source.path == self.paths.output or source.path.is_relative_to(self.paths.output):
+                raise ValueError("Study source data must be outside the experiment output")
         for section in ("execution", "analysis", "ablations", "corpora"):
             for name, value in asdict(getattr(self, section)).items():
                 if name == "device":
@@ -157,9 +242,16 @@ class Experiment:
                 raise ValueError("Each dataset revision must be a full 40-character commit SHA")
 
     def record(self):
-        record = asdict(self)
-        record["paths"] = {name: str(value) for name, value in asdict(self.paths).items()}
-        return record
+        def serializable(value):
+            if isinstance(value, Path):
+                return str(value)
+            if isinstance(value, dict):
+                return {key: serializable(item) for key, item in value.items()}
+            if isinstance(value, (tuple, list)):
+                return [serializable(item) for item in value]
+            return value
+
+        return serializable(asdict(self))
 
 
 def load_experiment(filename):
@@ -176,6 +268,7 @@ def load_experiment(filename):
         "ablations": Ablations,
         "corpora": Corpora,
         "model": Model,
+        "study": Study,
     }
     unknown = set(raw) - {"paths", "datasets", *sections}
     if unknown:
@@ -194,6 +287,32 @@ def load_experiment(filename):
         if not isinstance(values, dict):
             raise ValueError(f"{name} must be a TOML table")
         values = dict(values)
+        if name == "study" and "sources" in values:
+            sources = values["sources"]
+            if not isinstance(sources, list) or any(
+                not isinstance(source, dict) for source in sources
+            ):
+                raise ValueError("study.sources must be an array of tables")
+            parsed = []
+            for source in sources:
+                source = dict(source)
+                try:
+                    source["path"] = (filename.parent / source["path"]).resolve()
+                    domains = source["domains"]
+                    if not isinstance(domains, dict) or any(
+                        not isinstance(v, list) for v in domains.values()
+                    ):
+                        raise ValueError(
+                            "Study source domains must map names to arrays of subjects"
+                        )
+                    source["domains"] = {
+                        domain: tuple(subjects) for domain, subjects in domains.items()
+                    }
+                    source["exclude_origins"] = tuple(source.get("exclude_origins", ()))
+                    parsed.append(StudySource(**source))
+                except (KeyError, TypeError) as error:
+                    raise ValueError(f"Invalid study source: {error}") from error
+            values["sources"] = tuple(parsed)
         for key in ("layers", "expert_counts"):
             if key in values:
                 if not isinstance(values[key], list):

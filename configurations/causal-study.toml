@@ -1,0 +1,62 @@
+schema_version = 1
+
+[paths]
+model = "../models/olmoe-0924"
+data = "../data/causal-study"
+output = "../runs/causal-study-0924"
+
+[model]
+repository = "allenai/OLMoE-1B-7B-0924"
+revision = "6d84c48581ece794365f2b8e9cfb043c68ade9c5"
+
+[execution]
+device = "auto"
+threads = 8
+max_tokens = 1024
+condition_group = 4
+
+[analysis]
+seed = 20261019
+permutations = 9999
+bootstrap_samples = 10000
+probe_tokens_per_domain = 100
+layers = [7]
+
+[ablations]
+expert_counts = [1]
+control_seeds = 8
+control_candidates = 4000
+on_domain_candidates = 6000
+
+[study]
+discovery_per_cell = 30
+calibration_per_cell = 20
+evaluation_per_cell = 30
+max_bytes = 900
+near_duplicate_threshold = 0.8
+
+[[study.sources]]
+repository = "cais/mmlu"
+revision = "c30699e8356da336a370243923dbaf21066bb9fe"
+format = "mmlu"
+filename = "all/test-00000-of-00001.parquet"
+path = "../data/sources/mmlu/all/test-00000-of-00001.parquet"
+
+[study.sources.domains]
+computing = ["college_computer_science", "high_school_computer_science", "computer_security"]
+mathematics = ["abstract_algebra", "college_mathematics", "high_school_mathematics", "elementary_mathematics"]
+science = ["college_biology", "high_school_biology", "college_chemistry", "high_school_chemistry", "college_physics", "high_school_physics", "conceptual_physics"]
+
+[[study.sources]]
+repository = "TIGER-Lab/MMLU-Pro"
+revision = "b189ec765aa7ed75c8acfea42df31fdae71f97be"
+format = "mmlu-pro"
+filename = "data/test-00000-of-00001.parquet"
+path = "../data/sources/mmlu-pro/data/test-00000-of-00001.parquet"
+# Origin patterns are frozen after the source inventory, before data partitioning.
+exclude_origins = ["(?i)mmlu"]
+
+[study.sources.domains]
+computing = ["computer science"]
+mathematics = ["math"]
+science = ["biology", "chemistry", "physics"]

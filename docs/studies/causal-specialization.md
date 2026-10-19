@@ -4,8 +4,9 @@ This proposed local experiment tests whether domain-related expert routing
 predicts domain-selective loss effects after accounting for routing mass,
 lexical composition, and source. Its primary target is a pinned OLMoE
 checkpoint. The implementation supplies the intervention modes below,
-checkpointed diagnostics, and mass controls. Dataset controls and confirmatory
-statistics described below remain prerequisites for study execution.
+checkpointed diagnostics, mass controls, and the
+[source-balanced data preparation](data-design.md). Confirmatory statistics
+and measured matching criteria remain prerequisites for final evaluation.
 
 ## Hypotheses and observations
 

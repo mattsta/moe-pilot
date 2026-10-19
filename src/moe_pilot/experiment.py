@@ -19,18 +19,38 @@ class Step:
     module: str
     function: str
     dependencies: tuple[str, ...] = ()
+    data_files: tuple[str, ...] = ()
+    model_inputs: bool = True
+    study_sources: bool = False
 
 
 STEPS = {
-    "build-corpus": Step("build_corpus", "run"),
-    "build-heldout": Step("build_heldout", "run"),
-    "build-subtopics": Step("build_subtopics", "run"),
-    "routing": Step("routing", "run"),
-    "domain-report": Step("domain_report", "run", ("routing",)),
-    "build-conditions": Step("conditions", "run", ("domain-report",)),
-    "ablate": Step("ablations", "run", ("build-conditions",)),
-    "ablation-report": Step("ablation_report", "run", ("ablate",)),
-    "subtopic-report": Step("subtopic_report", "run", ("domain-report",)),
+    "build-corpus": Step("build_corpus", "run", model_inputs=False),
+    "build-heldout": Step("build_heldout", "run", data_files=("corpus.json",), model_inputs=False),
+    "build-subtopics": Step("build_subtopics", "run", model_inputs=False),
+    "routing": Step("routing", "run", data_files=("corpus.json", "corpus_sources.json")),
+    "domain-report": Step(
+        "domain_report", "run", ("routing",), ("corpus.json", "corpus_sources.json")
+    ),
+    "build-conditions": Step(
+        "conditions", "run", ("domain-report",), ("corpus.json", "corpus_sources.json")
+    ),
+    "ablate": Step(
+        "ablations",
+        "run",
+        ("build-conditions",),
+        ("corpus.json", "heldout.json", "heldout_sources.json"),
+    ),
+    "ablation-report": Step(
+        "ablation_report", "run", ("ablate",), ("heldout.json", "heldout_sources.json")
+    ),
+    "subtopic-report": Step(
+        "subtopic_report",
+        "run",
+        ("domain-report",),
+        ("subtopic_corpus.json", "subtopic_sources.json"),
+    ),
+    "prepare-study": Step("study_data", "run", model_inputs=False, study_sources=True),
 }
 PIPELINE = (
     "routing",
@@ -115,20 +135,21 @@ class ExperimentRunner:
         paths = self.config.paths
         package = Path(__file__).parent
         inputs = _files(sorted(package.rglob("*.py")))
-        if step == "build-heldout":
-            inputs.update(_files([paths.data / "corpus.json"]))
-        elif step not in ("build-corpus", "build-subtopics"):
-            corpus = (
-                "heldout.json"
-                if step in ("ablate", "ablation-report")
-                else ("subtopic_corpus.json" if step == "subtopic-report" else "corpus.json")
+        specification = STEPS[step]
+        inputs.update(_files([paths.data / name for name in specification.data_files]))
+        if specification.study_sources:
+            from moe_pilot.study_data import source_record_path
+
+            inputs.update(
+                _files(
+                    [
+                        path
+                        for source in self.config.study.sources
+                        for path in (source.path, source_record_path(source))
+                    ]
+                )
             )
-            sources = (
-                "subtopic_sources.json"
-                if corpus == "subtopic_corpus.json"
-                else corpus.replace(".json", "_sources.json")
-            )
-            inputs.update(_files([paths.data / corpus, paths.data / sources]))
+        if specification.model_inputs:
             inputs.update(_files(sorted(paths.model.glob("*.json"))))
             for shard in sorted(paths.model.glob("*.safetensors")):
                 stat = shard.stat()
