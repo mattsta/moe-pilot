@@ -1,15 +1,18 @@
 import numpy as np
 import pytest
 import torch
+import torch.nn.functional as F
 from tokenizers import Tokenizer
 from tokenizers.models import WordLevel
 from tokenizers.pre_tokenizers import Whitespace
-from transformers import PreTrainedTokenizerFast
+from transformers import AutoModelForCausalLM, PreTrainedTokenizerFast
 
 from moe_pilot.engine import Engine
 from moe_pilot.observations import observe_documents
+from moe_pilot.resources import ResourcePolicy
 from moe_pilot.smoke import tiny_model
 from moe_pilot.study_data import render_question
+from moe_pilot.study_formats import paired_chat_rows
 
 
 @pytest.fixture
@@ -55,7 +58,9 @@ def observation_inputs(tmp_path):
                 "answer_start": start,
             }
         )
-    return Engine(directory, device="cpu", weight_cache="resident"), rows
+    return Engine(
+        directory, device="cpu", weight_cache="resident", resources=ResourcePolicy(2, 4)
+    ), rows
 
 
 def test_microbatching_preserves_document_routing_losses_and_norm_samples(
@@ -110,3 +115,41 @@ def test_choice_prediction_cannot_read_the_given_answer(observation_inputs):
     arrays, _ = observe_documents(engine, paired, max_tokens=128, layers=(0,), seed=17)
     assert arrays["choice_accuracy"].sum() == 1
     np.testing.assert_allclose(np.exp(arrays["choice_log_probability"]).sum(), 1, atol=1e-6)
+
+
+def test_matched_question_spans_keep_probe_and_routing_invariant_to_batching(observation_inputs):
+    engine, rows = observation_inputs
+    engine.tok.chat_template = (
+        "{% for message in messages %}USER {{ message['content'] }} ASSISTANT{% endfor %}"
+    )
+    paired = paired_chat_rows(engine.tok, rows[:2])
+    full, _ = observe_documents(engine, paired, max_tokens=128, layers=(0,), seed=17)
+    split, _ = observe_documents(
+        engine, paired, max_tokens=128, layers=(0,), seed=17, microbatch_documents=1
+    )
+    for key in (
+        "mass",
+        "usage",
+        "norm",
+        "aligned_loss",
+        "choice_accuracy",
+        "choice_log_probability",
+    ):
+        np.testing.assert_allclose(full[key], split[key], atol=2e-5, rtol=2e-5)
+    np.testing.assert_allclose(full["usage"].sum(-1), engine.K)
+    assert full["routing_token_counts"][0] == full["routing_token_counts"][1]
+    assert full["routing_token_counts"][2] == full["routing_token_counts"][3]
+    reference = AutoModelForCausalLM.from_pretrained(
+        engine.store.directory, local_files_only=True
+    ).eval()
+    with torch.inference_mode():
+        for index, row in enumerate(paired):
+            ids = torch.tensor(
+                engine.tok(
+                    row["text"], add_special_tokens=row.get("add_special_tokens", True)
+                ).input_ids
+            )
+            logits = reference(ids[None], use_cache=False).logits[0]
+            positions = np.array(row["routing_positions"])
+            expected = F.cross_entropy(logits[positions[:-1]], ids[positions[1:]]).item()
+            np.testing.assert_allclose(full["aligned_loss"][index], expected, atol=2e-5, rtol=2e-5)

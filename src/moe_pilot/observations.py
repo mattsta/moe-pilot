@@ -46,7 +46,11 @@ class ExpertNormProbe:
 def encode_rows(engine, rows, max_tokens):
     ids, target_masks = [], []
     for row in rows:
-        encoded = engine.tok(row["text"], return_offsets_mapping=True)
+        encoded = engine.tok(
+            row["text"],
+            return_offsets_mapping=True,
+            add_special_tokens=row.get("add_special_tokens", True),
+        )
         tokens = encoded["input_ids"]
         if len(tokens) < 2 or len(tokens) > max_tokens:
             raise ValueError(
@@ -80,6 +84,20 @@ def observe_documents(
 ):
     """Collect paired document observations without truncating target content."""
     ids, answer_masks = encode_rows(engine, rows, max_tokens)
+    eligible_positions = []
+    for row, tokens in zip(rows, ids, strict=True):
+        positions = list(row.get("routing_positions", range(len(tokens) - 1)))
+        if (
+            not positions
+            or positions != sorted(set(positions))
+            or any(
+                type(position) is not int or not 0 <= position < len(tokens) - 1
+                for position in positions
+            )
+        ):
+            raise ValueError("Routing spans need sorted unique valid input-token positions")
+        eligible_positions.append(positions)
+    aligned_loss = np.zeros(len(rows)) if all("routing_positions" in row for row in rows) else None
     layers = tuple(layers)
     if (
         not rows
@@ -101,6 +119,7 @@ def observe_documents(
     usage, norms = np.zeros_like(mass), np.zeros_like(mass)
     loss, answer_loss = np.zeros(count), np.zeros(count)
     token_counts = np.array([len(tokens) for tokens in ids])
+    routing_counts = np.array([len(positions) for positions in eligible_positions])
     unigram = np.bincount(np.concatenate(ids), minlength=engine.cfg.vocab_size)
     frequency = unigram if discovery_counts is None else discovery_counts
     if (
@@ -130,11 +149,15 @@ def observe_documents(
         batch = engine.batch(ids[start:stop], max_tokens)
         positions = []
         offset = 0
-        for row, tokens in zip(rows[start:stop], ids[start:stop], strict=True):
+        routing_valid = np.zeros(batch.N, dtype=bool)
+        for index, (row, tokens) in enumerate(zip(rows[start:stop], ids[start:stop], strict=True)):
             number = int.from_bytes(
-                hashlib.sha256(f"{seed}:{row['id']}".encode()).digest()[:8], "big"
+                hashlib.sha256(f"{seed}:{row.get('sample_id', row['id'])}".encode()).digest()[:8],
+                "big",
             )
-            positions.append(offset + number % (len(tokens) - 1))
+            eligible = eligible_positions[start + index]
+            positions.append(offset + eligible[number % len(eligible)])
+            routing_valid[np.array(eligible) + offset] = True
             offset += len(tokens)
         probe = ExpertNormProbe(layers, positions)
         choice_tokens = []
@@ -142,7 +165,10 @@ def observe_documents(
             candidates = []
             for index in range(len(row["choices"])):
                 candidate = engine.tok(
-                    row["text"][: row["answer_start"]] + " " + chr(65 + index)
+                    row["text"][: row["answer_start"]]
+                    + row.get("choice_separator", " ")
+                    + chr(65 + index),
+                    add_special_tokens=row.get("add_special_tokens", True),
                 ).input_ids
                 if len(candidate) != len(tokens) or candidate[:-1] != tokens[:-1]:
                     raise ValueError(
@@ -174,6 +200,11 @@ def observe_documents(
         loss[start:stop] = document_means(results["base"], batch.doc, valid)
         answer_targets = np.concatenate(answer_masks[start:stop]) & valid
         answer_loss[start:stop] = document_means(results["base"], batch.doc, answer_targets)
+        if aligned_loss is not None:
+            adjacent = np.r_[routing_valid[1:] & (batch.doc[1:] == batch.doc[:-1]), False]
+            aligned_loss[start:stop] = document_means(
+                results["base"], batch.doc, valid & routing_valid & adjacent
+            )
         for index, name in enumerate(condition_names):
             condition_loss[index, start:stop] = document_means(results[name], batch.doc, valid)
             condition_answer_loss[index, start:stop] = document_means(
@@ -181,12 +212,16 @@ def observe_documents(
             )
         for position, layer in enumerate(layers):
             indices, gates, _ = routes[layer]
-            selected_docs = np.repeat(batch.doc[valid], engine.K)
+            selected_docs = np.repeat(batch.doc[routing_valid], engine.K)
             local_mass = np.zeros((stop - start, experts))
             local_usage = np.zeros_like(local_mass)
-            np.add.at(local_mass, (selected_docs, indices[valid].ravel()), gates[valid].ravel())
-            np.add.at(local_usage, (selected_docs, indices[valid].ravel()), 1)
-            denominators = (token_counts[start:stop] - 1)[:, None]
+            np.add.at(
+                local_mass,
+                (selected_docs, indices[routing_valid].ravel()),
+                gates[routing_valid].ravel(),
+            )
+            np.add.at(local_usage, (selected_docs, indices[routing_valid].ravel()), 1)
+            denominators = routing_counts[start:stop, None]
             mass[position, start:stop] = local_mass / denominators
             usage[position, start:stop] = local_usage / denominators
             norms[position, start:stop] = probe.values[layer]
@@ -199,6 +234,7 @@ def observe_documents(
         "loss": loss,
         "answer_loss": answer_loss,
         "token_counts": token_counts,
+        "routing_token_counts": routing_counts,
         "unigram": unigram,
         "features": np.array(features),
         "feature_names": np.array(FEATURES),
@@ -208,6 +244,8 @@ def observe_documents(
         "condition_loss": condition_loss,
         "condition_answer_loss": condition_answer_loss,
     }
+    if aligned_loss is not None:
+        arrays["aligned_loss"] = aligned_loss
     metadata = {
         "schema": 1,
         "model_fingerprint": engine.store.fingerprint(),

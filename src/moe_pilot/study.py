@@ -16,7 +16,7 @@ from moe_pilot.catalog import load_catalog
 from moe_pilot.engine import Engine
 from moe_pilot.observations import encode_rows, observe_documents
 from moe_pilot.perturbations import Intervention
-from moe_pilot.resources import bounded_inference, peak_process_bytes
+from moe_pilot.resources import ResourceAdmissionError, bounded_inference, peak_process_bytes
 from moe_pilot.study_data import load_study_split
 
 PLAN = {
@@ -38,6 +38,14 @@ PLAN = {
 }
 
 
+def plan_for(config):
+    return {
+        **PLAN,
+        "bootstrap": f"paired documents stratified by source and domain; {config.analysis.bootstrap_samples} replicates",
+        "permutation": f"domain labels permuted within source; {config.analysis.permutations} replicates; plus-one two-sided p",
+    }
+
+
 def digest(value):
     return hashlib.sha256(
         json.dumps(value, sort_keys=True, ensure_ascii=False).encode()
@@ -56,6 +64,7 @@ def implementation():
             "observations.py",
             "perturbations.py",
             "study_data.py",
+            "study_formats.py",
         )
     }
 
@@ -75,19 +84,29 @@ def load_observations(directory):
     manifest = read_json(directory / "manifest.json")
     if manifest.get("status") != "complete":
         raise ValueError(f"Incomplete observations: {directory}")
+    if not manifest["chunks"] or manifest["documents"] != len(manifest["records"]):
+        raise ValueError("Observation document coverage is incomplete")
     parts = []
+    expected_start = 0
     for item in manifest["chunks"]:
+        if item["start"] != expected_start or Path(item["file"]).name != item["file"]:
+            raise ValueError("Observation chunks must cover documents once, in order")
         path = directory / item["file"]
         if hashlib.sha256(path.read_bytes()).hexdigest() != item["sha256"]:
             raise ValueError("Observation checkpoint bytes changed")
         with np.load(path, allow_pickle=False) as data:
             part = {key: data[key] for key in data.files}
+            if part["loss"].shape != (item["documents"],):
+                raise ValueError("Observation chunk length differs from its record")
             if any(
                 np.issubdtype(value.dtype, np.number) and not np.isfinite(value).all()
                 for value in part.values()
             ):
                 raise ValueError("Nonfinite research observations")
             parts.append(part)
+        expected_start += item["documents"]
+    if expected_start != manifest["documents"]:
+        raise ValueError("Observation document coverage is incomplete")
     arrays = {}
     for key in parts[0]:
         if key in ("layers", "feature_names", "condition_names"):
@@ -104,6 +123,20 @@ def load_observations(directory):
             )
             arrays[key] = np.concatenate([part[key] for part in parts], axis=axis)
     return arrays, manifest
+
+
+def admit_batch(engine, ids, start, maximum, max_tokens, conditions, group):
+    """Shrink only before inference; actual OS pressure still stops the job."""
+    stop = min(len(ids), start + maximum)
+    while True:
+        batch = engine.batch(ids[start:stop], max_tokens)
+        try:
+            engine.resources.check(engine.estimate_memory(batch, conditions, group))
+            return stop
+        except ResourceAdmissionError:
+            if stop - start == 1:
+                raise
+            stop = start + max(1, (stop - start) // 2)
 
 
 def conditions_from_selection(selection):
@@ -127,10 +160,14 @@ def conditions_from_selection(selection):
 
 
 @bounded_inference
-def collect(config, catalog, names, partition, *, max_batches=None, interventions=False):
+def collect(
+    config, catalog, names, partition, *, max_batches=None, interventions=False, formatting="plain"
+):
     """Collect only real study observations; every completed microbatch is reusable."""
     if partition not in ("discovery", "calibration", "evaluation", "format_pairs"):
         raise ValueError("Unknown study partition")
+    if max_batches is not None and (type(max_batches) is not int or max_batches < 1):
+        raise ValueError("max_batches must be a positive integer")
     targets = {target.name: target for target in load_catalog(catalog)}
     if not names or set(names) - set(targets):
         raise ValueError("Unknown model targets")
@@ -138,15 +175,32 @@ def collect(config, catalog, names, partition, *, max_batches=None, intervention
         raise ValueError(
             "Research collection requires an accelerator; CPU model comparison is disabled"
         )
-    rows = load_study_split(config, partition)
+    if formatting not in ("plain", "paired-chat") or (
+        formatting != "plain" and (partition != "evaluation" or interventions)
+    ):
+        raise ValueError("Paired chat formatting is a separate evaluation-only follow-up")
+    source_rows = load_study_split(config, partition)
     root = config.paths.output
     root.mkdir(parents=True, exist_ok=True)
     plan = root / "plan.json"
-    if plan.exists() and read_json(plan) != PLAN:
+    active_plan = plan_for(config)
+    if plan.exists() and read_json(plan) != active_plan:
         raise ValueError("Research plan changed; use a new run directory")
-    write_json(plan, PLAN)
+    write_json(plan, active_plan)
+    active_format_plan = None
+    if formatting == "paired-chat":
+        from moe_pilot.study_formats import FORMAT_PLAN
+
+        active_format_plan = {
+            **FORMAT_PLAN,
+            "uncertainty": f"{config.analysis.bootstrap_samples} paired content-group bootstrap replicates stratified by source and domain",
+        }
+        format_path = root / "format-plan.json"
+        if format_path.exists() and read_json(format_path) != active_format_plan:
+            raise ValueError("Formatting plan changed; use a new run directory")
+        write_json(format_path, active_format_plan)
     selection = read_json(root / "selection.json") if interventions else None
-    if selection and (names != [selection["model"]] or selection.get("plan") != PLAN):
+    if selection and (names != [selection["model"]] or selection.get("plan") != active_plan):
         raise ValueError("Interventions require their frozen selection model and exact plan")
     if interventions and partition != "evaluation":
         raise ValueError("Frozen interventions are evaluated only on the evaluation split")
@@ -165,6 +219,19 @@ def collect(config, catalog, names, partition, *, max_batches=None, intervention
         )
         if engine.selection.backend == "cpu":
             raise ValueError("No compliant accelerator; research stopped without CPU inference")
+        rows = source_rows
+        if formatting == "paired-chat":
+            from moe_pilot.study_formats import paired_chat_rows
+
+            baseline_path = root / name / "evaluation" / "manifest.json"
+            if not baseline_path.exists() or read_json(baseline_path).get("status") != "complete":
+                raise ValueError("Complete the plain evaluation before its native-chat follow-up")
+            baseline = read_json(baseline_path)["identity"]
+            if baseline["model"] != engine.store.fingerprint() or baseline["rows"] != digest(
+                source_rows
+            ):
+                raise ValueError("Native-chat follow-up must use the same checkpoint and questions")
+            rows = paired_chat_rows(engine.tok, source_rows)
         ids, _ = encode_rows(engine, rows, config.execution.max_tokens)
         discovery_ids = (
             ids
@@ -174,7 +241,11 @@ def collect(config, catalog, names, partition, *, max_batches=None, intervention
             )[0]
         )
         frequency = np.bincount(np.concatenate(discovery_ids), minlength=engine.cfg.vocab_size)
-        label = partition + ("-interventions" if interventions else "")
+        label = (
+            partition
+            + ("-interventions" if interventions else "")
+            + ("-paired-chat" if formatting == "paired-chat" else "")
+        )
         directory = root / name / label
         directory.mkdir(parents=True, exist_ok=True)
         width = config.execution.microbatch_documents or 4
@@ -188,6 +259,9 @@ def collect(config, catalog, names, partition, *, max_batches=None, intervention
                 "lineage": target.lineage,
             },
             "rows": digest(rows),
+            "source_rows": digest(source_rows),
+            "formatting": formatting,
+            "format_plan": digest(active_format_plan),
             "token_ids_sha256": digest(ids),
             "model_directory": str(target.directory),
             "versions": {
@@ -195,6 +269,12 @@ def collect(config, catalog, names, partition, *, max_batches=None, intervention
                 for package in ("torch", "transformers", "numpy", "safetensors")
             },
             "threads": torch.get_num_threads(),
+            "matmul_precision": torch.get_float32_matmul_precision(),
+            "tokenizer_files": {
+                path.name: hashlib.sha256(path.read_bytes()).hexdigest()
+                for path in sorted(target.directory.glob("*.json"))
+                if path.name.startswith(("tokenizer", "special_tokens", "vocab"))
+            },
             "frequency": hashlib.sha256(frequency.tobytes()).hexdigest(),
             "implementation": implementation(),
             "device": engine.selection.identity(),
@@ -208,7 +288,7 @@ def collect(config, catalog, names, partition, *, max_batches=None, intervention
             },
             "conditions": {key: value.record() for key, value in conditions.items()},
             "selection": digest(selection),
-            "plan": digest(PLAN),
+            "plan": digest(active_plan),
         }
         manifest_path = directory / "manifest.json"
         manifest = (
@@ -221,7 +301,20 @@ def collect(config, catalog, names, partition, *, max_batches=None, intervention
                 "chunks": [],
                 "documents": len(rows),
                 "records": [
-                    {key: row[key] for key in ("id", "domain", "source", "group_id")}
+                    {
+                        key: row[key]
+                        for key in (
+                            "id",
+                            "domain",
+                            "source",
+                            "group_id",
+                            "source_id",
+                            "format_variant",
+                            "alignment_coverage",
+                            "aligned_tokens_sha256",
+                        )
+                        if key in row
+                    }
                     for row in rows
                 ],
             }
@@ -231,7 +324,8 @@ def collect(config, catalog, names, partition, *, max_batches=None, intervention
                 "Study observation identity changed; retain old run and use a new output"
             )
         done = {chunk["start"]: chunk for chunk in manifest["chunks"]}
-        for start in range(0, len(rows), width):
+        start = 0
+        while start < len(rows):
             filename = f"chunk-{start:05d}.npz"
             path = directory / filename
             if start in done:
@@ -240,19 +334,30 @@ def collect(config, catalog, names, partition, *, max_batches=None, intervention
                     or hashlib.sha256(path.read_bytes()).hexdigest() != done[start]["sha256"]
                 ):
                     raise ValueError("Previously completed observation changed")
+                start += done[start]["documents"]
                 continue
+            stop = admit_batch(
+                engine,
+                ids,
+                start,
+                width,
+                config.execution.max_tokens,
+                conditions,
+                config.execution.condition_group,
+            )
             before = perf_counter()
             arrays, _ = observe_documents(
                 engine,
-                rows[start : start + width],
+                rows[start:stop],
                 max_tokens=config.execution.max_tokens,
                 layers=target.layers,
                 seed=config.analysis.seed,
-                microbatch_documents=width,
+                microbatch_documents=stop - start,
                 discovery_counts=frequency,
                 conditions=conditions,
                 condition_group=config.execution.condition_group,
             )
+            engine.release_stream_memory()
             save_arrays(path, arrays)
             manifest["chunks"].append(
                 {
@@ -265,15 +370,21 @@ def collect(config, catalog, names, partition, *, max_batches=None, intervention
                 }
             )
             manifest["chunks"].sort(key=lambda item: item["start"])
+            if stop == len(rows):
+                if engine.store.fingerprint() != identity["model"]:
+                    raise ValueError("Model changed during observation")
+                load_study_split(config, partition)
+                manifest["status"] = "complete"
             write_json(manifest_path, manifest)
             completed += 1
             print(
-                f"{name}/{label}: {min(start + width, len(rows))}/{len(rows)} documents; "
+                f"{name}/{label}: {stop}/{len(rows)} documents; "
                 f"{manifest['chunks'][-1]['seconds']:.1f}s; peak RSS {peak_process_bytes() / 1024**3:.2f} GiB",
                 flush=True,
             )
             if max_batches is not None and completed >= max_batches:
                 return
+            start = stop
         if engine.store.fingerprint() != identity["model"]:
             raise ValueError("Model changed during observation")
         load_study_split(config, partition)
@@ -341,7 +452,7 @@ def freeze_selection(config, name="olmoe-0924"):
     selection = {
         "schema": 1,
         "model": name,
-        "plan": PLAN,
+        "plan": plan_for(config),
         "domains": results,
         "discovery_identity": digest(dm["identity"]),
         "calibration_identity": digest(cm["identity"]),
