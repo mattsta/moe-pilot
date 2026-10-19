@@ -76,3 +76,23 @@ def test_progress_excludes_admission_checks_and_preserves_actual_policy(tmp_path
     assert snapshot["progress"][0]["completed"] == 16
     assert snapshot["progress"][0]["status"] == "saved partial"
     assert snapshot["policy"]["max_memory_gib"] == 5
+
+
+def test_unvalidated_or_tampered_study_tables_are_not_displayed(tmp_path):
+    path = tmp_path / "tables" / "summary.csv"
+    path.parent.mkdir()
+    path.write_text("value\n1\n")
+    assert study_snapshot(tmp_path)["study"] == {}
+    write_json(
+        path.parent / "analysis_record.json",
+        {"table_sha256": {path.name: hashlib.sha256(path.read_bytes()).hexdigest()}},
+    )
+    assert study_snapshot(tmp_path)["study"]["summary"] == [{"value": 1}]
+    path.write_text("value\n2\n")
+    with pytest.raises(ValueError, match="changed after validation"):
+        study_snapshot(tmp_path)
+
+
+def test_report_output_cannot_overwrite_or_mix_with_research_inputs(publication, tmp_path):
+    with pytest.raises(ValueError, match="separate"):
+        build_report(publication, tmp_path / "study", publication / "report")

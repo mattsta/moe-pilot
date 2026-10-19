@@ -327,6 +327,12 @@ footer {
   .chart svg {
     min-width: 0;
   }
+  .chart.small svg {
+    min-width: 0;
+  }
+  .two-col {
+    grid-template-columns: 1fr;
+  }
   details {
     display: block;
   }

@@ -23,9 +23,15 @@ for (let i = 0; i < 16; i++)
 $("layer").value = "7";
 $("metrics").innerHTML = [
   [Number(DATA.record.documents).toLocaleString(), "analysis documents"],
-  [Number(DATA.record.valid_targets).toLocaleString(), "valid next-token targets"],
+  [
+    Number(DATA.record.valid_targets).toLocaleString(),
+    "valid next-token targets",
+  ],
   [f(DATA.record.baseline_mean_loss, 6), "baseline loss · nats/token"],
-  [Number(DATA.record.conditions).toLocaleString(), "held-out intervention conditions"],
+  [
+    Number(DATA.record.conditions).toLocaleString(),
+    "held-out intervention conditions",
+  ],
 ]
   .map(
     ([v, k]) =>
@@ -48,6 +54,8 @@ function axes(min, max, x, y, h) {
   return s;
 }
 function forest(rows) {
+  if (!rows.length)
+    return '<p class="pending">No completed contrasts for this selection.</p>';
   const vals = rows.flatMap((r) => [r.ci95_low, r.ci95_high, 0]),
     low = Math.min(...vals),
     high = Math.max(...vals),
@@ -56,13 +64,17 @@ function forest(rows) {
     max = high + pad;
   const w = 1000,
     h = 80 + rows.length * 54,
-    x = (v) => 180 + ((v - min) / (max - min)) * 720;
+    gutter = Math.max(
+      180,
+      Math.min(320, 30 + Math.max(...rows.map((row) => row.domain.length)) * 9),
+    ),
+    x = (v) => gutter + ((v - min) / (max - min)) * (920 - gutter);
   let s = axes(min, max, x, 20, h - 45);
   s += `<line x1="${x(0)}" x2="${x(0)}" y1="20" y2="${h - 45}" stroke="#526572" stroke-dasharray="4 4"/>`;
   rows.forEach((r, i) => {
     const y = 48 + i * 54,
-      c = colors[domains.indexOf(r.domain) % colors.length];
-    s += `<text x="155" y="${y + 5}" text-anchor="end">${esc(r.domain)}</text><line x1="${x(r.ci95_low)}" x2="${x(r.ci95_high)}" y1="${y}" y2="${y}" stroke="${c}" stroke-width="3"/><circle cx="${x(r.paired_difference)}" cy="${y}" r="5" fill="${c}"><title>${esc(r.domain)}: ${f(r.paired_difference, 6)} [${f(r.ci95_low, 6)}, ${f(r.ci95_high, 6)}]</title></circle>`;
+      c = colors[Math.max(0, domains.indexOf(r.domain)) % colors.length];
+    s += `<text x="${gutter - 25}" y="${y + 5}" text-anchor="end">${esc(r.domain)}</text><line x1="${x(r.ci95_low)}" x2="${x(r.ci95_high)}" y1="${y}" y2="${y}" stroke="${c}" stroke-width="3"/><circle cx="${x(r.paired_difference)}" cy="${y}" r="5" fill="${c}"><title>${esc(r.domain)}: ${f(r.paired_difference, 6)} [${f(r.ci95_low, 6)}, ${f(r.ci95_high, 6)}]</title></circle>`;
   });
   return svg(s, w, h);
 }
@@ -109,10 +121,11 @@ function bars(rows, key, label) {
   rows.forEach((r, i) => {
     const y = i * 52 + 15,
       width = (r[key] / max) * 600;
-    s += `<text x="180" y="${y + 20}" text-anchor="end">${esc(r[label])}</text><rect x="200" y="${y}" width="${width}" height="27" fill="${colors[i % 5]}"/><text x="${210 + width}" y="${y + 20}">${f(r[key], 3)}</text>`;
-    if(r.lower != null && r.upper != null){
-      const low=200+r.lower/max*600, high=200+r.upper/max*600;
-      s+=`<line x1="${low}" x2="${high}" y1="${y+13}" y2="${y+13}" stroke="#182a38" stroke-width="2"/><line x1="${low}" x2="${low}" y1="${y+7}" y2="${y+19}" stroke="#182a38"/><line x1="${high}" x2="${high}" y1="${y+7}" y2="${y+19}" stroke="#182a38"/>`;
+    s += `<text x="180" y="${y + 20}" text-anchor="end">${esc(r[label])}</text><rect x="200" y="${y}" width="${width}" height="27" fill="${colors[i % 5]}"/><text x="${215 + ((r.upper ?? r[key]) / max) * 600}" y="${y + 20}">${f(r[key], 3)}</text>`;
+    if (r.lower != null && r.upper != null) {
+      const low = 200 + (r.lower / max) * 600,
+        high = 200 + (r.upper / max) * 600;
+      s += `<line x1="${low}" x2="${high}" y1="${y + 13}" y2="${y + 13}" stroke="#182a38" stroke-width="2"/><line x1="${low}" x2="${low}" y1="${y + 7}" y2="${y + 19}" stroke="#182a38"/><line x1="${high}" x2="${high}" y1="${y + 7}" y2="${y + 19}" stroke="#182a38"/>`;
     }
   });
   return svg(s, 1000, h);
@@ -192,13 +205,21 @@ document.querySelectorAll("[data-download]").forEach(
       URL.revokeObjectURL(url);
     }),
 );
-const modelControls=document.createElement('div');
-modelControls.className='filters';
-modelControls.innerHTML='<label>Model comparison<select id="model-metric"><option value="accuracy">Forced-choice accuracy (%)</option><option value="choice_nll">Choice loss (nats/question)</option><option value="loss">Text loss (nats/token)</option></select></label>';
-$('models').insertBefore(modelControls,$('model-results'));
-$('model-metric').onchange=renderStudy;
-const modelNames={'olmoe-0924':'0924 base','olmoe-0125-base':'0125 base','olmoe-0125-sft':'0125 SFT','olmoe-0125-dpo':'0125 DPO','olmoe-0125-instruct':'0125 final'};
+const modelControls = document.createElement("div");
+modelControls.className = "filters";
+modelControls.innerHTML =
+  '<label>Model comparison<select id="model-metric"><option value="accuracy">Forced-choice accuracy (%)</option><option value="choice_nll">Choice loss (nats/question)</option><option value="loss">Text loss (nats/token)</option></select></label>';
+$("models").insertBefore(modelControls, $("model-results"));
+$("model-metric").onchange = renderStudy;
+const modelNames = {
+  "olmoe-0924": "0924 base",
+  "olmoe-0125-base": "0125 base",
+  "olmoe-0125-sft": "0125 SFT",
+  "olmoe-0125-dpo": "0125 DPO",
+  "olmoe-0125-instruct": "0125 final",
+};
 function renderStudy() {
+  $("new-effects").innerHTML = "";
   $("progress").innerHTML = DATA.progress.length
     ? table(DATA.progress, [
         ["model", "Model"],
@@ -208,6 +229,8 @@ function renderStudy() {
         ["documents", "Total docs", 0],
         ["seconds", "Seconds", 1],
         ["peak_gib", "Peak RSS GiB", 2],
+        ["job_budget_gib", "Budget GiB", 1],
+        ["reserve_gib", "Reserve GiB", 1],
       ])
     : '<p class="pending">New study has no completed inference batches yet. No new model comparison is claimed.</p>';
   if (DATA.policy)
@@ -224,22 +247,88 @@ function renderStudy() {
         ["accuracy", "Choice accuracy", 3],
       ])
     : '<p class="pending">Post-training results are not complete yet. The charts above show the completed 0924 reconstruction.</p>';
-  const metric=$('model-metric').value;
-  const summary=(DATA.study.model_summary||[]).filter(row=>row.metric===metric);
-  if(summary.length){
-    const scale=metric==='accuracy'?100:1;
-    const ordered=Object.keys(modelNames);
-    const chartRows=summary.slice().sort((a,b)=>ordered.indexOf(a.model)-ordered.indexOf(b.model)).map(row=>({...row,label:modelNames[row.model]||row.model,value:row.estimate*scale,lower:row.ci_low*scale,upper:row.ci_high*scale}));
-    $('model-results').insertAdjacentHTML('afterbegin','<div class="chart" role="img" aria-label="Completed model comparison with confidence intervals">'+bars(chartRows,'value','label')+'</div><p class="note">Only completed 180-question evaluations are included. Error bars are unadjusted 95% source/domain-stratified bootstrap intervals. Accuracy is forced-choice letter scoring under identical plain prompts; it is not a general reasoning score.</p>');
+  const metric = $("model-metric").value;
+  const summary = (DATA.study.model_summary || []).filter(
+    (row) => row.metric === metric,
+  );
+  if (summary.length) {
+    const scale = metric === "accuracy" ? 100 : 1;
+    const ordered = Object.keys(modelNames);
+    const chartRows = summary
+      .slice()
+      .sort((a, b) => ordered.indexOf(a.model) - ordered.indexOf(b.model))
+      .map((row) => ({
+        ...row,
+        label: modelNames[row.model] || row.model,
+        value: row.estimate * scale,
+        lower: row.ci_low * scale,
+        upper: row.ci_high * scale,
+      }));
+    $("model-results").insertAdjacentHTML(
+      "afterbegin",
+      '<div class="chart" role="img" aria-label="Completed model comparison with confidence intervals">' +
+        bars(chartRows, "value", "label") +
+        '</div><p class="note">Only completed 180-question evaluations are included. Error bars are unadjusted 95% source/domain-stratified bootstrap intervals. Accuracy is forced-choice letter scoring under identical plain prompts; it is not a general reasoning score.</p>',
+    );
   }
-  const paired=DATA.study.posttraining_contrasts;
-  if(paired?.length){
-    const rows=paired.map(row=>({...row,metric:row.metric==='accuracy'?'Accuracy (percentage points)':row.metric==='choice_nll'?'Choice loss (nats/question)':'Text loss (nats/token)',difference:row.difference*(row.metric==='accuracy'?100:1),ci_low:row.ci_low*(row.metric==='accuracy'?100:1),ci_high:row.ci_high*(row.metric==='accuracy'?100:1)}));
-    $('model-results').insertAdjacentHTML('beforeend','<h3>Paired differences from 0125 base</h3>'+table(rows,[['model','Stage'],['metric','Metric'],['difference','Difference',4],['ci_low','95% low',4],['ci_high','95% high',4]])+'<p class="note">These are observational training-stage contrasts on the same questions. Per-token differences are shown only when token IDs agree exactly.</p>');
+  const paired = DATA.study.posttraining_contrasts;
+  if (paired?.length) {
+    const rows = paired.map((row) => ({
+      ...row,
+      metric:
+        row.metric === "accuracy"
+          ? "Accuracy (percentage points)"
+          : row.metric === "choice_nll"
+            ? "Choice loss (nats/question)"
+            : "Text loss (nats/token)",
+      difference: row.difference * (row.metric === "accuracy" ? 100 : 1),
+      ci_low: row.ci_low * (row.metric === "accuracy" ? 100 : 1),
+      ci_high: row.ci_high * (row.metric === "accuracy" ? 100 : 1),
+    }));
+    $("model-results").insertAdjacentHTML(
+      "beforeend",
+      "<h3>Paired differences from 0125 base</h3>" +
+        table(rows, [
+          ["model", "Stage"],
+          ["metric", "Metric"],
+          ["difference", "Difference", 4],
+          ["ci_low", "95% low", 4],
+          ["ci_high", "95% high", 4],
+        ]) +
+        '<p class="note">These are observational training-stage contrasts on the same questions. Per-token differences are shown only when token IDs agree exactly.</p>',
+    );
   }
-  const balance=DATA.study.control_balance;
-  if(balance?.length){
-    $('new-effects').innerHTML='<h3>Calibration rejected the proposed control matches</h3><p class="caution">No domain passed all declared balance thresholds. Intervention results remain exploratory and cannot establish semantic specialization.</p>'+table(balance.map(row=>({...row,on_mass:row.on_mass*100,off_mass:row.off_mass*100,raw_output_norm:row.raw_output_norm*100})),[['domain','Domain'],['expert','Expert',0],['control','Control',0],['on_mass','On-mass gap (%)',1],['off_mass','Off-mass gap (%)',1],['raw_output_norm','Norm gap (%)',1]]);
+  const balance = DATA.study.control_balance;
+  if (balance?.length) {
+    const passed = balance.filter(
+      (row) => row.balance_passed === true || row.balance_passed === "True",
+    ).length;
+    $("new-effects").innerHTML =
+      '<h3>Calibration control balance</h3><p class="caution">' +
+      passed +
+      " of " +
+      balance.length +
+      " domains passed every declared threshold (mass/usage ≤10%, norm ≤20%). Failed matches keep their intervention results exploratory and prevent semantic-specialization claims.</p>" +
+      table(
+        balance.map((row) => ({
+          ...row,
+          on_mass: row.on_mass * 100,
+          off_mass: row.off_mass * 100,
+          on_usage: row.on_usage * 100,
+          off_usage: row.off_usage * 100,
+          raw_output_norm: row.raw_output_norm * 100,
+        })),
+        [
+          ["domain", "Domain"],
+          ["expert", "Expert", 0],
+          ["control", "Control", 0],
+          ["on_mass", "On-mass gap (%)", 1],
+          ["off_mass", "Off-mass gap (%)", 1],
+          ["on_usage", "On-usage gap (%)", 1],
+          ["off_usage", "Off-usage gap (%)", 1],
+          ["raw_output_norm", "Norm gap (%)", 1],
+        ],
+      );
   }
   const effects = DATA.study.causal_effects;
   if (effects?.length)
@@ -253,7 +342,128 @@ function renderStudy() {
         ["ci_high", "95% high", 6],
         ["holm_p", "Holm p", 4],
         ["balance_passed", "Balance passed"],
-      ]);
+      ]) +
+      '<div class="chart" role="img" aria-label="New held-out primary interaction intervals">' +
+      forest(
+        effects
+          .filter((row) => row.primary === true || row.primary === "True")
+          .map((row) => ({
+            ...row,
+            domain: row.domain + " / " + row.mode,
+            paired_difference: row.interaction,
+            ci95_low: row.ci_low,
+            ci95_high: row.ci_high,
+          })),
+      ) +
+      '</div><p class="note">Primary endpoints are removal and rerouting across three domains (Holm family of six). Rescaling and substitution are exploratory secondary outcomes. Intervals are unadjusted. Zero-strength restoration is checked exactly before analysis. Source/lexical sensitivity coefficients are available in the complete CSV.</p><a href="data/study/causal_effects.csv">Download all intervention contrasts</a>';
+  renderInternals();
+  renderFormats();
+}
+
+function renderInternals() {
+  const routing = (DATA.study.routing_shift || []).filter(
+    (row) => row.domain === "all",
+  );
+  const norms = DATA.study.expert_norm_changes || [];
+  let html = "";
+  if (routing.length) {
+    html +=
+      '<h3>Layer-7 routing changes from 0125 base</h3><div class="chart" role="img" aria-label="Routing divergence from base">' +
+      bars(
+        routing.map((row) => ({
+          ...row,
+          label: modelNames[row.model],
+          value: row.mean_jsd_bits,
+          lower: row.ci_low,
+          upper: row.ci_high,
+        })),
+        "value",
+        "label",
+      ) +
+      '</div><p class="note">Mean per-question Jensen–Shannon divergence of selected-gate mass distributions, in bits, with 95% source/domain-stratified bootstrap intervals. Divergence measures a routing change; it does not measure improved reasoning.</p><a href="data/study/routing_shift.csv">Download routing by stage and domain</a>';
+  }
+  if (norms.length) {
+    const models = [...new Set(norms.map((row) => row.model))];
+    const limit = Math.max(
+      ...norms.map((row) => Math.abs(row.mean_log_relative_norm_change)),
+      0.001,
+    );
+    let shapes = "";
+    models.forEach((model, i) => {
+      shapes += `<text x="140" y="${65 + i * 55}" text-anchor="end">${esc(modelNames[model])}</text>`;
+      norms
+        .filter((row) => row.model === model)
+        .forEach((row) => {
+          const value = row.mean_log_relative_norm_change;
+          const strength = Math.min(1, Math.abs(value) / limit);
+          const color =
+            value >= 0
+              ? `rgb(${Math.round(255 - 90 * strength)},${Math.round(255 - 186 * strength)},${Math.round(255 - 221 * strength)})`
+              : `rgb(${Math.round(255 - 203 * strength)},${Math.round(255 - 163 * strength)},${Math.round(255 - 95 * strength)})`;
+          shapes += `<rect x="${160 + row.expert * 12}" y="${42 + i * 55}" width="12" height="38" fill="${color}"><title>${esc(modelNames[model])} / expert ${row.expert}: log ratio ${f(value, 5)}, fold ${f(row.relative_norm_fold_change, 4)}</title></rect>`;
+        });
+    });
+    for (let expert = 0; expert < 64; expert += 8)
+      shapes += `<text x="${166 + expert * 12}" y="${65 + models.length * 55}" text-anchor="middle">${expert}</text>`;
+    shapes += `<text x="545" y="${100 + models.length * 55}" text-anchor="middle">Expert index · blue = smaller, red = larger relative norm · ±${f(limit, 3)} log units</text>`;
+    html +=
+      '<h3>Relative expert-output magnitude changes</h3><div class="chart" role="img" aria-label="Heatmap of relative expert-output norm changes">' +
+      svg(shapes, 1000, 125 + models.length * 55) +
+      '</div><p class="note">Within the 0125 lineage, matched token positions have model-specific incoming hidden states. Norms are divided by each document’s mean expert norm before log ratios. This measures output magnitude, not function direction, knowledge, or causal necessity. Hover a cell for its value.</p><a href="data/study/expert_norm_changes.csv">Download all expert values</a>';
+  }
+  $("internal-results").innerHTML = html;
+}
+
+function renderFormats() {
+  const rows = DATA.study.format_effects || [];
+  if (!rows.length) {
+    $("format-results").innerHTML =
+      '<p class="pending">No completed paired native-chat model comparison yet. Saved partial runs appear in execution progress.</p>';
+    return;
+  }
+  const accuracy = rows
+    .filter((row) => row.metric === "accuracy")
+    .map((row) => ({
+      ...row,
+      domain: modelNames[row.model],
+      paired_difference: 100 * row.estimate,
+      ci95_low: 100 * row.ci_low,
+      ci95_high: 100 * row.ci_high,
+    }));
+  const shown = rows.map((row) => ({
+    ...row,
+    metric:
+      row.metric === "accuracy"
+        ? "Accuracy (percentage points)"
+        : row.metric === "choice_nll"
+          ? "Choice loss (nats/question)"
+          : row.metric === "aligned_loss"
+            ? "Aligned-span loss (nats/token)"
+            : "Routing divergence (bits)",
+    estimate: row.estimate * (row.metric === "accuracy" ? 100 : 1),
+    ci_low: row.ci_low * (row.metric === "accuracy" ? 100 : 1),
+    ci_high: row.ci_high * (row.metric === "accuracy" ? 100 : 1),
+  }));
+  $("format-results").innerHTML =
+    '<h3>Native-chat minus plain accuracy (percentage points)</h3><div class="chart" role="img" aria-label="Paired chat-format accuracy effects">' +
+    forest(accuracy) +
+    "</div>" +
+    table(shown, [
+      ["model", "Checkpoint"],
+      ["metric", "Outcome"],
+      ["estimate", "Estimate", 5],
+      ["ci_low", "95% low", 5],
+      ["ci_high", "95% high", 5],
+      ["pairs", "Pairs", 0],
+    ]) +
+    '<p class="note">Signed effects are chat minus plain; lower loss is better. Routing divergence is nonnegative and has no direction. All intervals are paired, source/domain-stratified, and unadjusted. Whole-prompt per-token loss is deliberately not contrasted across different token sequences.</p>' +
+    table(DATA.study.format_alignment || [], [
+      ["model", "Checkpoint"],
+      ["pairs", "Pairs", 0],
+      ["minimum_question_coverage", "Minimum aligned fraction", 4],
+      ["mean_question_coverage", "Mean aligned fraction", 4],
+    ]) +
+    '<a href="data/study/format_paired_documents.csv">Inspect every paired question effect</a>';
 }
 renderStudy();
 const refreshButton = document.createElement("button");
@@ -288,7 +498,9 @@ if (interactions?.length) {
   }));
   $("interaction-results").innerHTML =
     '<div class="eyebrow">NEW ANALYSIS OF COMPLETED INTERVENTIONS</div><h2>Do the effects exceed what happens off-domain?</h2><p>This contrast subtracts off-domain specialist-minus-control effects from on-domain effects. It uses all five layer-7, single-expert comparisons, 10,000 within-domain paired bootstrap replicates and 9,999 label permutations, with Holm correction across five tests.</p>' +
-    '<div class="chart" role="img" aria-label="On-domain minus off-domain effects">'+forest(rows)+'</div>' +
+    '<div class="chart" role="img" aria-label="On-domain minus off-domain effects">' +
+    forest(rows) +
+    "</div>" +
     table(interactions, [
       ["domain", "Domain"],
       ["interaction", "On/off interaction", 6],
@@ -296,7 +508,7 @@ if (interactions?.length) {
       ["ci_high", "95% high", 6],
       ["holm_p", "Holm p", 4],
     ]) +
-    '<p class="caution">Multilingual and science interactions remain positive after multiplicity correction in this sample. This is a post-hoc reanalysis of existing runs. Source/domain confounding and large control-mass gaps remain; the result does not establish semantic expert necessity. Confidence intervals are unadjusted.</p><a href="data/study/reconstruction_interactions.csv">Download interaction table</a> · <a href="data/study/reconstruction_paired_documents.csv">Inspect all paired document effects</a>';
+    '<p class="caution"></p><a href="data/study/reconstruction_interactions.csv">Download interaction table</a> · <a href="data/study/reconstruction_paired_documents.csv">Inspect all paired document effects</a>';
 }
 if (interactions?.length) {
   const surviving = interactions
@@ -306,3 +518,31 @@ if (interactions?.length) {
     `${surviving.length === 1 ? "Only " + surviving[0] : surviving.join(", ") || "No domain"} clears the Holm threshold in this sample using a studentized permutation test. This is a post-hoc reanalysis; source/domain confounding and large control-mass gaps remain. It does not establish semantic expert necessity. Confidence intervals are unadjusted.`;
 }
 render();
+const exported = DATA.figures || {};
+$("figure-downloads").innerHTML = Object.keys(exported).length
+  ? "<h3>Export figures for reading and reuse</h3><ul>" +
+    Object.entries(exported)
+      .map(
+        ([name, item]) =>
+          "<li><strong>" +
+          esc(name.replaceAll("_", " ")) +
+          "</strong> · " +
+          ["png", "svg", "pdf"]
+            .map(
+              (extension) =>
+                '<a href="figures/' +
+                esc(name) +
+                "." +
+                extension +
+                '">' +
+                extension.toUpperCase() +
+                "</a>",
+            )
+            .join(" · ") +
+          '<p class="note">' +
+          esc(item.caption) +
+          "</p></li>",
+      )
+      .join("") +
+    "</ul>"
+  : "";

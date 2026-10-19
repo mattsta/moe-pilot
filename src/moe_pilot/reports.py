@@ -36,8 +36,14 @@ def study_snapshot(study):
         "policy": None,
         "refreshed_at": datetime.now(UTC).isoformat(),
     }
-    phases = {"discovery", "calibration", "evaluation", "evaluation-interventions", "format_pairs"}
-    for path in sorted(study.glob("*/*/manifest.json")):
+    phases = {
+        "discovery",
+        "calibration",
+        "evaluation",
+        "evaluation-interventions",
+        "evaluation-paired-chat",
+    }
+    for path in sorted(study.glob("*/*/manifest.json"), key=lambda path: path.stat().st_mtime):
         if path.parent.name not in phases:
             continue
         record = json.loads(path.read_text())
@@ -53,6 +59,13 @@ def study_snapshot(study):
                 "seconds": sum(item.get("seconds", 0) for item in chunks),
                 "peak_gib": max((item.get("peak_process_bytes", 0) for item in chunks), default=0)
                 / 1024**3,
+                "resources": record.get("identity", {}).get("resources"),
+                "job_budget_gib": record.get("identity", {})
+                .get("resources", {})
+                .get("max_memory_gib"),
+                "reserve_gib": record.get("identity", {})
+                .get("resources", {})
+                .get("reserve_memory_gib"),
             }
         )
     if (study / "selection.json").exists():
@@ -69,8 +82,9 @@ def study_snapshot(study):
                 or hashlib.sha256(path.read_bytes()).hexdigest() != expected
             ):
                 raise ValueError("Study analysis table changed after validation")
-    for path in sorted((study / "tables").glob("*.csv")):
-        result["study"][path.stem] = read_table(path)
+        for name in record["table_sha256"]:
+            path = study / "tables" / name
+            result["study"][path.stem] = read_table(path)
     return result
 
 
@@ -83,6 +97,8 @@ def build_report(reconstruction, study, output):
         output == reconstruction
         or reconstruction.is_relative_to(output)
         or study.is_relative_to(output)
+        or output.is_relative_to(reconstruction)
+        or output.is_relative_to(study)
     ):
         raise ValueError("Report output must be separate from research inputs")
     evidence = json.loads((reconstruction / "evidence.json").read_text())
@@ -114,6 +130,44 @@ def build_report(reconstruction, study, output):
         )
     if (study / "tables").exists():
         shutil.copytree(study / "tables", output / "data" / "study", dirs_exist_ok=True)
+    if (study / "figures").exists():
+        shutil.copytree(study / "figures", output / "figures", dirs_exist_ok=True)
+        manifest = json.loads((study / "figures" / "manifest.json").read_text())
+        for item in manifest.values():
+            for filename, expected in item["sources"].items():
+                path = (study / "tables" / filename).resolve()
+                if (
+                    path.parent != (study / "tables").resolve()
+                    or hashlib.sha256(path.read_bytes()).hexdigest() != expected
+                ):
+                    raise ValueError("Study figure does not match its current source table")
+            for filename, expected in item["files"].items():
+                path = (study / "figures" / filename).resolve()
+                if (
+                    path.parent != (study / "figures").resolve()
+                    or hashlib.sha256(path.read_bytes()).hexdigest() != expected
+                ):
+                    raise ValueError("Exported study figure changed after validation")
+        payload["figures"] = manifest
+    for path in sorted(study.glob("*/*/manifest.json")):
+        if path.parent.name in (
+            "discovery",
+            "calibration",
+            "evaluation",
+            "evaluation-interventions",
+            "evaluation-paired-chat",
+        ):
+            destination = (
+                output / "data" / "provenance" / path.parent.parent.name / path.parent.name
+            )
+            destination.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(path, destination / "manifest.json")
+    for filename in ("plan.json", "format-plan.json", "selection.json"):
+        if (study / filename).exists():
+            shutil.copy2(study / filename, output / "data" / filename)
+    for filename in ("README.md", "analysis.md"):
+        if (study / filename).exists():
+            shutil.copy2(study / filename, output / filename)
     shutil.copy2(
         reconstruction / "evidence.json", output / "data" / "reconstruction" / "evidence.json"
     )

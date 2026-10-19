@@ -27,6 +27,7 @@
         <a href="#findings">Findings</a
         ><a href="#interventions">Interventions</a><a href="#routing">Routing</a
         ><a href="#models">Training stages</a
+        ><a href="#formats">Prompt format</a
         ><a href="#methods">Methods & data</a>
       </nav>
       <section class="metrics" id="metrics"></section>
@@ -140,16 +141,34 @@
           The 0924 model is a separate lineage.
         </p>
         <div id="model-results"></div>
+        <div id="internal-results"></div>
         <div id="new-effects"></div>
         <details>
           <summary>Execution progress and measured resource use</summary>
           <div id="progress" class="table-wrap"></div>
           <p class="note">
-            One accelerator job at a time; streaming weights; 8 GiB job budget;
-            16 GiB workstation reserve. Refused or incomplete batches are not
-            counted as scientific results.
+            One accelerator job at a time; streaming weights; 5 GiB job budget;
+            8 GiB available-memory reserve for current research. Refused or
+            incomplete batches are not counted as scientific results.
           </p>
         </details>
+      </section>
+      <section id="formats">
+        <div class="eyebrow">PAIRED PROTOCOL FOLLOW-UP</div>
+        <h2>Does the checkpoint's native chat wrapper change the result?</h2>
+        <p>
+          Each question is scored twice within the same checkpoint. Question and
+          response-label strings stay fixed. Routing and span loss use the
+          longest exactly identical contiguous question-token span, covering at
+          least 90% of the plain question tokens. This separates context changes
+          from adding role tokens to the routing population.
+        </p>
+        <div id="format-results"></div>
+        <p class="note">
+          This exploratory follow-up was selected after the plain-prompt
+          results. It measures protocol sensitivity on this cohort. It does not
+          isolate a training algorithm or evaluate free-form generated answers.
+        </p>
       </section>
       <section id="methods">
         <div class="eyebrow">METHODS & REPRODUCTION</div>
@@ -189,6 +208,19 @@
             </p>
           </article>
         </div>
+        <p class="note">
+          The new study uses 180 evaluation questions, equally weighted across
+          six source × domain cells. Accuracy scores the highest next-token
+          letter among the displayed answer options; normalized choice loss
+          renormalizes over those letters. These are zero-shot subset
+          measurements, not official MMLU or MMLU-Pro scores. Full-text loss
+          includes question, options, and the given answer; its unit differs
+          from loss per question. Exact and near-duplicate grouping separates
+          the study partitions, but does not prove absence of semantic overlap
+          or pretraining contamination. Each training stage has one checkpoint,
+          and the two sources do not represent all tasks.
+        </p>
+        <div id="figure-downloads"></div>
         <details>
           <summary>Inspect source tables and exported figures</summary>
           <ul>
