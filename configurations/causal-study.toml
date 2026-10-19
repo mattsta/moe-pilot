@@ -16,8 +16,8 @@ threads = 2
 max_memory_gib = 5
 reserve_memory_gib = 16
 max_tokens = 1024
-condition_group = 1
-microbatch_documents = 4
+condition_group = 4
+microbatch_documents = 16
 
 [analysis]
 seed = 20261019

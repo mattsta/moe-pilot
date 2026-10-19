@@ -4,6 +4,7 @@ import gc
 import hashlib
 import json
 import tempfile
+from importlib.metadata import version
 from pathlib import Path
 from time import perf_counter
 
@@ -80,7 +81,13 @@ def load_observations(directory):
         if hashlib.sha256(path.read_bytes()).hexdigest() != item["sha256"]:
             raise ValueError("Observation checkpoint bytes changed")
         with np.load(path, allow_pickle=False) as data:
-            parts.append({key: data[key] for key in data.files})
+            part = {key: data[key] for key in data.files}
+            if any(
+                np.issubdtype(value.dtype, np.number) and not np.isfinite(value).all()
+                for value in part.values()
+            ):
+                raise ValueError("Nonfinite research observations")
+            parts.append(part)
     arrays = {}
     for key in parts[0]:
         if key in ("layers", "feature_names", "condition_names"):
@@ -181,6 +188,13 @@ def collect(config, catalog, names, partition, *, max_batches=None, intervention
                 "lineage": target.lineage,
             },
             "rows": digest(rows),
+            "token_ids_sha256": digest(ids),
+            "model_directory": str(target.directory),
+            "versions": {
+                package: version(package)
+                for package in ("torch", "transformers", "numpy", "safetensors")
+            },
+            "threads": torch.get_num_threads(),
             "frequency": hashlib.sha256(frequency.tobytes()).hexdigest(),
             "implementation": implementation(),
             "device": engine.selection.identity(),

@@ -91,3 +91,22 @@ def test_observations_reject_truncating_answers_and_cross_model_frequencies(obse
         observe_documents(
             engine, rows, max_tokens=128, layers=(0,), seed=17, discovery_counts=np.array([1, 2, 3])
         )
+
+
+def test_choice_prediction_cannot_read_the_given_answer(observation_inputs):
+    engine, rows = observation_inputs
+    paired = []
+    for answer in (0, 1):
+        text, start = render_question(rows[0]["question"], rows[0]["choices"], answer)
+        paired.append(
+            {
+                **rows[0],
+                "id": str(answer),
+                "text": text,
+                "answer_start": start,
+                "answer_index": answer,
+            }
+        )
+    arrays, _ = observe_documents(engine, paired, max_tokens=128, layers=(0,), seed=17)
+    assert arrays["choice_accuracy"].sum() == 1
+    np.testing.assert_allclose(np.exp(arrays["choice_log_probability"]).sum(), 1, atol=1e-6)
