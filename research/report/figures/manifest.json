@@ -1,0 +1,68 @@
+{
+  "checkpoint_comparison": {
+    "caption": "Selected MMLU/MMLU-Pro questions, zero-shot forced-letter scoring. Unadjusted source/domain-stratified intervals; not official benchmark scores.",
+    "sources": {
+      "model_summary.csv": "269c41d054392707da005b1cfd2ca44096b470037b912f8e87b951b1da3cdbc5"
+    },
+    "files": {
+      "checkpoint_comparison.png": "056adb9e4d9477dc1641cee15e86e3a5878c5327f0cc0a54f38752985cf187fc",
+      "checkpoint_comparison.svg": "46a9eb2b524ed84df85f50168a575c16ec7aafe6a1d6acd2bb7c3cfbad8c5cc9",
+      "checkpoint_comparison.pdf": "d01e58c1d1741cd914c26d5a66bceb7b6c02b015730927ca2586735ceddaef09"
+    }
+  },
+  "reconstruction_interactions": {
+    "caption": "Paired 95% bootstrap intervals are unadjusted. Read the table for declared-family Holm p values. Imperfect controls prevent semantic-specialization claims.",
+    "sources": {
+      "reconstruction_interactions.csv": "778421bfd26adaea25866e132a4b71574f37c5b9b8ee17f04f2f2b801272a1b0"
+    },
+    "files": {
+      "reconstruction_interactions.png": "3cc0dd763b7b0bc5e6a8b10a40c293a5495538ca89e849115804c53df4fe112e",
+      "reconstruction_interactions.svg": "97e530dc2028960648821d1104bd38cfe54c81af17abe7ad8421277635da4388",
+      "reconstruction_interactions.pdf": "de7c0e7b08c300e35917388a0d1e490abd882d2f754199cd3765cf9f814e8ce4"
+    }
+  },
+  "causal_effects": {
+    "caption": "Paired 95% bootstrap intervals are unadjusted. Read the table for declared-family Holm p values. Imperfect controls prevent semantic-specialization claims.",
+    "sources": {
+      "causal_effects.csv": "7d37f5ed587f568b328e015542197db269bec89ec49d44d26bd0d5aa14d7f54a"
+    },
+    "files": {
+      "causal_effects.png": "59dce3b3282baab00fa8e26fdbbe04f50883d09cf7fa3540340d38f181095f8c",
+      "causal_effects.svg": "7c2bac4d9f293cab8cec222a3367db7345dc5e0e98ccc9cf78f32bac1ed8b0a9",
+      "causal_effects.pdf": "73476abce5b13bdf7ac44428fe92dcb5bbff2974e51f2fa7b523e84309dc79bf"
+    }
+  },
+  "answer_label_effects": {
+    "caption": "Paired 95% bootstrap intervals are unadjusted. Read the table for exploratory-family Holm p values across twelve answer-label tests. Imperfect controls prevent semantic-specialization claims.",
+    "sources": {
+      "answer_label_effects.csv": "3249723179aa25b83a9066ea7b4453c7a1d28c7c16113290fd03c61bbfc6104c"
+    },
+    "files": {
+      "answer_label_effects.png": "c81a4d70cee81cec6799894a630a63793f8a622fab4aebeb8f704537e4f8b3a4",
+      "answer_label_effects.svg": "710fc805a9d586c7cebf02b3e7a43f3e013a5ba1e9951367c03d15f512c7d5db",
+      "answer_label_effects.pdf": "f7729890c9fd65e31697ea045a39d116462830e2e0bc81c79e0b054c7d863216"
+    }
+  },
+  "expert_norm_changes": {
+    "caption": "Same token positions, model-specific incoming hidden states. Each document's expert norms are divided by their mean before the paired log ratio. This measures magnitude, not function direction or causal necessity.",
+    "sources": {
+      "expert_norm_changes.csv": "3731eecd2dbe350220d1f38bb6655e4485581d67945f7e5c8f273c97027b3347"
+    },
+    "files": {
+      "expert_norm_changes.png": "f6a01828d456536b620b4b1fdd40740a4c7629f1587e5c32d6c75b0e0ae4d30f",
+      "expert_norm_changes.svg": "3bb6a38f1dc70dfececc70e9f6fe689910862d788d01e5cdd453d2a6d95bd860",
+      "expert_norm_changes.pdf": "24f318d9281be1079746e779842e6f4d7925d059e24b17c57908817e6c481077"
+    }
+  },
+  "format_effects": {
+    "caption": "Exploratory protocol follow-up selected after the plain-prompt comparison. Paired unadjusted 95% intervals. The checkpoint and response-label strings are held fixed; routing and span loss use identical contiguous question tokens.",
+    "sources": {
+      "format_effects.csv": "e8b696ae55c462edd2453fdf11ca4c75f3710e99faaa33b8ff38fab9606bdc45"
+    },
+    "files": {
+      "format_effects.png": "f58616d0eed6ba309aaaf427e08e4b18aec00f96721b6f92726eca31360d2e55",
+      "format_effects.svg": "24db8d3e600cc7a2c3fd0d0fd945bf83b74eeb3c415cd153f96ab8cb7f5cec16",
+      "format_effects.pdf": "b77ac268fa6c8734b72b18cd48a8c31adcd1c7eb432dd1a932f3e46e1453c1ff"
+    }
+  }
+}
