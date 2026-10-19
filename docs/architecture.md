@@ -43,6 +43,8 @@ model layers. Explicit layer indices are validated against the actual model.
 | `benchmark.py`                | Repeated synchronized engine measurements and parity checks |
 | `plotting.py`                 | Headless figures without process-wide plotting state     |
 | `interventions.py`            | Versioned, validated specialist/control metadata         |
+| `perturbations.py`            | Immutable mode, strength, expert mask, and donor semantics |
+| `verification.py`             | Full-depth local checkpoint checks against Transformers |
 | `controls.py`                 | Specialist ranking and routing-mass matching             |
 | `corpora.py`, `datasets.py`   | Seeded sampling and pinned source downloads              |
 | `metrics.py`, `statistics.py` | Probability metrics and document-level inference         |
@@ -122,7 +124,7 @@ weights are stored in float16; losses and computation use float32.
 
 ## Interventions and statistics
 
-Condition JSON explicitly stores its schema, model dimensions, domain, scope,
+Condition JSON schema 2 explicitly stores model dimensions, domain, scope,
 expert count, family, mask, seed, and specialist parent. Reports never infer
 meaning from names. Both global-mass and on-domain-mass controls are generated
 with specialists, so report generation is not a prerequisite for controls.
@@ -131,9 +133,28 @@ domain names, model depth, or expert count are hard-coded into execution.
 Condition definitions and ablation summaries include masked routing masses so
 control-matching quality remains inspectable alongside the loss contrasts.
 
+Each condition also records mode, strength, and donor mapping. The engine accepts
+only explicit immutable `Intervention` objects. `reroute` excludes target experts
+before softmax/top-k. `remove` attenuates their original selected contributions
+without replacements. `rescale` additionally restores the original total gate
+mass; if every contribution is removed its defined output is zero. `substitute`
+evaluates declared donor experts on the same inputs with the target gate values.
+Partial rerouting/substitution blends original and transformed expert outputs.
+Zero strength reproduces baseline inference.
+
+Fixed routing refers to the unperturbed router at each target site's incoming
+states. Earlier interventions can change later hidden states and hence later
+router choices. It does not globally freeze all baseline routes. Optional
+intervention callbacks and checkpoint diagnostics expose affected-token counts,
+gate masses, expert-set changes, and output changes. For partial rerouting and
+substitution, gate diagnostics describe the transformed branch before blending.
+Checkpoint signatures include complete intervention semantics; mode, strength,
+or donor changes cannot reuse a prior condition. Missing requested diagnostics
+cause recomputation rather than accepting incomplete observation artifacts.
+
 The engine always returns a baseline. Each document's final token has zero loss
 and `valid=False`; apply that mask before averaging. Empty engine conditions
-reproduce the baseline. Conditions must leave at least top-k experts available.
+reproduce the baseline. Rerouting must leave at least top-k experts available.
 The condition builder also requires equally sized disjoint control masks.
 Held-out evaluation rejects texts overlapping the analysis corpus.
 
@@ -148,12 +169,15 @@ statistics exclude those undefined values, and heatmaps use neutral lift.
 
 ```python
 from moe_pilot.engine import Engine
+from moe_pilot.perturbations import Intervention
 
 
 def compare_documents(model_directory, documents):
     engine = Engine(model_directory)
     batch = engine.batch([engine.tok(text).input_ids for text in documents], 64)
-    losses, valid, routing = engine.run(batch, {"masked": {0: [1]}}, log_routing=True)
+    losses, valid, routing = engine.run(
+        batch, {"masked": Intervention({0: [1]}, mode="remove")}, log_routing=True
+    )
     return {name: float(values[valid].mean()) for name, values in losses.items()}
 ```
 

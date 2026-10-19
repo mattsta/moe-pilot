@@ -7,6 +7,7 @@ import torch.nn.functional as F
 from safetensors.torch import save_file
 
 from moe_pilot.engine import Batch, Engine
+from moe_pilot.perturbations import Intervention
 from moe_pilot.smoke import tiny_model, verify_engine
 
 
@@ -32,7 +33,9 @@ def test_router_normalization_and_qkv_clipping_match_reference(tmp_path, normali
 def test_routing_masks_and_document_boundaries(local_model):
     _, engine = local_model
     batch = engine.batch([[2, 3, 4], [6, 7]], 8)
-    results, valid, log = engine.run(batch, {"masked": {0: [0]}, "empty": {}}, log_routing=True)
+    results, valid, log = engine.run(
+        batch, {"masked": Intervention({0: [0]}), "empty": Intervention({})}, log_routing=True
+    )
     np.testing.assert_array_equal(valid, [True, True, False, True, False])
     np.testing.assert_array_equal(results["base"][[2, 4]], 0)
     np.testing.assert_array_equal(results["empty"], results["base"])
@@ -41,7 +44,13 @@ def test_routing_masks_and_document_boundaries(local_model):
         hidden = engine.get("model.embed_tokens.weight")[batch.tok]
         weights = engine.load_layer(0)
         masked_log = []
-        engine.moe(engine.attn(hidden, weights, batch), weights, mask=[0], log=masked_log)
+        engine.moe(
+            engine.attn(hidden, weights, batch),
+            weights,
+            Intervention({0: [0]}),
+            layer=0,
+            log=masked_log,
+        )
     assert not (masked_log[0][0] == 0).any()
     np.testing.assert_array_equal(masked_log[0][2][:, 0], 0)
 
@@ -69,7 +78,7 @@ def test_masked_losses_match_independent_reference_router(local_model):
             expected = F.cross_entropy(logits[:-1], batch.tok[1:], reduction="none").numpy()
     finally:
         hook.remove()
-    results, valid, _ = engine.run(batch, {"masked": {0: [0]}}, verbose=False)
+    results, valid, _ = engine.run(batch, {"masked": Intervention({0: [0]})}, verbose=False)
     np.testing.assert_allclose(results["masked"][valid], expected, atol=2e-5, rtol=2e-5)
 
 
@@ -118,8 +127,8 @@ def test_original_sharded_expert_format_matches_packed(local_model, tmp_path):
     )
     engine = Engine(directory, device="cpu")
     batch = Batch([[2, 3, 4], [5, 6]], 4)
-    expected = packed.run(batch, {"mask": {1: [2]}}, verbose=False)[0]
-    actual = engine.run(batch, {"mask": {1: [2]}}, verbose=False)[0]
+    expected = packed.run(batch, {"mask": Intervention({1: [2]})}, verbose=False)[0]
+    actual = engine.run(batch, {"mask": Intervention({1: [2]})}, verbose=False)[0]
     for name in expected:
         np.testing.assert_allclose(actual[name], expected[name], atol=1e-6)
 
@@ -144,11 +153,12 @@ def test_invalid_batches_fail_early(ids, limit):
 @pytest.mark.parametrize(
     "conditions",
     [
-        {"base": {}},
-        {"../escape": {}},
-        {"mask": {2: [0]}},
-        {"mask": {0: [4]}},
-        {"mask": {0: [0, 1, 2]}},
+        {"base": Intervention({})},
+        {"../escape": Intervention({})},
+        {"mask": Intervention({2: [0]})},
+        {"mask": Intervention({0: [4]})},
+        {"mask": Intervention({0: [0, 1, 2]})},
+        {"mask": {0: [0]}},
     ],
 )
 def test_invalid_conditions_fail_early(local_model, conditions):
@@ -161,9 +171,9 @@ def test_checkpoint_rejects_changed_inputs_and_masks(local_model, tmp_path):
     _, engine = local_model
     directory = tmp_path / "checkpoints"
     batch = engine.batch([[2, 3, 4]], 4)
-    engine.run_ckpt(batch, {"mask": {0: [0]}}, directory, verbose=False)
+    engine.run_ckpt(batch, {"mask": Intervention({0: [0]})}, directory, verbose=False)
     with pytest.raises(ValueError, match="condition"):
-        engine.run_ckpt(batch, {"mask": {0: [1]}}, directory)
+        engine.run_ckpt(batch, {"mask": Intervention({0: [1]})}, directory)
     with pytest.raises(ValueError, match="inputs"):
         engine.run_ckpt(engine.batch([[2, 3, 5]], 4), {}, directory)
 
@@ -174,9 +184,14 @@ def test_checkpoint_skips_completed_work_and_adds_new_conditions(
     _, engine = local_model
     batch = engine.batch([[2, 3, 4]], 4)
     directory = tmp_path / "checkpoints"
-    engine.run_ckpt(batch, {"first": {1: [0]}}, directory, verbose=False)
+    engine.run_ckpt(batch, {"first": Intervention({1: [0]})}, directory, verbose=False)
     before = (directory / "losses/base.npy").stat().st_mtime_ns
-    engine.run_ckpt(batch, {"first": {1: [0]}, "second": {0: [1]}}, directory, verbose=False)
+    engine.run_ckpt(
+        batch,
+        {"first": Intervention({1: [0]}), "second": Intervention({0: [1]})},
+        directory,
+        verbose=False,
+    )
     assert (directory / "losses/second.npy").is_file()
     # A new earlier condition may need a new baseline pass to populate its cache.
     assert (directory / "losses/base.npy").stat().st_mtime_ns >= before
@@ -185,7 +200,9 @@ def test_checkpoint_skips_completed_work_and_adds_new_conditions(
         pytest.fail("Completed checkpoint should not load model tensors")
 
     monkeypatch.setattr(engine, "get", unexpected)
-    engine.run_ckpt(batch, {"first": {1: [0]}, "second": {0: [1]}}, directory)
+    engine.run_ckpt(
+        batch, {"first": Intervention({1: [0]}), "second": Intervention({0: [1]})}, directory
+    )
 
 
 def test_checkpoint_without_provenance_is_rejected(local_model, tmp_path):

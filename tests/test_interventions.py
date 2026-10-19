@@ -31,6 +31,26 @@ def test_explicit_condition_metadata_roundtrips_without_parsing_names(tmp_path):
     assert Conditions.load(path) == definition
 
 
+def test_substitution_metadata_roundtrips_with_integer_donor_keys(tmp_path):
+    definition = conditions()
+    items = tuple(
+        replace(item, mode="substitute", donors={0: {item.mask[0][0]: 3}})
+        for item in definition.items
+    )
+    definition = replace(definition, items=items)
+    path = tmp_path / "conditions.json"
+    definition.save(path)
+    assert Conditions.load(path) == definition
+
+
+def test_controls_require_the_same_intervention_semantics_as_the_parent():
+    definition = conditions()
+    for changes in ({"mode": "remove"}, {"strength": 0.5}):
+        control = replace(definition.items[1], **changes)
+        with pytest.raises(ValueError, match="parent"):
+            replace(definition, items=(definition.items[0], control)).validate()
+
+
 @pytest.mark.parametrize(
     "change",
     [

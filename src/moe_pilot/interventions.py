@@ -2,9 +2,10 @@
 
 import math
 import re
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, field
 
 from moe_pilot.artifacts import read_json, write_json
+from moe_pilot.perturbations import Intervention
 
 
 @dataclass(frozen=True)
@@ -19,6 +20,13 @@ class Condition:
     on_domain_mass: float
     parent: str | None = None
     seed: int | None = None
+    mode: str = "reroute"
+    strength: float = 1.0
+    donors: dict[int, dict[int, int]] = field(default_factory=dict)
+
+    @property
+    def intervention(self):
+        return Intervention(self.mask, self.mode, self.strength, self.donors)
 
 
 @dataclass(frozen=True)
@@ -36,6 +44,7 @@ class Conditions:
         if not by_name or len(by_name) != len(self.items):
             raise ValueError("Conditions must be nonempty and names unique")
         for item in self.items:
+            item.intervention.validate(self.layers, self.experts, self.top_k)
             if (
                 not isinstance(item.name, str)
                 or not re.fullmatch(r"[A-Za-z0-9_-]+", item.name)
@@ -76,6 +85,8 @@ class Conditions:
                     or parent.domain != item.domain
                     or parent.count != item.count
                     or parent.scope != item.scope
+                    or parent.mode != item.mode
+                    or parent.strength != item.strength
                 ):
                     raise ValueError(f"Invalid control parent for {item.name}")
                 if set(parent.mask) != set(item.mask) or any(
@@ -89,16 +100,23 @@ class Conditions:
 
     def save(self, filename):
         self.validate()
-        write_json(filename, {"schema": 1, **asdict(self)})
+        write_json(filename, {"schema": 2, **asdict(self)})
 
     @classmethod
     def load(cls, filename):
         raw = read_json(filename)
-        if raw.pop("schema", None) != 1:
+        if raw.pop("schema", None) != 2:
             raise ValueError("Unsupported condition schema")
         items = tuple(
             Condition(
-                **{**item, "mask": {int(layer): experts for layer, experts in item["mask"].items()}}
+                **{
+                    **item,
+                    "mask": {int(layer): experts for layer, experts in item["mask"].items()},
+                    "donors": {
+                        int(layer): {int(target): donor for target, donor in donors.items()}
+                        for layer, donors in item["donors"].items()
+                    },
+                }
             )
             for item in raw.pop("items")
         )

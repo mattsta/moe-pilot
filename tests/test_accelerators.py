@@ -6,6 +6,7 @@ import torch
 
 from moe_pilot.devices import resolve_device
 from moe_pilot.engine import Engine
+from moe_pilot.perturbations import Intervention
 from moe_pilot.probes import OrthogonalityProbe
 from moe_pilot.smoke import tiny_model, verify_engine
 
@@ -28,7 +29,14 @@ def test_accelerator_inference_geometry_and_checkpoint_roundtrip(backend, tmp_pa
     engine = Engine(model_dir, device=selected)
     cpu = Engine(model_dir, device="cpu")
     batch = engine.batch([[2, 3, 4, 5], [6, 7, 8]], 6)
-    conditions = {"masked": {0: [0]}, "late": {1: [1]}}
+    conditions = {
+        "masked": Intervention({0: [0]}),
+        "late": Intervention({1: [1]}),
+        "remove": Intervention({0: [0]}, "remove"),
+        "rescale": Intervention({0: [0]}, "rescale"),
+        "substitute": Intervention({0: [0]}, "substitute", 0.5, {0: {0: 3}}),
+        "restored": Intervention({0: [0]}, "remove", 0),
+    }
     observer = OrthogonalityProbe([0, 1, 4], 17)
     actual, valid, routing = engine.run(
         batch, conditions, log_routing=True, on_layer=observer, verbose=False
@@ -43,7 +51,7 @@ def test_accelerator_inference_geometry_and_checkpoint_roundtrip(backend, tmp_pa
     weights = engine.load_layer(0)
     assert weights["G"][0].device == selected.device
     checkpoint = tmp_path / "checkpoint"
-    engine.run_ckpt(batch, conditions, checkpoint, verbose=False)
+    engine.run_ckpt(batch, conditions, checkpoint, record_diagnostics=True, verbose=False)
     for name in actual:
         np.testing.assert_allclose(
             np.load(checkpoint / f"losses/{name}.npy"), actual[name], atol=2e-5, rtol=2e-5

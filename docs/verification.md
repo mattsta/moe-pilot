@@ -59,7 +59,7 @@ Local checks passed on 2026-10-19:
 | --------------------------------------------- | ---------------------------------------------------- |
 | Locked uv synchronization                     | Passed                                               |
 | Ruff lint and formatting                      | Passed                                               |
-| `pytest -q -W error`                          | 103 passed; 2 absent CUDA/ROCm hardware tests skipped; no warnings |
+| `pytest -q -W error`                          | 146 passed; 2 absent CUDA/ROCm hardware tests skipped; no warnings |
 | CPU/MPS performance measurement               | 24 cases, 7 timed repeats each; numerical parity passed |
 | Offline CLI smoke                             | CPU and real MPS passed against CPU/Hugging Face |
 | Configured read-only inventory                | Passed without creating input/output directories     |
@@ -68,5 +68,9 @@ Local checks passed on 2026-10-19:
 
 Historical corpora, 37 CSV tables, and plots remain unchanged in `research/pilot`.
 Original model weights, routing/geometry arrays, and per-token ablation losses
-were absent. The full downloaded model and source datasets have not been run;
-the historical pilot's scientific claims are not independently revalidated.
+were absent. The historical pilot's scientific claims are not independently revalidated by
+synthetic checks. A pinned OLMoE 0924 snapshot has now passed full-depth local
+CPU/MPS verification: all 16 layers' expert sets agree on the check inputs,
+with maximum loss difference `8.68e-5`. See the
+[verification record](../research/reconstruction-0924/full-model-verification.json)
+and [research progress](research-progress.md) for full-model execution status.

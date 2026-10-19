@@ -3,9 +3,9 @@
 This proposed local experiment tests whether domain-related expert routing
 predicts domain-selective loss effects after accounting for routing mass,
 lexical composition, and source. Its primary target is a pinned OLMoE
-checkpoint. The existing implementation supplies rerouting ablations and mass
-controls; additional intervention modes, dataset controls, and confirmatory
-statistics described below require implementation before execution.
+checkpoint. The implementation supplies the intervention modes below,
+checkpointed diagnostics, and mass controls. Dataset controls and confirmatory
+statistics described below remain prerequisites for study execution.
 
 ## Hypotheses and observations
 
@@ -70,8 +70,8 @@ accounted bits per byte when comparing likelihood across tokenizers.
 
 | Intervention | Operation | Interpretation |
 | --- | --- | --- |
-| Exclusion with rerouting | Mask selected expert logits before softmax/top-k, as in the current engine | Effect of excluding those experts while allowing gate redistribution and replacements |
-| Fixed-routing output removal | Preserve baseline expert choices and original gate values; zero selected output contributions | Effect of removing contributions without replacement; removed output mass is part of the treatment |
+| Exclusion with rerouting | Mask selected expert logits before softmax/top-k | Effect of excluding those experts while allowing gate redistribution and replacements |
+| Fixed-routing output removal | Preserve router choices on incoming states at each target site; zero selected output contributions | Effect of removing contributions without replacement; removed output mass is part of the treatment |
 | Fixed-routing removal with explicit rescaling | Remove contributions and rescale according to a declared rule | Sensitivity to output magnitude; rescaling is a separate treatment |
 | Controlled substitution or patch | Replace a selected contribution with a declared donor/control contribution | Tests whether the specific contribution matters beyond comparable activity; donor validity needs checks |
 | Strength sweep and restoration | Vary intervention strength, then restore the original contribution | Checks response shape and implementation consistency; exact restoration alone does not establish semantic specificity |
@@ -80,6 +80,13 @@ For OLMoE configurations with unnormalized selected gate weights, pre-softmax
 masking can change both selected experts and gate scale. Save the relevant
 before/after gate masses, replacement identities, and contribution norms so
 those effects remain visible.
+
+Fixed-routing modes freeze routing locally at each targeted operation. Hidden
+state changes can alter downstream routing; the modes do not globally freeze a
+baseline route trajectory. Strength sweeps blend original/transformed outputs
+for rerouting and substitution, and attenuate targeted contributions for
+removal/rescaling. Gate diagnostics for output blends describe the transformed
+branch. Complete removal under rescaling has explicitly defined zero output.
 
 Use sham interventions and exact restoration tests. Preserve the original
 batch/document mapping in every condition and validate each mode against a

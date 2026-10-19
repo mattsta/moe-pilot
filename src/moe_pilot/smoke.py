@@ -11,6 +11,7 @@ from transformers import OlmoeConfig, OlmoeForCausalLM
 
 from moe_pilot.devices import resolve_device
 from moe_pilot.engine import Engine
+from moe_pilot.perturbations import Intervention
 
 
 def synthetic_model(directory, config):
@@ -52,7 +53,7 @@ def verify_engine(output=None, *, device="auto"):
         selection = resolve_device(device)
         engine = Engine(root / "model", device=selection)
         batch = engine.batch([[2, 3, 4, 5, 6], [7, 8, 9]], max_tokens=8)
-        conditions = {"masked": {0: [0]}, "unmasked": {}}
+        conditions = {"masked": Intervention({0: [0]}), "unmasked": Intervention({})}
         results, valid, routing = engine.run(batch, conditions, log_routing=True, verbose=False)
         expected = []
         for document in batch.ids:

@@ -16,6 +16,7 @@ from transformers import OlmoeConfig
 from moe_pilot.artifacts import write_json
 from moe_pilot.devices import resolve_device, synchronize
 from moe_pilot.engine import Engine
+from moe_pilot.perturbations import Intervention
 from moe_pilot.probes import OrthogonalityProbe
 from moe_pilot.smoke import synthetic_model, tiny_model
 
@@ -23,7 +24,11 @@ WORKLOADS = ("baseline", "routing_geometry", "ablations")
 
 
 def _run(engine, batch, workload):
-    conditions = {"early": {0: [0]}, "late": {engine.L - 1: [1]}} if workload == "ablations" else {}
+    conditions = (
+        {"early": Intervention({0: [0]}), "late": Intervention({engine.L - 1: [1]})}
+        if workload == "ablations"
+        else {}
+    )
     probe = (
         OrthogonalityProbe(np.arange(min(100, batch.N)), seed=17)
         if workload == "routing_geometry"

@@ -16,9 +16,11 @@ import torch
 import torch.nn.functional as F
 from transformers import AutoTokenizer
 
+from moe_pilot.artifacts import write_json
 from moe_pilot.checkpoints import Checkpoints
 from moe_pilot.devices import DeviceSelection, resolve_device, to_numpy
 from moe_pilot.model import ModelStore, rope_theta
+from moe_pilot.perturbations import Intervention
 
 
 @dataclass
@@ -166,15 +168,75 @@ class Engine:
         output = output.transpose(1, 2).reshape(-1, self.H)[batch.flat_idx.to(self.device)]
         return hidden + output @ weights["self_attn.o_proj.weight"].T
 
-    def moe(self, hidden, weights, mask=None, log=None):
+    def _expert_sum(self, x, weights, indices, gates):
+        output = torch.zeros_like(x)
+        for expert in range(self.E):
+            rows, columns = torch.where((indices == expert) & (gates != 0))
+            if len(rows):
+                selected = x[rows]
+                activated = F.silu(selected @ weights["G"][expert].T)
+                activated = activated * (selected @ weights["U"][expert].T)
+                value = activated @ weights["D"][expert].T
+                output.index_add_(0, rows, value * gates[rows, columns, None])
+        return output
+
+    def moe(self, hidden, weights, intervention=None, *, layer=None, log=None, on_trace=None):
         x = self.rms(hidden, weights["post_attention_layernorm.weight"])
         logits = x @ weights["mlp.gate.weight"].T
-        if mask:
-            logits[:, list(mask)] = -torch.inf
         probabilities = logits.softmax(dim=-1)
         top_weights, top_indices = probabilities.topk(self.K, dim=-1)
         if self.cfg.norm_topk_prob:
             top_weights = top_weights / top_weights.sum(dim=-1, keepdim=True)
+        original_weights, original_indices = top_weights, top_indices
+        targets = intervention.mask.get(layer, ()) if intervention else ()
+        targeted = torch.zeros_like(top_indices, dtype=torch.bool)
+        if targets:
+            for expert in targets:
+                targeted |= top_indices == expert
+            if intervention.mode == "reroute":
+                logits[:, list(targets)] = -torch.inf
+                probabilities = logits.softmax(-1)
+                top_weights, top_indices = probabilities.topk(self.K, dim=-1)
+                if self.cfg.norm_topk_prob:
+                    top_weights = top_weights / top_weights.sum(-1, keepdim=True)
+            elif intervention.mode in ("remove", "rescale"):
+                top_weights = top_weights * (1 - intervention.strength * targeted)
+                if intervention.mode == "rescale":
+                    retained = top_weights.sum(-1, keepdim=True)
+                    scale = original_weights.sum(-1, keepdim=True) / retained.clamp_min(1e-30)
+                    top_weights = top_weights * torch.where(retained > 0, scale, 0)
+            else:
+                top_indices = top_indices.clone()
+                for target, donor in intervention.donors[layer].items():
+                    top_indices[original_indices == target] = donor
+        output = self._expert_sum(x, weights, top_indices, top_weights)
+        original = None
+        if targets and (
+            on_trace is not None
+            or (intervention.mode in ("reroute", "substitute") and intervention.strength < 1)
+        ):
+            original = self._expert_sum(x, weights, original_indices, original_weights)
+            if intervention.mode in ("reroute", "substitute") and intervention.strength < 1:
+                output = original + intervention.strength * (output - original)
+        if targets and on_trace is not None:
+            removed = (original_weights * targeted).sum(-1)
+            changed = (top_indices.sort(-1).values != original_indices.sort(-1).values).any(-1)
+            on_trace(
+                {
+                    "mode": intervention.mode,
+                    "strength": float(intervention.strength),
+                    "gate_diagnostics": "transformed branch before reroute/substitution output blending",
+                    "tokens": len(x),
+                    "targeted_tokens": int(targeted.any(-1).sum().item()),
+                    "original_selected_mass_mean": float(original_weights.sum(-1).mean().item()),
+                    "target_selected_mass_mean": float(removed.mean().item()),
+                    "post_selected_mass_mean": float(top_weights.sum(-1).mean().item()),
+                    "zero_post_mass_tokens": int((top_weights.sum(-1) == 0).sum().item()),
+                    "fraction_changed_expert_sets": float(changed.float().mean().item()),
+                    "original_output_norm_mean": float(original.norm(dim=-1).mean().item()),
+                    "output_delta_norm_mean": float((output - original).norm(dim=-1).mean().item()),
+                }
+            )
         if log is not None:
             log.append(
                 (
@@ -183,15 +245,6 @@ class Engine:
                     to_numpy(probabilities).astype(np.float16),
                 )
             )
-        output = torch.zeros_like(hidden)
-        for expert in range(self.E):
-            rows, columns = torch.where(top_indices == expert)
-            if len(rows):
-                selected = x[rows]
-                activated = F.silu(selected @ weights["G"][expert].T)
-                activated = activated * (selected @ weights["U"][expert].T)
-                value = activated @ weights["D"][expert].T
-                output.index_add_(0, rows, value * top_weights[rows, columns, None])
         return hidden + output
 
     def token_losses(self, hidden, batch, norm, head):
@@ -228,26 +281,31 @@ class Engine:
                 )
             ):
                 raise ValueError("Condition names must be safe filenames; 'base' is reserved")
-            for layer, experts in condition.items():
-                if not isinstance(layer, int) or not 0 <= layer < self.L:
-                    raise ValueError(f"Invalid layer {layer!r}")
-                if any(not isinstance(e, int) or not 0 <= e < self.E for e in experts):
-                    raise ValueError("Invalid masked expert")
-                if len(set(experts)) > self.E - self.K:
-                    raise ValueError("Mask must leave at least top-k experts available")
+            if not isinstance(condition, Intervention):
+                raise ValueError("Conditions must contain explicit Intervention objects")
+            condition.validate(self.L, self.E, self.K)
 
     @torch.inference_mode()
-    def run(self, batch, conditions, group=12, log_routing=False, verbose=True, on_layer=None):
+    def run(
+        self,
+        batch,
+        conditions,
+        group=12,
+        log_routing=False,
+        verbose=True,
+        on_layer=None,
+        on_intervention=None,
+    ):
         """Return per-token losses, valid-target mask, and optional baseline routing.
 
-        Each condition maps a name to ``{layer_index: [masked_expert_ids]}``.
+        Each condition maps a name to an explicit ``Intervention``.
         The baseline is always included as ``base``. Last tokens in each
         document have zero loss and are excluded by the returned valid mask.
         """
         self._validate(batch, conditions, group)
         norm, head = self.get("model.norm.weight"), self.get("lm_head.weight")
         hidden = self._embed(batch)
-        starts = sorted({min(c) for c in conditions.values() if c})
+        starts = sorted({min(c.mask) for c in conditions.values() if c})
         caches, results = {}, {}
         routing = [] if log_routing else None
         for layer in range(self.L):
@@ -268,10 +326,12 @@ class Engine:
             if not condition:
                 results[name] = results["base"].copy()
         for start in starts:
-            names = [name for name, c in conditions.items() if c and min(c) == start]
+            names = [name for name, c in conditions.items() if c and min(c.mask) == start]
             for offset in range(0, len(names), group):
                 selected = names[offset : offset + group]
-                outputs = self._conditions(batch, conditions, selected, start, caches[start])
+                outputs = self._conditions(
+                    batch, conditions, selected, start, caches[start], on_intervention
+                )
                 results.update(
                     {
                         n: self.token_losses(h, batch, norm, head)[0]
@@ -287,21 +347,36 @@ class Engine:
             )
         return results, valid, routing
 
-    def _conditions(self, batch, conditions, names, start, initial):
+    def _conditions(self, batch, conditions, names, start, initial, on_intervention=None):
         hidden = [initial.clone() for _ in names]
         for layer in range(start, self.L):
             weights = self.load_layer(layer)
             for index, name in enumerate(names):
+
+                def trace(record, name=name, layer=layer):
+                    on_intervention(name, layer, record)
+
                 hidden[index] = self.moe(
                     self.attn(hidden[index], weights, batch),
                     weights,
-                    mask=conditions[name].get(layer),
+                    intervention=conditions[name],
+                    layer=layer,
+                    on_trace=trace if on_intervention is not None else None,
                 )
             del weights
         return hidden
 
     @torch.inference_mode()
-    def run_ckpt(self, batch, conditions, outdir, group=10, on_done=None, verbose=True):
+    def run_ckpt(
+        self,
+        batch,
+        conditions,
+        outdir,
+        group=10,
+        on_done=None,
+        verbose=True,
+        record_diagnostics=False,
+    ):
         """Persist atomic per-condition losses and resume only matching inputs.
 
         Model/config, ordered tokenized corpus, engine source, and each named
@@ -319,7 +394,13 @@ class Engine:
                         name: hashlib.sha256(
                             Path(__file__).with_name(name).read_bytes()
                         ).hexdigest()
-                        for name in ("engine.py", "model.py", "checkpoints.py", "devices.py")
+                        for name in (
+                            "engine.py",
+                            "model.py",
+                            "checkpoints.py",
+                            "devices.py",
+                            "perturbations.py",
+                        )
                     },
                     "dependencies": {
                         name: version(name)
@@ -334,11 +415,18 @@ class Engine:
                 sort_keys=True,
             ).encode()
         ).hexdigest()
-        checkpoint = Checkpoints(outdir, identity, conditions)
-        pending = {n: c for n, c in conditions.items() if not checkpoint.exists(f"losses/{n}.npy")}
+        checkpoint = Checkpoints(outdir, identity, {n: c.record() for n, c in conditions.items()})
+        pending = {
+            n: c
+            for n, c in conditions.items()
+            if (
+                not checkpoint.exists(f"losses/{n}.npy")
+                or (record_diagnostics and not checkpoint.exists(f"diagnostics/{n}.json"))
+            )
+        }
         if not pending and checkpoint.exists("losses/base.npy") and checkpoint.exists("valid.npy"):
             return
-        starts = sorted({min(c) for c in pending.values() if c}, reverse=True)
+        starts = sorted({min(c.mask) for c in pending.values() if c}, reverse=True)
         needed = [s for s in starts if not checkpoint.exists(f"cache/h_in_L{s}.npy")]
         norm, head = self.get("model.norm.weight"), self.get("lm_head.weight")
         if needed or not checkpoint.exists("losses/base.npy") or not checkpoint.exists("valid.npy"):
@@ -357,18 +445,34 @@ class Engine:
                 on_done(["base"])
         for name, condition in pending.items():
             if not condition:
+                if record_diagnostics:
+                    write_json(checkpoint.path(f"diagnostics/{name}.json"), [])
                 checkpoint.save(f"losses/{name}.npy", checkpoint.load("losses/base.npy"))
                 if on_done:
                     on_done([name])
         for start in starts:
-            names = [n for n, c in pending.items() if c and min(c) == start]
+            names = [n for n, c in pending.items() if c and min(c.mask) == start]
             for offset in range(0, len(names), group):
                 selected = names[offset : offset + group]
                 initial = torch.from_numpy(checkpoint.load(f"cache/h_in_L{start}.npy")).to(
                     self.device
                 )
-                outputs = self._conditions(batch, conditions, selected, start, initial)
+                diagnostics = {name: [] for name in selected}
+
+                def trace(name, layer, record, records=diagnostics):
+                    records[name].append({"layer": layer, **record})
+
+                outputs = self._conditions(
+                    batch,
+                    conditions,
+                    selected,
+                    start,
+                    initial,
+                    trace if record_diagnostics else None,
+                )
                 for name, hidden in zip(selected, outputs, strict=True):
+                    if record_diagnostics:
+                        write_json(checkpoint.path(f"diagnostics/{name}.json"), diagnostics[name])
                     checkpoint.save(
                         f"losses/{name}.npy", self.token_losses(hidden, batch, norm, head)[0]
                     )

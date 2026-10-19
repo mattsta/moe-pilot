@@ -36,7 +36,7 @@ memory and storage. Synthetic MPS speedups do not predict full-model runtime.
 | Inference | `Engine` explicitly supports OLMoE, full multi-head attention, and float32 tensor staging | Other model families require architecture work and numerical validation |
 | Routing analysis | Domain divergence, expert usage, token categories, and same-token routing comparisons | Association and lexical diagnostics exist; matched semantic/source interventions do not |
 | Geometry | Flattened weight cosine, functional output cosine, centered outputs, Gaussian and norm-matched random controls | Low cosine alone does not establish distinct knowledge or causal independence |
-| Ablation | Experts are masked before softmax/top-k, allowing replacement experts and changed gate weights | This measures removal with rerouting; fixed-routing output removal is a different experiment |
+| Ablation | Explicit rerouting, fixed-routing removal/rescaling, substitution, and strength/restoration modes with diagnostics | Software modes are validated against Transformers; their scientific comparison requires the frozen study |
 | Controls | Global-mass and on-domain-mass matching, held-out evaluation, document bootstrap intervals | Control balance, selection independence, source clustering, and multiplicity need stronger confirmatory treatment |
 | Study scale | Sample config uses 64 tokens, 20 permutations, and three control seeds | These are pilot settings, not a justified confirmatory sample size or null distribution |
 | Local verification | Synthetic numerical tests and synchronized CPU/MPS benchmarks | Establish software behavior and small-model timing; full-model scientific findings require new runs |
@@ -82,8 +82,8 @@ targets, not models already executed by this package.
 
 ## Studies with the highest scientific value
 
-**Routing preference and causal contribution.** Extend the current mass-matched
-ablations with fixed-routing removal and controlled output substitution.
+**Routing preference and causal contribution.** Compare the implemented
+mass-matched rerouting, fixed-routing removal, and controlled substitution modes.
 Measure whether a routing-based specialist prediction survives independent
 sources, matched token composition, and both intervention semantics. The
 [detailed protocol](studies/causal-specialization.md) defines this first study.

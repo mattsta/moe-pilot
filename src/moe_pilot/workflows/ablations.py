@@ -26,7 +26,7 @@ def run(config, *, device=None):
     checkpoint = paths.ablations / "checkpoint"
     engine.run_ckpt(
         batch,
-        {item.name: item.mask for item in definition.items},
+        {item.name: item.intervention for item in definition.items},
         checkpoint,
         group=config.execution.condition_group,
     )
