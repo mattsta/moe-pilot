@@ -1,6 +1,7 @@
 """Thin CLI over the same explicit experiment API used by library callers."""
 
 import argparse
+import json
 import re
 import sys
 from pathlib import Path
@@ -10,9 +11,9 @@ from moe_pilot.experiment import STEPS, ExperimentRunner
 
 
 def parser():
-    result = argparse.ArgumentParser(description="Configured CPU MoE research experiments")
+    result = argparse.ArgumentParser(description="Configured MoE research experiments")
     result.add_argument(
-        "--config", type=Path, help="Experiment TOML file; required except for smoke"
+        "--config", type=Path, help="Experiment TOML file; required except for smoke and devices"
     )
     commands = result.add_subparsers(dest="command", required=True)
     for name in STEPS:
@@ -22,16 +23,28 @@ def parser():
     commands.add_parser("inventory", help="Read configured input and output availability")
     smoke = commands.add_parser("smoke", help="Offline tiny-model numerical verification")
     smoke.add_argument("--output", type=Path, help="Optional JSON report destination")
+    smoke.add_argument(
+        "--device", default="auto", help="auto, cuda[:index], rocm[:index], mps, or cpu"
+    )
+    devices = commands.add_parser(
+        "devices", help="Probe available backends and report the selected device"
+    )
+    devices.add_argument("--device", default="auto", help="Requested device (default: auto)")
     return result
 
 
 def main(argv=None):
     arguments = parser().parse_args(argv)
     try:
+        if arguments.command == "devices":
+            from moe_pilot.devices import resolve_device
+
+            print(json.dumps(resolve_device(arguments.device).record(), indent=2))
+            return 0
         if arguments.command == "smoke":
             from moe_pilot.smoke import verify_engine
 
-            report = verify_engine(arguments.output)
+            report = verify_engine(arguments.output, device=arguments.device)
             print(f"Offline smoke passed; max loss error {report['max_loss_error']:.3g}")
             return 0
         if arguments.config is None:
@@ -64,6 +77,7 @@ def main(argv=None):
 
         torch.set_num_threads(config.execution.threads)
         runner = ExperimentRunner(config)
+        print(f"Compute device: {runner.selection.backend} ({runner.selection.device})")
         if arguments.command == "run":
             runner.run_pipeline()
         else:

@@ -1,0 +1,44 @@
+name: Accelerator validation
+
+on:
+  workflow_dispatch:
+    inputs:
+      backend:
+        description: Backend required on the self-hosted GPU runner
+        required: true
+        default: mps
+        type: choice
+        options: [cuda, rocm, mps]
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on:
+      - self-hosted
+      - ${{ inputs.backend == 'mps' && 'macOS' || 'Linux' }}
+      - gpu
+    env:
+      HF_HUB_OFFLINE: '1'
+      HF_DATASETS_OFFLINE: '1'
+      MPLBACKEND: Agg
+      REQUESTED_BACKEND: ${{ inputs.backend }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: '0.11.19'
+          python-version: '3.12'
+      - name: Validate CUDA or MPS
+        if: inputs.backend != 'rocm'
+        run: |
+          uv sync --locked --extra data
+          uv run --locked moe-pilot devices --device "$REQUESTED_BACKEND"
+          uv run --locked pytest -W error
+      - name: Validate ROCm
+        if: inputs.backend == 'rocm'
+        run: |
+          uv sync --locked --extra data --extra rocm
+          uv run --locked --extra rocm moe-pilot devices --device rocm
+          uv run --locked --extra rocm pytest -W error

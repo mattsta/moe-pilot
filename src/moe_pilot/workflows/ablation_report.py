@@ -10,7 +10,7 @@ from moe_pilot.plotting import subplots
 from moe_pilot.statistics import bootstrap_interval, document_means
 
 
-def run(config):
+def run(config, *, device=None):
     paths = config.paths
     definition = Conditions.load(paths.ablations / "conditions.json")
     checkpoint = paths.ablations / "checkpoint"

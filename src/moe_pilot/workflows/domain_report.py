@@ -1,7 +1,7 @@
 """Domain specialization and geometry reports from explicit experiment artifacts."""
 
 
-def run(config):
+def run(config, *, device=None):
     import itertools
     import keyword
     import re

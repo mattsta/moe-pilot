@@ -4,16 +4,18 @@ import numpy as np
 import torch
 import torch.nn.functional as F
 
+from moe_pilot.devices import to_numpy
+
 
 def pair_cosine(vectors):
     normalized = F.normalize(vectors, dim=1)
-    return (normalized @ normalized.T).numpy()
+    return to_numpy(normalized @ normalized.T)
 
 
 def activation_cosine(outputs):
     normalized = F.normalize(outputs, dim=-1)
     cosine = torch.einsum("eph,fph->efp", normalized, normalized)
-    return cosine.mean(-1).numpy(), cosine.abs().mean(-1).numpy()
+    return to_numpy(cosine.mean(-1)), to_numpy(cosine.abs().mean(-1))
 
 
 class OrthogonalityProbe:
@@ -21,20 +23,22 @@ class OrthogonalityProbe:
 
     def __init__(self, token_indices, seed):
         self.indices = torch.tensor(token_indices, dtype=torch.long)
-        self.random = torch.Generator().manual_seed(seed)
+        self.random = torch.Generator(device="cpu").manual_seed(seed)
         self.matrices = {}
         self.inputs = []
         self.extra = []
 
     def __call__(self, layer, inputs, weights):
-        sample = inputs[self.indices]
-        self.inputs.append(sample.numpy().copy())
+        sample = inputs[self.indices.to(inputs.device)]
+        self.inputs.append(to_numpy(sample).copy())
         experts = len(weights["G"])
         for key, projection in (("G", "gate"), ("U", "up"), ("D", "down")):
             vectors = torch.stack([w.flatten() for w in weights[key]])
             self.matrices[f"w_{layer}_{projection}_real"] = pair_cosine(vectors)
             del vectors
-            random = torch.randn(experts, weights[key][0].numel(), generator=self.random)
+            random = torch.randn(
+                experts, weights[key][0].numel(), generator=self.random, dtype=inputs.dtype
+            ).to(inputs.device)
             self.matrices[f"w_{layer}_{projection}_random"] = pair_cosine(random)
             del random
         outputs = []
@@ -43,7 +47,8 @@ class OrthogonalityProbe:
             gate, up, down = (weights[key][expert] for key in ("G", "U", "D"))
             outputs.append((F.silu(sample @ gate.T) * (sample @ up.T)) @ down.T)
             random_weights = [
-                torch.randn(w.shape, generator=self.random) * (w.norm() / np.sqrt(w.numel()))
+                torch.randn(w.shape, generator=self.random, dtype=inputs.dtype).to(inputs.device)
+                * (w.norm() / np.sqrt(w.numel()))
                 for w in (gate, up, down)
             ]
             gate, up, down = random_weights

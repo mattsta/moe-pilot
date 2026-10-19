@@ -1,7 +1,7 @@
 """Build heldout pilot workflow."""
 
 
-def run(config):
+def run(config, *, device=None):
     # Held-out eval texts: same sources as corpus.json, disjoint texts, different seed.
     from moe_pilot.artifacts import load_corpus, write_json
     from moe_pilot.corpora import CorpusBuilder

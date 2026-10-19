@@ -1,4 +1,4 @@
-"""Layer-streaming CPU inference and routing ablations for OLMoE.
+"""Layer-streaming inference and routing ablations for OLMoE on PyTorch devices.
 
 The engine owns its configuration and tensor store. Constructing a batch does
 not tokenize or download data. All inference runs without autograd.
@@ -17,12 +17,13 @@ import torch.nn.functional as F
 from transformers import AutoTokenizer
 
 from moe_pilot.checkpoints import Checkpoints
+from moe_pilot.devices import DeviceSelection, resolve_device, to_numpy
 from moe_pilot.model import ModelStore, rope_theta
 
 
 @dataclass
 class Batch:
-    """Flattened documents with explicit boundaries and right-padding indices."""
+    """Host-side token/document metadata with explicit right-padding indices."""
 
     ids: list[list[int]]
     T: int
@@ -41,7 +42,7 @@ class Batch:
             raise ValueError("Token IDs must be integers")
         self.lens = np.array([len(document) for document in self.ids])
         self.N = int(self.lens.sum())
-        self.tok = torch.tensor(np.concatenate(self.ids), dtype=torch.long)
+        self.tok = torch.tensor(np.concatenate(self.ids), dtype=torch.long, device="cpu")
         if (self.tok < 0).any():
             raise ValueError("Token IDs must be nonnegative")
         self.doc = np.repeat(np.arange(len(self.ids)), self.lens)
@@ -50,15 +51,17 @@ class Batch:
 
 
 class Engine:
-    """CPU reference engine for standard OLMoE checkpoints.
+    """Device-aware reference engine for standard OLMoE checkpoints.
 
     ``model_dir`` must already contain config and safetensors. Tokenizer files
     are needed only when accessing ``tok``. Thread settings are left to the
     caller; constructing this library object does not change process settings.
     """
 
-    def __init__(self, model_dir):
+    def __init__(self, model_dir, *, device="auto"):
         self.store = ModelStore(model_dir)
+        self.selection = device if isinstance(device, DeviceSelection) else resolve_device(device)
+        self.device = self.selection.device
         self.cfg = self.store.config
         cfg = self.cfg
         if cfg.model_type != "olmoe":
@@ -89,7 +92,12 @@ class Engine:
         return Batch(ids, max_tokens)
 
     def get(self, name):
-        return self.store.get(name)
+        return self.store.get(name).to(self.device)
+
+    def _embed(self, batch):
+        # Select token rows while staging from disk; do not upload an entire
+        # embedding table just to retain a small corpus's hidden states.
+        return self.store.get("model.embed_tokens.weight")[batch.tok].to(self.device)
 
     def rms(self, x, weight):
         return x * torch.rsqrt(x.pow(2).mean(-1, keepdim=True) + self.cfg.rms_norm_eps) * weight
@@ -130,14 +138,16 @@ class Engine:
         v = x @ weights["self_attn.v_proj.weight"].T
         if self.cfg.clip_qkv is not None:
             q, k, v = [z.clamp(-self.cfg.clip_qkv, self.cfg.clip_qkv) for z in (q, k, v)]
-        inv = self.theta ** (-torch.arange(0, self.HD, 2).float() / self.HD)
-        frequencies = torch.outer(torch.arange(batch.T).float(), inv)
+        inv = self.theta ** (-torch.arange(0, self.HD, 2, device=self.device).float() / self.HD)
+        frequencies = torch.outer(torch.arange(batch.T, device=self.device).float(), inv)
         embeddings = torch.cat((frequencies, frequencies), dim=-1)
         cosine, sine = embeddings.cos(), embeddings.sin()
 
         def pad(z):
-            padded = torch.zeros(len(batch.ids) * batch.T, self.H)
-            padded[batch.flat_idx] = z
+            padded = torch.zeros(
+                len(batch.ids) * batch.T, self.H, device=self.device, dtype=hidden.dtype
+            )
+            padded[batch.flat_idx.to(self.device)] = z
             return padded.view(len(batch.ids), batch.T, self.NH, self.HD).transpose(1, 2)
 
         def rotate(z):
@@ -153,7 +163,7 @@ class Engine:
                 for i in range(0, len(batch.ids), 64)
             ]
         )
-        output = output.transpose(1, 2).reshape(-1, self.H)[batch.flat_idx]
+        output = output.transpose(1, 2).reshape(-1, self.H)[batch.flat_idx.to(self.device)]
         return hidden + output @ weights["self_attn.o_proj.weight"].T
 
     def moe(self, hidden, weights, mask=None, log=None):
@@ -168,9 +178,9 @@ class Engine:
         if log is not None:
             log.append(
                 (
-                    top_indices.numpy().astype(np.int32),
-                    top_weights.numpy().astype(np.float16),
-                    probabilities.numpy().astype(np.float16),
+                    to_numpy(top_indices).astype(np.int32),
+                    to_numpy(top_weights).astype(np.float16),
+                    to_numpy(probabilities).astype(np.float16),
                 )
             )
         output = torch.zeros_like(hidden)
@@ -186,10 +196,12 @@ class Engine:
 
     def token_losses(self, hidden, batch, norm, head):
         normalized = self.rms(hidden, norm)
-        targets = torch.full((batch.N,), -100, dtype=torch.long)
+        targets = torch.full((batch.N,), -100, dtype=torch.long, device=self.device)
         positions = np.where(np.r_[batch.doc[1:] == batch.doc[:-1], False])[0]
-        targets[positions] = batch.tok[positions + 1]
-        losses = torch.zeros(batch.N)
+        targets[torch.tensor(positions, device=self.device)] = batch.tok[positions + 1].to(
+            self.device
+        )
+        losses = torch.zeros(batch.N, device=self.device, dtype=hidden.dtype)
         for start in range(0, batch.N, 2048):
             losses[start : start + 2048] = F.cross_entropy(
                 normalized[start : start + 2048] @ head.T,
@@ -197,7 +209,7 @@ class Engine:
                 reduction="none",
                 ignore_index=-100,
             )
-        return losses.numpy(), (targets != -100).numpy()
+        return to_numpy(losses), to_numpy(targets != -100)
 
     def _validate(self, batch, conditions, group):
         if group < 1:
@@ -234,7 +246,7 @@ class Engine:
         """
         self._validate(batch, conditions, group)
         norm, head = self.get("model.norm.weight"), self.get("lm_head.weight")
-        hidden = self.get("model.embed_tokens.weight")[batch.tok]
+        hidden = self._embed(batch)
         starts = sorted({min(c) for c in conditions.values() if c})
         caches, results = {}, {}
         routing = [] if log_routing else None
@@ -307,13 +319,14 @@ class Engine:
                         name: hashlib.sha256(
                             Path(__file__).with_name(name).read_bytes()
                         ).hexdigest()
-                        for name in ("engine.py", "model.py", "checkpoints.py")
+                        for name in ("engine.py", "model.py", "checkpoints.py", "devices.py")
                     },
                     "dependencies": {
                         name: version(name)
                         for name in ("torch", "transformers", "numpy", "safetensors")
                     },
                     "runtime": {
+                        "device": self.selection.identity(),
                         "threads": torch.get_num_threads(),
                         "matmul_precision": torch.get_float32_matmul_precision(),
                     },
@@ -329,10 +342,10 @@ class Engine:
         needed = [s for s in starts if not checkpoint.exists(f"cache/h_in_L{s}.npy")]
         norm, head = self.get("model.norm.weight"), self.get("lm_head.weight")
         if needed or not checkpoint.exists("losses/base.npy") or not checkpoint.exists("valid.npy"):
-            hidden = self.get("model.embed_tokens.weight")[batch.tok]
+            hidden = self._embed(batch)
             for layer in range(self.L):
                 if layer in needed:
-                    checkpoint.save(f"cache/h_in_L{layer}.npy", hidden.numpy())
+                    checkpoint.save(f"cache/h_in_L{layer}.npy", to_numpy(hidden))
                 weights = self.load_layer(layer)
                 hidden = self.moe(self.attn(hidden, weights, batch), weights)
                 del weights
@@ -351,7 +364,9 @@ class Engine:
             names = [n for n, c in pending.items() if c and min(c) == start]
             for offset in range(0, len(names), group):
                 selected = names[offset : offset + group]
-                initial = torch.from_numpy(checkpoint.load(f"cache/h_in_L{start}.npy"))
+                initial = torch.from_numpy(checkpoint.load(f"cache/h_in_L{start}.npy")).to(
+                    self.device
+                )
                 outputs = self._conditions(batch, conditions, selected, start, initial)
                 for name, hidden in zip(selected, outputs, strict=True):
                     checkpoint.save(

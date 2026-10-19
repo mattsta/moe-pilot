@@ -5,15 +5,16 @@ import pandas as pd
 
 from moe_pilot.artifacts import load_corpus
 from moe_pilot.config import Experiment
+from moe_pilot.devices import to_numpy
 from moe_pilot.engine import Engine
 from moe_pilot.probes import OrthogonalityProbe
 
 
-def run(config: Experiment):
+def run(config: Experiment, *, device=None):
     paths = config.paths
     paths.prepare_outputs()
     corpus = load_corpus(paths.data / "corpus.json")
-    engine = Engine(paths.model)
+    engine = Engine(paths.model, device=device or config.execution.device)
     batch = engine.batch(
         [engine.tok(c["text"]).input_ids for c in corpus], config.execution.max_tokens
     )
@@ -38,7 +39,7 @@ def run(config: Experiment):
         topi=np.stack([r[0] for r in routing]),
         topw=np.stack([r[1] for r in routing]),
         probs=np.stack([r[2] for r in routing]),
-        tok_ids=batch.tok.numpy(),
+        tok_ids=to_numpy(batch.tok),
         doc=batch.doc,
         pos=batch.pos,
         dom=domain,

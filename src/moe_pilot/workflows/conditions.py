@@ -7,7 +7,7 @@ from moe_pilot.controls import matched_experts, specialist_ranking
 from moe_pilot.interventions import Condition, Conditions
 
 
-def run(config):
+def run(config, *, device=None):
     paths = config.paths
     paths.prepare_outputs()
     with np.load(paths.routing) as routing:

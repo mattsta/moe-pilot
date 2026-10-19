@@ -11,7 +11,7 @@ from moe_pilot.smoke import tiny_model, verify_engine
 
 
 def test_huggingface_numerical_parity_and_resume(tmp_path):
-    report = verify_engine(tmp_path / "report.json")
+    report = verify_engine(tmp_path / "report.json", device="cpu")
     assert report["max_loss_error"] < 2e-5
     assert report["valid_tokens"] == 6
     assert json.loads((tmp_path / "report.json").read_text())["checkpoint_resume"] == "passed"
@@ -20,7 +20,7 @@ def test_huggingface_numerical_parity_and_resume(tmp_path):
 @pytest.mark.parametrize("normalize,clip", [(True, None), (False, 0.01), (True, 0.01)])
 def test_router_normalization_and_qkv_clipping_match_reference(tmp_path, normalize, clip):
     model = tiny_model(tmp_path, norm_topk_prob=normalize, clip_qkv=clip)
-    engine = Engine(tmp_path)
+    engine = Engine(tmp_path, device="cpu")
     batch = engine.batch([[2, 3, 4, 5]], 4)
     with torch.inference_mode():
         logits = model(batch.tok[None], use_cache=False).logits[0]
@@ -88,7 +88,7 @@ def test_independent_engine_instances_and_no_global_thread_changes(local_model, 
     previous = torch.get_num_threads()
     reference.config.rms_norm_eps = 0.001
     reference.save_pretrained(tmp_path / "other")
-    other = Engine(tmp_path / "other")
+    other = Engine(tmp_path / "other", device="cpu")
     assert other.cfg.rms_norm_eps != engine.cfg.rms_norm_eps
     assert torch.get_num_threads() == previous
 
@@ -116,7 +116,7 @@ def test_original_sharded_expert_format_matches_packed(local_model, tmp_path):
     (directory / "model.safetensors.index.json").write_text(
         json.dumps({"weight_map": dict.fromkeys(original, "model-00001-of-00001.safetensors")})
     )
-    engine = Engine(directory)
+    engine = Engine(directory, device="cpu")
     batch = Batch([[2, 3, 4], [5, 6]], 4)
     expected = packed.run(batch, {"mask": {1: [2]}}, verbose=False)[0]
     actual = engine.run(batch, {"mask": {1: [2]}}, verbose=False)[0]

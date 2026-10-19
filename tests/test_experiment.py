@@ -3,9 +3,11 @@ from dataclasses import replace
 from types import SimpleNamespace
 
 import pytest
+import torch
 from filelock import FileLock
 
 from moe_pilot.artifacts import read_json, write_json
+from moe_pilot.devices import DeviceSelection
 from moe_pilot.experiment import ExperimentRunner
 
 
@@ -17,7 +19,7 @@ def test_completed_outputs_are_reused_and_modified_inputs_are_recomputed(experim
     calls = []
     write_json(experiment.paths.data / "corpus.json", [{"text": "first"}])
 
-    def routing(config):
+    def routing(config, *, device):
         calls.append(1)
         config.paths.routing.write_text(str(len(calls)))
         return [config.paths.routing]
@@ -33,7 +35,7 @@ def test_completed_outputs_are_reused_and_modified_inputs_are_recomputed(experim
 
 
 def test_tampered_dependency_is_rejected_before_downstream_execution(experiment, monkeypatch):
-    def routing(config):
+    def routing(config, *, device):
         config.paths.routing.write_text("original")
         return [config.paths.routing]
 
@@ -46,7 +48,7 @@ def test_tampered_dependency_is_rejected_before_downstream_execution(experiment,
 
 
 def test_changed_config_cannot_reuse_output_directory(experiment, monkeypatch):
-    def routing(config):
+    def routing(config, *, device):
         config.paths.routing.write_text("routing")
         return [config.paths.routing]
 
@@ -58,7 +60,7 @@ def test_changed_config_cannot_reuse_output_directory(experiment, monkeypatch):
 
 
 def test_failed_stages_are_recorded_and_never_consumed(experiment, monkeypatch):
-    def failed(config):
+    def failed(config, *, device):
         config.paths.routing.write_text("partial")
         raise RuntimeError("interrupted")
 
@@ -82,7 +84,7 @@ def test_single_writer_lock_blocks_concurrent_mutation(experiment):
 def test_inputs_changed_during_execution_are_not_accepted(experiment, monkeypatch):
     write_json(experiment.paths.data / "corpus.json", [{"text": "before"}])
 
-    def changing_inputs(config):
+    def changing_inputs(config, *, device):
         config.paths.routing.write_text("partial")
         write_json(config.paths.data / "corpus.json", [{"text": "after"}])
         return [config.paths.routing]
@@ -101,3 +103,22 @@ def test_inventory_does_not_mutate_an_existing_manifest(experiment, monkeypatch)
     before = filename.read_bytes()
     assert "routing: failed" in inspect_experiment(experiment)
     assert filename.read_bytes() == before
+
+
+def test_changed_effective_backend_invalidates_dependencies_with_same_config(
+    experiment, monkeypatch
+):
+    experiment = replace(experiment, execution=replace(experiment.execution, device="auto"))
+
+    def routing(config, *, device):
+        config.paths.routing.write_text("routing")
+        return [config.paths.routing]
+
+    install_stage(monkeypatch, "routing", routing)
+    first_runtime = ExperimentRunner(experiment)
+    first_runtime._selection = DeviceSelection("auto", "cpu", torch.device("cpu"), "Test CPU")
+    first_runtime.run("routing")
+    changed_runtime = ExperimentRunner(experiment)
+    changed_runtime._selection = DeviceSelection("auto", "mps", torch.device("mps:0"), "Test GPU")
+    with pytest.raises(ValueError, match="routing.*stale"):
+        changed_runtime.run("domain-report")

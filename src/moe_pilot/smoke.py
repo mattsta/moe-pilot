@@ -9,6 +9,7 @@ import torch
 import torch.nn.functional as F
 from transformers import OlmoeConfig, OlmoeForCausalLM
 
+from moe_pilot.devices import resolve_device
 from moe_pilot.engine import Engine
 
 
@@ -30,20 +31,21 @@ def tiny_model(directory, *, layers=2, experts=4, norm_topk_prob=False, clip_qkv
         norm_topk_prob=norm_topk_prob,
         clip_qkv=clip_qkv,
     )
-    with torch.random.fork_rng():
-        torch.manual_seed(42)
+    with torch.random.fork_rng(devices=[]), torch.device("cpu"):
+        torch.random.default_generator.manual_seed(42)
         model = OlmoeForCausalLM(config).eval()
     model.save_pretrained(directory, safe_serialization=True)
     return model
 
 
 @torch.inference_mode()
-def verify_engine(output=None):
+def verify_engine(output=None, *, device="auto"):
     """Compare streaming losses with Hugging Face and verify checkpoint resume."""
     with tempfile.TemporaryDirectory(prefix="moe-pilot-smoke-") as temporary:
         root = Path(temporary)
         model = tiny_model(root / "model")
-        engine = Engine(root / "model")
+        selection = resolve_device(device)
+        engine = Engine(root / "model", device=selection)
         batch = engine.batch([[2, 3, 4, 5, 6], [7, 8, 9]], max_tokens=8)
         conditions = {"masked": {0: [0]}, "unmasked": {}}
         results, valid, routing = engine.run(batch, conditions, log_routing=True, verbose=False)
@@ -54,7 +56,8 @@ def verify_engine(output=None):
             losses = F.cross_entropy(logits[:-1], tokens[0, 1:], reduction="none")
             expected.extend(losses.tolist() + [0.0])
         error = float(np.max(np.abs(results["base"] - expected)))
-        np.testing.assert_allclose(results["base"], expected, atol=2e-5, rtol=2e-5)
+        tolerance = 2e-5 if selection.backend == "cpu" else 2e-4
+        np.testing.assert_allclose(results["base"], expected, atol=tolerance, rtol=tolerance)
         np.testing.assert_array_equal(results["unmasked"], results["base"])
         if np.any(routing[0][0] < 0):
             raise AssertionError("Invalid routing index")
@@ -72,6 +75,7 @@ def verify_engine(output=None):
             "valid_tokens": int(valid.sum()),
             "conditions": list(results),
             "torch": torch.__version__,
+            "device": selection.record(),
             "checkpoint_resume": "passed",
         }
     if output is not None:

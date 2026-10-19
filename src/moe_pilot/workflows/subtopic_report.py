@@ -1,7 +1,7 @@
 """Subtopics pilot workflow."""
 
 
-def run(config):
+def run(config, *, device=None):
     import itertools
     import json
 
@@ -9,6 +9,7 @@ def run(config):
     import pandas as pd
 
     from moe_pilot.artifacts import load_corpus
+    from moe_pilot.devices import to_numpy
     from moe_pilot.engine import Engine
     from moe_pilot.metrics import entropy_bits as H2
     from moe_pilot.metrics import jensen_shannon as jsd
@@ -22,7 +23,7 @@ def run(config):
     OUT.mkdir(parents=True, exist_ok=True)
     figures.mkdir(parents=True, exist_ok=True)
     C = load_corpus(paths.data / "subtopic_corpus.json", subtopics=True)
-    M = Engine(paths.model)
+    M = Engine(paths.model, device=device or config.execution.device)
     ids = [M.tok(x["text"]).input_ids for x in C]
     B = M.batch(ids, config.execution.max_tokens)
     res, valid, rl = M.run(B, {}, log_routing=True)
@@ -39,7 +40,7 @@ def run(config):
                 for r in rl
             ]
         ),
-        tok=B.tok.numpy(),
+        tok=to_numpy(B.tok),
         doc=B.doc,
         loss=res["base"],
         valid=valid,

@@ -25,7 +25,7 @@ def cpu_threads():
 def local_model(tmp_path):
     directory = tmp_path / "model"
     reference = tiny_model(directory)
-    return reference, Engine(directory)
+    return reference, Engine(directory, device="cpu")
 
 
 @pytest.fixture
@@ -39,6 +39,7 @@ model = "../model"
 data = "../data"
 output = "../output"
 [execution]
+device = "cpu"
 threads = 2
 max_tokens = 32
 condition_group = 4

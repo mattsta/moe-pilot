@@ -8,7 +8,7 @@ from moe_pilot.engine import Engine
 from moe_pilot.interventions import Conditions
 
 
-def run(config):
+def run(config, *, device=None):
     paths = config.paths
     definition = Conditions.load(paths.ablations / "conditions.json")
     corpus = load_corpus(paths.data / "corpus.json")
@@ -17,7 +17,7 @@ def run(config):
         raise ValueError("Held-out texts overlap the analysis corpus")
     if set(definition.domains) != {r["domain"] for r in heldout}:
         raise ValueError("Held-out domains must match the analysis domains")
-    engine = Engine(paths.model)
+    engine = Engine(paths.model, device=device or config.execution.device)
     if (definition.layers, definition.experts, definition.top_k) != (engine.L, engine.E, engine.K):
         raise ValueError("Condition dimensions differ from the configured model")
     batch = engine.batch(

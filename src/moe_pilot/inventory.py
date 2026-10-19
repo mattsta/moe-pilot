@@ -8,6 +8,7 @@ from moe_pilot.artifacts import load_corpus, read_json
 def inspect_experiment(config):
     paths = config.paths
     lines = [
+        f"Device policy: {config.execution.device}",
         f"Data: {paths.data}",
         f"Model: {paths.model}",
         f"Output: {paths.output}",

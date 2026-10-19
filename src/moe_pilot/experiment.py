@@ -11,6 +11,7 @@ from filelock import FileLock, Timeout
 
 from moe_pilot.artifacts import read_json, write_json
 from moe_pilot.config import Experiment
+from moe_pilot.devices import resolve_device
 
 
 @dataclass(frozen=True)
@@ -50,7 +51,7 @@ def _files(paths):
     return {str(path): _hash(path) for path in paths if path.is_file()}
 
 
-def _versions():
+def _versions(selection):
     import torch
 
     versions = {
@@ -68,6 +69,7 @@ def _versions():
         )
     }
     versions.update(
+        device=selection.identity(),
         machine=platform.machine(),
         torch_threads=torch.get_num_threads(),
         torch_matmul_precision=torch.get_float32_matmul_precision(),
@@ -86,6 +88,13 @@ class ExperimentRunner:
     def __init__(self, experiment: Experiment):
         self.config = experiment
         self.manifest = experiment.paths.output / "experiment.json"
+        self._selection = None
+
+    @property
+    def selection(self):
+        if self._selection is None:
+            self._selection = resolve_device(self.config.execution.device)
+        return self._selection
 
     def _record(self):
         if not self.manifest.exists():
@@ -128,7 +137,7 @@ class ExperimentRunner:
 
     def _valid(self, step, records):
         record = records.get(step, {})
-        if record.get("versions") != _versions():
+        if record.get("versions") != _versions(self.selection):
             return False
         if record.get("status") != "complete" or record.get("inputs") != self._inputs(step):
             return False
@@ -171,14 +180,15 @@ class ExperimentRunner:
             "dependencies": {
                 parent: record["steps"][parent]["outputs"] for parent in STEPS[step].dependencies
             },
-            "versions": _versions(),
+            "versions": _versions(self.selection),
+            "device_selection": self.selection.record(),
         }
         record["steps"][step] = current
         write_json(self.manifest, record)
         try:
             specification = STEPS[step]
             module = importlib.import_module(f"moe_pilot.workflows.{specification.module}")
-            outputs = getattr(module, specification.function)(self.config)
+            outputs = getattr(module, specification.function)(self.config, device=self.selection)
             if not outputs:
                 raise ValueError(f"Step {step} must declare its output artifacts")
             missing = [str(path) for path in outputs if not Path(path).is_file()]

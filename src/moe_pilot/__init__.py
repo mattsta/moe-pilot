@@ -1,4 +1,4 @@
-"""Tools for CPU OLMoE expert-specialization research.
+"""Tools for OLMoE expert-specialization research across PyTorch devices.
 
 Importing the package does not load models, download data, or start experiments.
 """

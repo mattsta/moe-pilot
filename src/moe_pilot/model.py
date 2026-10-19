@@ -20,7 +20,8 @@ class ModelStore:
     """Read one tensor at a time from a local sharded or single-file checkpoint.
 
     Both the original per-expert checkpoint and Transformers' packed expert
-    format are accepted. Tensors are materialized as CPU float32 values.
+    format are accepted. Tensors are staged as host float32 values; the engine
+    transfers each needed tensor to its selected compute device.
     """
 
     def __init__(self, directory):

@@ -1,7 +1,7 @@
 """Build corpus pilot workflow."""
 
 
-def run(config):
+def run(config, *, device=None):
     from moe_pilot.artifacts import write_json
     from moe_pilot.corpora import CorpusBuilder
     from moe_pilot.datasets import DatasetLoader

@@ -11,6 +11,7 @@ repository = "allenai/OLMoE-1B-7B-0924"
 revision = ""
 
 [execution]
+device = "auto"
 threads = 8
 max_tokens = 64
 condition_group = 10

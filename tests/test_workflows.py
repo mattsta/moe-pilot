@@ -55,10 +55,14 @@ def research_experiment(config_file):
     return config
 
 
+@pytest.mark.parametrize("device_policy", ["cpu", "auto"])
 def test_complete_configured_pipeline_from_an_unrelated_directory(
-    research_experiment, config_file, tmp_path, monkeypatch
+    research_experiment, config_file, tmp_path, monkeypatch, device_policy
 ):
-    config = research_experiment
+    config_file.write_text(
+        config_file.read_text().replace('device = "cpu"', f'device = "{device_policy}"')
+    )
+    config = load_experiment(config_file)
     unrelated = tmp_path / "unrelated"
     unrelated.mkdir()
     monkeypatch.chdir(unrelated)
@@ -85,6 +89,7 @@ def test_complete_configured_pipeline_from_an_unrelated_directory(
     assert (paths.figures / "subtopics/jsd_within_vs_between.png").stat().st_size > 1000
     manifest = read_json(paths.output / "experiment.json")
     assert all(record["status"] == "complete" for record in manifest["steps"].values())
+    assert manifest["steps"]["routing"]["device_selection"]["requested"] == device_policy
     # A second pipeline call should reuse only fully validated artifacts.
     before = paths.routing.stat().st_mtime_ns
     ExperimentRunner(config).run_pipeline()

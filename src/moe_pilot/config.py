@@ -56,6 +56,7 @@ class Paths:
 
 @dataclass(frozen=True)
 class Execution:
+    device: str = "auto"
     threads: int = 8
     max_tokens: int = 64
     condition_group: int = 10
@@ -119,8 +120,13 @@ class Experiment:
     datasets: tuple[DatasetRevision, ...] = ()
 
     def __post_init__(self):
+        from moe_pilot.devices import validate_device_name
+
+        validate_device_name(self.execution.device)
         for section in ("execution", "analysis", "ablations", "corpora"):
             for name, value in asdict(getattr(self, section)).items():
+                if name == "device":
+                    continue
                 if name in ("layers", "expert_counts"):
                     if not isinstance(value, tuple):
                         raise ValueError(f"{section}.{name} must contain unique integers")

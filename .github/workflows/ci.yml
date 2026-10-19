@@ -31,9 +31,10 @@ jobs:
           version: '0.11.19'
           python-version: ${{ matrix.python }}
           enable-cache: true
-      - run: uv sync --locked --all-extras
-      - run: uv run --locked ruff check .
-      - run: uv run --locked ruff format --check .
-      - run: uv run --locked pytest -W error
-      - run: uv run --locked moe-pilot smoke --output smoke-output/verification.json
+      - run: uv sync --locked --extra data --extra cpu
+      - run: uv run --locked --extra data --extra cpu ruff check .
+      - run: uv run --locked --extra data --extra cpu ruff format --check .
+      - run: uv run --locked --extra data --extra cpu pytest -W error
+      - run: uv run --locked --extra data --extra cpu moe-pilot devices
+      - run: uv run --locked --extra data --extra cpu moe-pilot smoke --output smoke-output/verification.json
       - run: uv build
