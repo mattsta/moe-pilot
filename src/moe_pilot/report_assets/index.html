@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Local MoE Research — Results explorer</title>
+    <link rel="stylesheet" href="report.css" />
+  </head>
+  <body>
+    <header>
+      <a href="#" class="brand">MOE / RESEARCH</a
+      ><span>LOCAL EXPERIMENTS · OPEN METHODS</span
+      ><button id="print">Print / save PDF</button>
+    </header>
+    <main>
+      <div class="eyebrow">OLMoE · MPS · PINNED LOCAL WEIGHTS</div>
+      <h1>
+        Routing preferences are clear.<br />Causal specialization needs stronger
+        controls.
+      </h1>
+      <p class="lede">
+        Explore measured routing, expert interventions, and post-training
+        comparisons. Each chart is backed by downloadable tables. Incomplete
+        studies stay visibly incomplete.
+      </p>
+      <nav aria-label="Report sections">
+        <a href="#findings">Findings</a
+        ><a href="#interventions">Interventions</a><a href="#routing">Routing</a
+        ><a href="#models">Training stages</a
+        ><a href="#methods">Methods & data</a>
+      </nav>
+      <section class="metrics" id="metrics"></section>
+      <section id="findings" class="summary">
+        <div class="eyebrow">COMPLETED RECONSTRUCTION</div>
+        <h2>Expert exclusion changes loss, but the controls are imbalanced.</h2>
+        <p>
+          The archived-input reconstruction completed all six inference and
+          reporting stages on the full OLMoE 0924 model. Multilingual and
+          science contrasts are positive in the displayed layer-7, single-expert
+          comparisons. Code, math, and prose intervals include zero.
+        </p>
+        <p class="caution">
+          The displayed controls differ by 22–93% in on-domain routing mass.
+          These exploratory contrasts do not establish semantic specialization.
+          Domain and dataset source are also confounded in the archived inputs.
+        </p>
+      </section>
+      <div class="filters">
+        <label
+          >Domain<select id="domain">
+            <option value="all">All domains</option>
+          </select></label
+        ><label>Layer<select id="layer"></select></label
+        ><label
+          >Control family<select id="family">
+            <option value="on-domain-control">On-domain mass</option>
+            <option value="global-control">Global mass</option>
+          </select></label
+        ><button id="reset">Reset filters</button>
+      </div>
+      <section id="interventions">
+        <div class="section-head">
+          <div>
+            <div class="eyebrow">HELD-OUT INTERVENTIONS</div>
+            <h2>How much more does excluding a specialist hurt?</h2>
+          </div>
+          <button data-download="ablations">Download full CSV</button>
+        </div>
+        <p>
+          Specialist loss change minus mean control loss change on its nominated
+          domain; nats/token. One expert is excluded before routing, so
+          replacements remain available. Intervals are paired document
+          bootstraps, unadjusted for multiple comparisons.
+        </p>
+        <div
+          id="effect-chart"
+          class="chart"
+          role="img"
+          aria-label="Specialist-minus-control effects and confidence intervals"
+        ></div>
+        <div id="balance" class="table-wrap"></div>
+        <p id="effect-note" class="note"></p>
+      </section>
+      <section id="interaction-results"></section>
+      <section id="routing">
+        <div class="section-head">
+          <div>
+            <div class="eyebrow">ROUTING ASSOCIATION</div>
+            <h2>Routing differs across domains and layers.</h2>
+          </div>
+          <button data-download="routing">Download full CSV</button>
+        </div>
+        <p>
+          Jensen–Shannon divergence from overall expert usage, in bits. Dashed
+          lines show mean document-label permutation nulls. This measures
+          association with the sampled domain labels.
+        </p>
+        <div
+          id="routing-chart"
+          class="chart"
+          role="img"
+          aria-label="Routing divergence across model layers"
+        ></div>
+        <div class="two-col">
+          <article>
+            <h3>Baseline loss by domain</h3>
+            <div
+              id="baseline-chart"
+              class="chart small"
+              role="img"
+              aria-label="Mean next-token loss by domain"
+            ></div>
+            <p class="note">
+              Different texts and sources contribute to these differences; lower
+              loss is not evidence of better reasoning.
+            </p>
+          </article>
+          <article>
+            <h3>Expert output geometry</h3>
+            <div
+              id="geometry-chart"
+              class="chart small"
+              role="img"
+              aria-label="Centered expert output similarity by layer"
+            ></div>
+            <p class="note">
+              Centered output cosine is descriptive. Small angles do not
+              demonstrate independent knowledge or causal necessity.
+            </p>
+          </article>
+        </div>
+      </section>
+      <section id="models">
+        <div class="eyebrow">SOURCE-BALANCED EXTENSION</div>
+        <h2>What changes across post-training stages?</h2>
+        <p>
+          OLMoE 0125 base, SFT, DPO, and final models use the same frozen
+          questions and plain-text formatting. These are observational stage
+          comparisons; they do not isolate a training algorithm from its data.
+          The 0924 model is a separate lineage.
+        </p>
+        <div id="model-results"></div>
+        <div id="new-effects"></div>
+        <details>
+          <summary>Execution progress and measured resource use</summary>
+          <div id="progress" class="table-wrap"></div>
+          <p class="note">
+            One accelerator job at a time; streaming weights; 8 GiB job budget;
+            16 GiB workstation reserve. Refused or incomplete batches are not
+            counted as scientific results.
+          </p>
+        </details>
+      </section>
+      <section id="methods">
+        <div class="eyebrow">METHODS & REPRODUCTION</div>
+        <h2>Read the limits alongside the results.</h2>
+        <div class="two-col">
+          <article>
+            <h3>Completed reconstruction</h3>
+            <p>
+              The pinned checkpoint is allenai/OLMoE-1B-7B-0924, revision
+              6d84c48581ece794365f2b8e9cfb043c68ade9c5. All 16 layers use
+              float32 inference on MPS, selecting 8 of 64 experts per token.
+            </p>
+            <p>
+              The analysis population contains 100 documents in each of five
+              domains. Loss weights valid next-token targets; document-final
+              positions are excluded. Held-out evaluation includes 420 declared
+              intervention conditions. The original checkpoint revision was
+              absent from the archive, so this is a reconstruction rather than
+              exact checkpoint replication.
+            </p>
+          </article>
+          <article>
+            <h3>New study protocol</h3>
+            <p>
+              Question-content groups are separated into discovery, calibration,
+              and evaluation partitions. MMLU and origin-filtered MMLU-Pro each
+              contribute computing, mathematics, and science. Overlapping
+              MMLU-derived origins are excluded from MMLU-Pro.
+            </p>
+            <p>
+              Specialists are ranked on discovery routing only. Controls are
+              selected on calibration mass, usage, and function norms. Primary
+              endpoints compare on- versus off-domain specialist-minus-control
+              effects for fixed-routing removal and rerouting, with paired
+              uncertainty and Holm correction. Failed balance prevents
+              causal-specialization claims.
+            </p>
+          </article>
+        </div>
+        <details>
+          <summary>Inspect source tables and exported figures</summary>
+          <ul>
+            <li>
+              <a href="data/reconstruction/tables/baseline_by_domain.csv"
+                >Baseline measurements</a
+              >
+            </li>
+            <li>
+              <a
+                href="data/reconstruction/tables/ablations/ablation_summary.csv"
+                >All ablation contrasts and intervals</a
+              >
+            </li>
+            <li>
+              <a href="data/reconstruction/tables/layer_domain_metrics.csv"
+                >All domain/layer routing measurements</a
+              >
+            </li>
+            <li>
+              <a
+                href="data/reconstruction/tables/subtopics/layer_within_vs_between_jsd.csv"
+                >Subtopic routing measurements</a
+              >
+            </li>
+            <li>
+              <a href="data/reconstruction/figures/ablations/delta_loss.png"
+                >Complete intervention figure (PNG)</a
+              >
+            </li>
+            <li>
+              <a href="data/reconstruction/evidence.json"
+                >Machine-readable reproducibility metadata</a
+              >
+            </li>
+          </ul>
+        </details>
+        <p class="note">
+          The report runs offline, uses no external scripts, and requires no
+          model loading. Charts redraw with filters; downloadable CSVs preserve
+          full precision.
+        </p>
+      </section>
+    </main>
+    <footer>
+      MoE Pilot · Research results explorer · Local computation, explicit
+      uncertainty, reproducible tables
+    </footer>
+    <script id="research-data" type="application/json">
+      __RESEARCH_DATA__
+    </script>
+    <script src="report.js"></script>
+  </body>
+</html>

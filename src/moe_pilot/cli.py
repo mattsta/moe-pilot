@@ -34,6 +34,38 @@ def parser():
     )
     publication.add_argument("--output", type=Path, required=True)
     commands.add_parser("inventory", help="Read configured input and output availability")
+    report = commands.add_parser(
+        "report", help="Build the offline interactive HTML research report"
+    )
+    report.add_argument("--reconstruction", type=Path, default=Path("research/reconstruction-0924"))
+    report.add_argument("--study", type=Path, default=Path("runs/causal-study"))
+    report.add_argument("--output", type=Path, default=Path("research/report"))
+    preview = commands.add_parser(
+        "serve-report", help="Serve the report locally without model imports"
+    )
+    preview.add_argument("--directory", type=Path, default=Path("research/report"))
+    preview.add_argument("--port", type=int, default=8765)
+    preview.add_argument("--study", type=Path, default=Path("runs/causal-study"))
+    study = commands.add_parser("study-observe", help="Resume bounded local research observations")
+    study.add_argument("--catalog", type=Path, required=True)
+    study.add_argument("--names", nargs="+", required=True)
+    study.add_argument(
+        "--partition",
+        choices=("discovery", "calibration", "evaluation", "format_pairs"),
+        required=True,
+    )
+    study.add_argument("--max-batches", type=int)
+    study.add_argument("--interventions", action="store_true")
+    study.add_argument("--formatting", choices=("plain", "paired-chat"), default="plain")
+    commands.add_parser("study-select", help="Freeze controls from discovery and calibration only")
+    commands.add_parser("study-analyse", help="Analyse completed research observations")
+    reanalysis = commands.add_parser(
+        "analyse-reconstruction", help="Compute paired on/off interactions from existing research"
+    )
+    reanalysis.add_argument(
+        "--reconstruction", type=Path, default=Path("research/reconstruction-0924")
+    )
+    reanalysis.add_argument("--output", type=Path, default=Path("runs/causal-study/tables"))
     verification = commands.add_parser(
         "verify-model", help="Explicit, memory-budgeted model parity"
     )
@@ -77,6 +109,26 @@ def parser():
 def main(argv=None):
     arguments = parser().parse_args(argv)
     try:
+        if arguments.command == "analyse-reconstruction":
+            from moe_pilot.study_analysis import reconstruction_interactions
+
+            print(
+                json.dumps(
+                    reconstruction_interactions(arguments.reconstruction, arguments.output),
+                    indent=2,
+                )
+            )
+            return 0
+        if arguments.command == "report":
+            from moe_pilot.reports import build_report
+
+            print(build_report(arguments.reconstruction, arguments.study, arguments.output))
+            return 0
+        if arguments.command == "serve-report":
+            from moe_pilot.reports import serve_report
+
+            serve_report(arguments.directory, arguments.port, arguments.study)
+            return 0
         if arguments.command == "download-models":
             from moe_pilot.acquisition import acquire_model
             from moe_pilot.catalog import load_catalog
@@ -160,6 +212,29 @@ def main(argv=None):
         import torch
 
         torch.set_num_threads(config.execution.threads)
+        if arguments.command == "study-analyse":
+            from moe_pilot.study_analysis import analyse_study
+
+            print(json.dumps(analyse_study(config), indent=2))
+            return 0
+        if arguments.command == "study-observe":
+            from moe_pilot.study import collect
+
+            collect(
+                config,
+                arguments.catalog,
+                arguments.names,
+                arguments.partition,
+                max_batches=arguments.max_batches,
+                interventions=arguments.interventions,
+                formatting=arguments.formatting,
+            )
+            return 0
+        if arguments.command == "study-select":
+            from moe_pilot.study import freeze_selection
+
+            print(json.dumps(freeze_selection(config), indent=2))
+            return 0
         if arguments.command == "verify-model":
             from moe_pilot.artifacts import load_corpus
             from moe_pilot.engine import Engine

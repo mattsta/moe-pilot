@@ -11,7 +11,6 @@ from filelock import FileLock, Timeout
 
 from moe_pilot.artifacts import read_json, write_json
 from moe_pilot.config import Experiment
-from moe_pilot.devices import resolve_device
 
 
 @dataclass(frozen=True)
@@ -112,6 +111,8 @@ class ExperimentRunner:
 
     @property
     def selection(self):
+        from moe_pilot.devices import resolve_device
+
         if self._selection is None:
             self._selection = resolve_device(self.config.execution.device)
         return self._selection
