@@ -278,3 +278,31 @@ model/dataset revisions, corpus/source files, hardware, raw arrays, final tables
 and figures. Loss is in nats/token; information metrics are bits. Ablation
 bootstrap intervals are document-level and unadjusted for multiple comparisons.
 Short sampled texts and selected interventions limit scientific generalization.
+
+## Export validated research evidence
+
+After every reconstruction stage completes:
+
+```sh
+uv run --locked moe-pilot --config configurations/reconstruction-0924.toml publish-reconstruction --output research/reconstruction-0924
+```
+
+Publication takes the run's writer lock, verifies recorded input/source and
+output identities, checks dependency consistency, and exports CSV/JSON/PNG
+artifacts plus generated reader and detailed analyses. Large arrays remain in
+the local run with their hashes retained. It validates the source identities
+of a frozen runtime, rather than substituting the current package version.
+
+For long experiments during continued development, build and install a frozen
+package before running. An explicit local runtime preserves the package source
+used by provenance validation:
+
+```sh
+uv build
+uv --no-cache pip install --no-deps --python .venv/bin/python --target runs/runtime/reconstruction-v1 dist/moe_pilot-0.1.0-py3-none-any.whl
+PYTHONPATH=runs/runtime/reconstruction-v1 HF_HUB_OFFLINE=1 HF_DATASETS_OFFLINE=1 runs/runtime/reconstruction-v1/bin/moe-pilot --config configurations/reconstruction-0924.toml run
+```
+
+Use a fresh runtime directory for changed source and retain the original
+runtime, model, inputs, dependency environment, and experiment outputs with
+the run. Do not install over a runtime that an active or published run uses.

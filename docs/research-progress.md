@@ -8,7 +8,7 @@ Software checks and proposed methods do not count as completed science.
 | Phase | Deliverable and completion evidence | Status |
 | --- | --- | --- |
 | 1 | Immutable OLMoE 0924 snapshot, archived inputs, and full-depth CPU-reference/device parity | Complete; [evidence](../research/reconstruction-0924/full-model-verification.json) |
-| 2 | Executed archived-input reconstruction with routing, functional geometry, held-out ablations, subtopics, and provenance | Running from frozen package ba75545 |
+| 2 | Executed archived-input reconstruction with routing, functional geometry, held-out ablations, subtopics, and provenance | Complete; [reader summary](../research/reconstruction-0924/README.md), [analysis](../research/reconstruction-0924/analysis.md), [evidence](../research/reconstruction-0924/evidence.json) |
 | 3 | Validated fixed-routing removal, explicit rescaling, strength/restoration, substitution, and intervention diagnostics | CPU/real-MPS software validation passed; full-model diagnostic study pending |
 | 4 | Frozen discovery/calibration/evaluation splits, measured matching balance, paired contrasts, multiplicity, and lexical/source controls | Data preparation implemented; statistical and matching extensions pending |
 | 5 | Completed causal-specialization study, including null results, paired uncertainty, sensitivity analyses, and a reader summary | Pending |
@@ -36,9 +36,15 @@ as supported or completed by the studies above.
 - All four intervention modes and strengths 0, 0.5, and 1 were checked against
   independent Transformers expert execution. Real-MPS integration checks
   include removal, rescaling, substitution, restoration, and diagnostics.
-  The current suite passes 153 tests; CUDA/ROCm hardware tests are skipped on
+  The current suite passes 154 tests; CUDA/ROCm hardware tests are skipped on
   this host. This establishes software semantics, not a causal study finding.
 - The [causal data design](studies/data-design.md) records source-origin
   exclusions, duplicate grouping, six balanced source/domain cells, and
   discovery/calibration/evaluation counts. No final model outcomes have been
   used to select this cohort.
+- The reconstruction completed all six stages from frozen package ba75545:
+  baseline loss 2.130555 nats/token over 29,522 valid targets, 420 held-out
+  conditions, and the full subtopic analysis. Publication validates source,
+  input, output, and dependency identities. The selected layer-7 single-expert
+  comparisons show 22–93% relative control-mass gaps, motivating stricter
+  matching rather than a claim of semantic expert necessity.

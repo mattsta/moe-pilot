@@ -25,6 +25,10 @@ def parser():
         "inspect-study-data", help="Audit local source origins and eligible cells"
     )
     audit.add_argument("--output", type=Path, required=True)
+    publication = commands.add_parser(
+        "publish-reconstruction", help="Validate and export local research evidence"
+    )
+    publication.add_argument("--output", type=Path, required=True)
     commands.add_parser("inventory", help="Read configured input and output availability")
     verification = commands.add_parser("verify-model", help="Full-depth local CPU reference parity")
     verification.add_argument("--documents", type=int, default=5)
@@ -93,6 +97,11 @@ def main(argv=None):
         if arguments.config is None:
             parser().error("--config is required for experiment commands")
         config = load_experiment(arguments.config)
+        if arguments.command == "publish-reconstruction":
+            from moe_pilot.publication import publish_reconstruction
+
+            print(publish_reconstruction(config.paths.output, arguments.output))
+            return 0
         if arguments.command == "download-study-data":
             from moe_pilot.study_data import acquire_sources
 

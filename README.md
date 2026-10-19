@@ -41,6 +41,21 @@ data, output paths, sampling, inference, controls, and reporting. Paths resolve
 relative to that file. The CLI and library share the same experiment runner;
 execution does not depend on the working directory.
 
+## Measured research results
+
+The [full OLMoE 0924 reconstruction](research/reconstruction-0924/README.md)
+completed locally on MPS with a pinned 6.9B-parameter checkpoint: 500 analysis
+documents, 29,522 valid next-token targets, mean loss **2.130555 nats/token**,
+420 held-out intervention conditions, and subtopic analysis.
+
+The displayed layer-7 single-expert comparisons have approximately **22–93%**
+relative routing-mass gaps between specialists and their mean controls.
+Those gaps limit causal interpretation despite visible routing preferences
+and loss differences. The new study adds independent selection/calibration
+partitions, explicit intervention modes, and measured matching criteria.
+See the [detailed reconstruction analysis](research/reconstruction-0924/analysis.md)
+and [completion checklist](docs/research-progress.md) for evidence and status.
+
 ## Run an experiment
 
 Prepare the local model and input corpora using the [operator runbook](docs/runbook.md),
@@ -81,8 +96,9 @@ on macOS. Linux AMD users select `--extra rocm`; CPU-only Linux wheels are an
 opt-in `--extra cpu` profile. Use the same profile on `uv sync` and `uv run`;
 see [backend installation and validation](docs/runbook.md#devices-and-pytorch-installation).
 
-The historical pilot's model weights, raw routing/geometry arrays, and per-token
-ablation losses were not supplied. Software checks use synthetic local models
-and do not independently validate the historical scientific claims. The archived
-outputs are evidence; they are not active experiment inputs or cache formats.
+The historical pilot's original weights, raw routing/geometry arrays, and
+per-token losses were not supplied. The new reconstruction uses newly pinned
+weights and records its own raw evidence; the archive lacks the original model
+commit needed to establish exact checkpoint replication. Archived outputs
+remain separate from active experiment inputs and caches.
 Code licensing remains an owner decision; dataset and model terms remain separate.

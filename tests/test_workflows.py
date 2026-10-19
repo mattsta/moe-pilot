@@ -96,6 +96,37 @@ def test_complete_configured_pipeline_from_an_unrelated_directory(
     assert paths.routing.stat().st_mtime_ns == before
 
 
+def test_publication_validates_completed_artifacts_and_exports_traceable_results(
+    research_experiment, tmp_path
+):
+    from moe_pilot.publication import publish_reconstruction, validate_evidence
+
+    config = research_experiment
+    ExperimentRunner(config).run_pipeline()
+    destination = tmp_path / "publication"
+    summary = publish_reconstruction(config.paths.output, destination)
+    evidence = read_json(destination / "evidence.json")
+    assert evidence["derived"]["documents"] == 20
+    assert evidence["derived"]["conditions"] == 45
+    assert "exploratory" in summary.read_text()
+    assert "permutations" in (destination / "analysis.md").read_text()
+    assert (destination / "figures/jsd_by_layer.png").is_file()
+    assert not (destination / "artifacts/routing.npz").exists()
+    assert all("sha256" in artifact for artifact in evidence["artifacts"])
+    table = config.paths.tables / "ablations/ablation_summary.csv"
+    original = table.read_bytes()
+    table.write_bytes(original + b"tampered")
+    with pytest.raises(ValueError, match="output"):
+        publish_reconstruction(config.paths.output, tmp_path / "invalid")
+    table.write_bytes(original)
+    manifest_path = config.paths.output / "experiment.json"
+    manifest = read_json(manifest_path)
+    manifest["steps"]["routing"]["status"] = "failed"
+    write_json(manifest_path, manifest)
+    with pytest.raises(ValueError, match="Incomplete"):
+        validate_evidence(config.paths.output)
+
+
 def test_corpus_builders_with_stubbed_sources(experiment, monkeypatch):
     from moe_pilot.workflows import build_corpus, build_heldout, build_subtopics
 

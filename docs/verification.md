@@ -59,7 +59,7 @@ Local checks passed on 2026-10-19:
 | --------------------------------------------- | ---------------------------------------------------- |
 | Locked uv synchronization                     | Passed                                               |
 | Ruff lint and formatting                      | Passed                                               |
-| `pytest -q -W error`                          | 153 passed; 2 absent CUDA/ROCm hardware tests skipped; no warnings |
+| `pytest -q -W error`                          | 154 passed; 2 absent CUDA/ROCm hardware tests skipped; no warnings |
 | CPU/MPS performance measurement               | 24 cases, 7 timed repeats each; numerical parity passed |
 | Offline CLI smoke                             | CPU and real MPS passed against CPU/Hugging Face |
 | Configured read-only inventory                | Passed without creating input/output directories     |
@@ -74,3 +74,8 @@ CPU/MPS verification: all 16 layers' expert sets agree on the check inputs,
 with maximum loss difference `8.68e-5`. See the
 [verification record](../research/reconstruction-0924/full-model-verification.json)
 and [research progress](research-progress.md) for full-model execution status.
+
+The full reconstruction has completed every configured inference/report stage
+on MPS. Its [published analysis](../research/reconstruction-0924/analysis.md)
+and [evidence inventory](../research/reconstruction-0924/evidence.json) retain
+the validated source/input/output identities, tables, figures, and study limits.
