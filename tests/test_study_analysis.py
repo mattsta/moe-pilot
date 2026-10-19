@@ -3,6 +3,7 @@ import pytest
 
 from moe_pilot.study_analysis import (
     contrast_weights,
+    format_pair_indices,
     holm,
     interaction_inference,
     stage_internal_comparison,
@@ -49,3 +50,114 @@ def test_internal_profiles_remove_global_scale_without_inventing_a_shift():
     divergence, change = stage_internal_comparison(mass, mass * 3, norms, norms * 2)
     np.testing.assert_allclose(divergence, 0, atol=1e-12)
     np.testing.assert_allclose(change, 0, atol=1e-12)
+
+
+def test_format_pairing_rejects_content_drift_and_missing_variants():
+    common = {
+        "source_id": "q",
+        "group_id": "g",
+        "source": "s",
+        "domain": "d",
+        "aligned_tokens_sha256": "abc",
+        "alignment_coverage": 0.99,
+    }
+    plain, chat = {**common, "format_variant": "plain"}, {**common, "format_variant": "chat"}
+    np.testing.assert_array_equal(format_pair_indices([chat, plain]), [[1, 0]])
+    with pytest.raises(ValueError, match="incomplete"):
+        format_pair_indices([plain])
+    with pytest.raises(ValueError, match="content and token alignment"):
+        format_pair_indices([plain, {**chat, "aligned_tokens_sha256": "changed"}])
+
+
+def test_analysis_preserves_all_intervention_modes_and_separates_diagnostics(tmp_path, monkeypatch):
+    import hashlib
+    from types import SimpleNamespace
+
+    from moe_pilot.artifacts import write_json
+    from moe_pilot.reports import read_table
+    from moe_pilot.study import conditions_from_selection, digest, plan_for, save_arrays
+    from moe_pilot.study_analysis import analyse_study
+
+    config = SimpleNamespace(
+        paths=SimpleNamespace(output=tmp_path),
+        analysis=SimpleNamespace(seed=1, bootstrap_samples=50, permutations=19),
+    )
+    plan = plan_for(config)
+    write_json(tmp_path / "plan.json", plan)
+    domains = ("computing", "mathematics", "science")
+    selection = {
+        "model": "olmoe-0924",
+        "plan": plan,
+        "matching_features": ["on_mass", "off_mass", "on_usage", "off_usage", "raw_output_norm"],
+        "domains": [
+            {
+                "domain": domain,
+                "expert": 0,
+                "control": 1,
+                "balance_passed": False,
+                "gaps": [0.2] * 5,
+            }
+            for domain in domains
+        ],
+    }
+    write_json(tmp_path / "selection.json", selection)
+    records = [
+        {"id": str(index), "group_id": str(index), "source": source, "domain": domain}
+        for index, (source, domain) in enumerate(
+            (source, domain) for source in ("one", "two") for domain in domains for _ in range(2)
+        )
+    ]
+    names = list(conditions_from_selection(selection))
+    losses = np.ones((len(names), len(records)))
+    for index, name in enumerate(names):
+        for domain in domains:
+            if not name.startswith(domain + "_"):
+                continue
+            on = np.array([row["domain"] == domain for row in records])
+            for multiplier, mode in enumerate(("remove", "reroute", "rescale", "substitute"), 1):
+                if name == f"{domain}_{mode}_specialist":
+                    losses[index] += on * multiplier * 0.1
+    directory = tmp_path / "olmoe-0924" / "evaluation-interventions"
+    path = directory / "chunk-00000.npz"
+    save_arrays(
+        path,
+        {
+            "loss": np.ones(12),
+            "answer_loss": np.ones(12),
+            "choice_accuracy": np.zeros(12),
+            "choice_log_probability": -np.ones(12),
+            "condition_names": np.array(names),
+            "condition_loss": losses,
+            "features": np.zeros((12, 2)),
+        },
+    )
+    write_json(
+        directory / "manifest.json",
+        {
+            "status": "complete",
+            "documents": 12,
+            "records": records,
+            "identity": {
+                "target": {"stage": "base", "lineage": "0924"},
+                "selection": digest(selection),
+            },
+            "chunks": [
+                {
+                    "file": path.name,
+                    "start": 0,
+                    "documents": 12,
+                    "sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
+                }
+            ],
+        },
+    )
+    monkeypatch.setattr("moe_pilot.study_figures.build_study_figures", lambda root: None)
+    result = analyse_study(config)
+    assert result["causal_endpoints"] == 12
+    effects = read_table(tmp_path / "tables/causal_effects.csv")
+    assert len({(row["domain"], row["mode"]) for row in effects}) == 12
+    assert sum(row["holm_p"] is not None for row in effects) == 6
+    for row in effects:
+        multiplier = ("remove", "reroute", "rescale", "substitute").index(row["mode"]) + 1
+        assert row["interaction"] == pytest.approx(multiplier * 0.1)
+    assert len(read_table(tmp_path / "tables/intervention_diagnostics.csv")) == 27

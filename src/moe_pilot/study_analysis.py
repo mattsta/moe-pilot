@@ -15,6 +15,7 @@ from moe_pilot.statistics import document_means
 def write_table(path, rows):
     path.parent.mkdir(parents=True, exist_ok=True)
     if not rows:
+        path.unlink(missing_ok=True)
         return
     with tempfile.NamedTemporaryFile(
         dir=path.parent, mode="w", newline="", encoding="utf-8", delete=False
@@ -388,7 +389,8 @@ def analyse_study(config):
     write_table(tables / "posttraining_contrasts.csv", comparisons)
     write_table(tables / "routing_shift.csv", routing_rows)
     write_table(tables / "expert_norm_changes.csv", norm_rows)
-    effect_rows = []
+    effect_rows, diagnostic_rows, causal_documents, source_effects = [], [], [], []
+    gate_diagnostics = []
     selection_file = root / "selection.json"
     if selection_file.exists():
         selection = read_json(selection_file)
@@ -397,6 +399,18 @@ def analyse_study(config):
             arrays, record = observed[name]
             if record["identity"]["selection"] != digest(selection):
                 raise ValueError("Intervention outcomes do not match the frozen selection")
+            directory = root / name / "evaluation-interventions"
+            for chunk in record["chunks"]:
+                if "trace_file" not in chunk:
+                    continue
+                trace_path = (directory / chunk["trace_file"]).resolve()
+                if (
+                    trace_path.parent != directory.resolve()
+                    or hashlib.sha256(trace_path.read_bytes()).hexdigest() != chunk["trace_sha256"]
+                ):
+                    raise ValueError("Intervention gate diagnostics changed")
+                for trace in read_json(trace_path):
+                    gate_diagnostics.append({"chunk_start": chunk["start"], **trace})
             labels = np.array([row["domain"] for row in record["records"]])
             sources = np.array([row["source"] for row in record["records"]])
             conditions = {
@@ -421,6 +435,37 @@ def analyse_study(config):
                         permutations=config.analysis.permutations,
                     )
                     on = labels == domain
+                    for document, value in enumerate(effect):
+                        causal_documents.append(
+                            {
+                                "specialist_domain": domain,
+                                "mode": mode,
+                                **record["records"][document],
+                                "specialist_minus_control": float(value),
+                            }
+                        )
+                    for source in np.unique(sources):
+                        for evaluation_domain in np.unique(labels):
+                            selected = (sources == source) & (labels == evaluation_domain)
+                            estimate, low, high = stratified_mean_interval(
+                                effect[selected],
+                                labels[selected],
+                                sources[selected],
+                                seed=config.analysis.seed,
+                                samples=config.analysis.bootstrap_samples,
+                            )
+                            source_effects.append(
+                                {
+                                    "specialist_domain": domain,
+                                    "mode": mode,
+                                    "source": source,
+                                    "evaluation_domain": evaluation_domain,
+                                    "excess": estimate,
+                                    "ci_low": low,
+                                    "ci_high": high,
+                                    "documents": int(selected.sum()),
+                                }
+                            )
                     features = arrays["features"]
                     columns = (features - features.mean(0)) / np.maximum(features.std(0), 1e-12)
                     source_columns = (
@@ -450,10 +495,51 @@ def analyse_study(config):
                             else "conditional on this checkpoint and cohort",
                         }
                     )
+                full = conditions[f"{domain}_remove_specialist"] - arrays["loss"]
+                half = conditions[f"{domain}_half"] - arrays["loss"]
+                joint = (
+                    conditions[f"{domain}_joint"]
+                    - conditions[f"{domain}_remove_specialist"]
+                    - conditions[f"{domain}_remove_control"]
+                    + arrays["loss"]
+                )
+                for metric, values in (
+                    ("half_strength_loss_delta", half),
+                    ("half_minus_half_full_delta", half - 0.5 * full),
+                    ("joint_nonadditivity", joint),
+                ):
+                    for population in ("all", "on", "off"):
+                        selected = (
+                            np.ones(len(labels), dtype=bool)
+                            if population == "all"
+                            else (labels == domain if population == "on" else labels != domain)
+                        )
+                        estimate, low, high = stratified_mean_interval(
+                            values[selected],
+                            labels[selected],
+                            sources[selected],
+                            seed=config.analysis.seed,
+                            samples=config.analysis.bootstrap_samples,
+                        )
+                        diagnostic_rows.append(
+                            {
+                                "domain": domain,
+                                "metric": metric,
+                                "population": population,
+                                "estimate": estimate,
+                                "ci_low": low,
+                                "ci_high": high,
+                                "interpretation": "exploratory intervention response; unadjusted interval",
+                            }
+                        )
             primary = [row for row in effect_rows if row["primary"]]
             for row, p in zip(primary, holm([row["p"] for row in primary]), strict=True):
                 row["holm_p"] = float(p)
     write_table(tables / "causal_effects.csv", effect_rows)
+    write_table(tables / "causal_paired_documents.csv", causal_documents)
+    write_table(tables / "causal_by_source_domain.csv", source_effects)
+    write_table(tables / "intervention_diagnostics.csv", diagnostic_rows)
+    write_table(tables / "intervention_gate_diagnostics.csv", gate_diagnostics)
     balance = []
     if selection_file.exists():
         for item in selection["domains"]:
@@ -467,6 +553,10 @@ def analyse_study(config):
                 }
             )
     write_table(tables / "control_balance.csv", balance)
+    format_rows, alignment_rows, pair_rows = analyse_formats(config)
+    write_table(tables / "format_effects.csv", format_rows)
+    write_table(tables / "format_alignment.csv", alignment_rows)
+    write_table(tables / "format_paired_documents.csv", pair_rows)
     write_json(
         tables / "analysis_record.json",
         {
@@ -483,7 +573,128 @@ def analyse_study(config):
             },
         },
     )
-    return {"completed_models": len(observed), "causal_endpoints": len(effect_rows)}
+    from moe_pilot.study_figures import build_study_figures
+
+    build_study_figures(root)
+    from moe_pilot.study_publication import write_reader_analysis
+
+    write_reader_analysis(root)
+    return {
+        "completed_models": len(observed),
+        "causal_endpoints": len(effect_rows),
+        "format_endpoints": len(format_rows),
+    }
+
+
+def format_pair_indices(records):
+    """Pair one plain/chat observation per original content group, or fail."""
+    groups = {}
+    for index, row in enumerate(records):
+        key = row["source_id"]
+        variant = row["format_variant"]
+        if variant not in ("plain", "chat") or variant in groups.setdefault(key, {}):
+            raise ValueError("Formatting observations require unique plain/chat pairs")
+        groups[key][variant] = index
+    pairs = []
+    content_groups = set()
+    for variants in groups.values():
+        if set(variants) != {"plain", "chat"}:
+            raise ValueError("Formatting observations contain an incomplete pair")
+        first, second = variants["plain"], variants["chat"]
+        a, b = records[first], records[second]
+        for key in ("source", "domain", "group_id", "aligned_tokens_sha256", "alignment_coverage"):
+            if a[key] != b[key]:
+                raise ValueError("Formatting pairs must preserve content and token alignment")
+        if a["group_id"] in content_groups:
+            raise ValueError("Repeated content groups need cluster-aware inference")
+        content_groups.add(a["group_id"])
+        pairs.append((first, second))
+    return np.asarray(pairs, dtype=int).reshape(-1, 2)
+
+
+def analyse_formats(config):
+    from moe_pilot.study import digest, load_observations
+
+    rows, alignments, documents = [], [], []
+    root = config.paths.output
+    for path in sorted(root.glob("*/evaluation-paired-chat/manifest.json")):
+        if read_json(path).get("status") != "complete":
+            continue
+        arrays, record = load_observations(path.parent)
+        plan = read_json(root / "format-plan.json")
+        if record["identity"]["format_plan"] != digest(plan):
+            raise ValueError("Format observations differ from the frozen format plan")
+        pairs = format_pair_indices(record["records"])
+        plain, chat = pairs[:, 0], pairs[:, 1]
+        if not np.array_equal(
+            arrays["routing_token_counts"][plain], arrays["routing_token_counts"][chat]
+        ):
+            raise ValueError("Format pairs have different aligned token counts")
+        _, baseline = load_observations(path.parent.parent / "evaluation")
+        if (
+            record["identity"]["model"] != baseline["identity"]["model"]
+            or record["identity"]["source_rows"] != baseline["identity"]["rows"]
+        ):
+            raise ValueError(
+                "Format follow-up does not preserve its plain baseline checkpoint and cohort"
+            )
+        metadata = [record["records"][index] for index in plain]
+        labels = np.array([row["domain"] for row in metadata])
+        sources = np.array([row["source"] for row in metadata])
+        divergence, _ = stage_internal_comparison(
+            arrays["mass"][0, plain],
+            arrays["mass"][0, chat],
+            arrays["norm"][0, plain],
+            arrays["norm"][0, chat],
+        )
+        outcomes = {
+            "accuracy": arrays["choice_accuracy"][chat] - arrays["choice_accuracy"][plain],
+            "choice_nll": arrays["choice_log_probability"][plain]
+            - arrays["choice_log_probability"][chat],
+            "aligned_loss": arrays["aligned_loss"][chat] - arrays["aligned_loss"][plain],
+            "routing_jsd_bits": divergence,
+        }
+        name = path.parent.parent.name
+        for metric, values in outcomes.items():
+            estimate, low, high = stratified_mean_interval(
+                values,
+                labels,
+                sources,
+                seed=config.analysis.seed,
+                samples=config.analysis.bootstrap_samples,
+            )
+            rows.append(
+                {
+                    "model": name,
+                    "metric": metric,
+                    "estimate": estimate,
+                    "ci_low": low,
+                    "ci_high": high,
+                    "pairs": len(pairs),
+                    "interpretation": "exploratory within-checkpoint native-chat protocol comparison; unadjusted intervals",
+                }
+            )
+        for index, row in enumerate(metadata):
+            documents.append(
+                {
+                    "model": name,
+                    **row,
+                    **{key: float(values[index]) for key, values in outcomes.items()},
+                }
+            )
+        alignments.append(
+            {
+                "model": name,
+                "pairs": len(pairs),
+                "minimum_question_coverage": min(row["alignment_coverage"] for row in metadata),
+                "mean_question_coverage": float(
+                    np.mean([row["alignment_coverage"] for row in metadata])
+                ),
+                "matching_token_spans": len(pairs),
+                "producer_identity_sha256": digest(record["identity"]),
+            }
+        )
+    return rows, alignments, documents
 
 
 def stratified_mean_interval(values, labels, sources, *, seed, samples=10000):
